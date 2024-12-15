@@ -1,6 +1,15 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/User';
+import mongoose from 'mongoose';
+import { User, IUser } from '../models/User';
+
+const generateToken = (userId: mongoose.Types.ObjectId | string): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET is not defined');
+  }
+  return jwt.sign({ userId: userId.toString() }, secret, { expiresIn: '24h' });
+};
 
 export const authController = {
   // Register new user
@@ -9,28 +18,20 @@ export const authController = {
       const { email, password, name } = req.body;
 
       // Check if user already exists
-      const existingUser = await User.findOne({ email });
+      const existingUser = await User.findOne({ email }) as IUser | null;
       if (existingUser) {
         res.status(400).json({ error: 'Email already registered' });
         return;
       }
 
       // Create new user
-      const user = new User({
+      const user = await new User({
         email,
         password,
         name
-      });
+      }).save() as IUser;
 
-      await user.save();
-
-      // Generate JWT token
-      const secret = process.env.JWT_SECRET;
-      if (!secret) {
-        throw new Error('JWT_SECRET is not defined');
-      }
-
-      const token = jwt.sign({ userId: user._id }, secret, { expiresIn: '24h' });
+      const token = generateToken(user._id.toString());
 
       res.status(201).json({
         user: {
@@ -51,7 +52,7 @@ export const authController = {
       const { email, password } = req.body;
 
       // Find user
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email }) as IUser | null;
       if (!user) {
         res.status(401).json({ error: 'Invalid credentials' });
         return;
@@ -64,13 +65,7 @@ export const authController = {
         return;
       }
 
-      // Generate JWT token
-      const secret = process.env.JWT_SECRET;
-      if (!secret) {
-        throw new Error('JWT_SECRET is not defined');
-      }
-
-      const token = jwt.sign({ userId: user._id }, secret, { expiresIn: '24h' });
+      const token = generateToken(user._id.toString());
 
       res.json({
         user: {
@@ -88,7 +83,12 @@ export const authController = {
   // Get current user
   getCurrentUser: async (req: Request, res: Response): Promise<void> => {
     try {
-      const user = req.user;
+      const user = req.user as IUser;
+      if (!user) {
+        res.status(401).json({ error: 'User not authenticated' });
+        return;
+      }
+      
       res.json({
         user: {
           id: user._id,
@@ -98,6 +98,24 @@ export const authController = {
       });
     } catch (error) {
       res.status(500).json({ error: 'Error getting user data' });
+    }
+  },
+
+  // Google OAuth callback
+  googleCallback: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const user = req.user as IUser;
+      if (!user) {
+        res.status(401).json({ error: 'Authentication failed' });
+        return;
+      }
+
+      const token = generateToken(user._id);
+
+      // Redirect to frontend with token
+      res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}`);
+    } catch (error) {
+      res.status(500).json({ error: 'Error processing Google authentication' });
     }
   }
 };

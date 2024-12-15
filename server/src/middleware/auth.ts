@@ -1,17 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/User';
+import { User, IUser } from '../models/User';
 
 interface JwtPayload {
   userId: string;
-}
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: any;
-    }
-  }
 }
 
 export const auth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

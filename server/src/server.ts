@@ -11,6 +11,7 @@ import authRoutes from './routes/authRoutes';
 import './config/passport';
 
 const app: Express = express();
+export { app };  // Export for testing
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -42,13 +43,19 @@ app.use(errorHandler);
 const startServer = async (): Promise<void> => {
   try {
     await connectDB();
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-    });
+    // Only start the server if we're not in a test environment
+    if (process.env.NODE_ENV !== 'test') {
+      app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+      });
+    }
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
   }
 };
 
-startServer();
+// Only start the server if this file is being run directly
+if (require.main === module) {
+  startServer();
+}

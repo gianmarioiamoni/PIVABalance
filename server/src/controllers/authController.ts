@@ -14,24 +14,21 @@ const generateToken = (userId: mongoose.Types.ObjectId | string): string => {
 export const authController = {
   // Register new user
   register: async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { email, password, name } = req.body;
+    const { email, password, name } = req.body;
 
+    try {
       // Check if user already exists
-      const existingUser = await User.findOne({ email }) as IUser | null;
+      const existingUser = await User.findOne({ email });
       if (existingUser) {
-        res.status(400).json({ error: 'Email already registered' });
+        res.status(400).json({ message: 'Email already registered' });
         return;
       }
 
       // Create new user
-      const user = await new User({
-        email,
-        password,
-        name
-      }).save() as IUser;
+      const user = new User({ email, password, name });
+      await user.save();
 
-      const token = generateToken(user._id.toString());
+      const token = generateToken(user._id);
 
       res.status(201).json({
         user: {
@@ -42,30 +39,31 @@ export const authController = {
         token
       });
     } catch (error) {
-      res.status(500).json({ error: 'Error registering user' });
+      console.error('Registration error:', error);
+      res.status(500).json({ message: 'Error registering user' });
     }
   },
 
   // Login user
   login: async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { email, password } = req.body;
+    const { email, password } = req.body;
 
+    try {
       // Find user
-      const user = await User.findOne({ email }) as IUser | null;
+      const user = await User.findOne({ email });
       if (!user) {
-        res.status(401).json({ error: 'Invalid credentials' });
+        res.status(401).json({ message: 'Invalid email or password' });
         return;
       }
 
       // Check password
       const isMatch = await user.comparePassword(password);
       if (!isMatch) {
-        res.status(401).json({ error: 'Invalid credentials' });
+        res.status(401).json({ message: 'Invalid email or password' });
         return;
       }
 
-      const token = generateToken(user._id.toString());
+      const token = generateToken(user._id);
 
       res.json({
         user: {
@@ -76,7 +74,8 @@ export const authController = {
         token
       });
     } catch (error) {
-      res.status(500).json({ error: 'Error logging in' });
+      console.error('Login error:', error);
+      res.status(500).json({ message: 'Error logging in' });
     }
   },
 
@@ -85,19 +84,18 @@ export const authController = {
     try {
       const user = req.user as IUser;
       if (!user) {
-        res.status(401).json({ error: 'User not authenticated' });
+        res.status(401).json({ message: 'Not authenticated' });
         return;
       }
       
       res.json({
-        user: {
-          id: user._id,
-          email: user.email,
-          name: user.name
-        }
+        id: user._id,
+        email: user.email,
+        name: user.name
       });
     } catch (error) {
-      res.status(500).json({ error: 'Error getting user data' });
+      console.error('Get current user error:', error);
+      res.status(500).json({ message: 'Error getting user data' });
     }
   },
 
@@ -106,16 +104,15 @@ export const authController = {
     try {
       const user = req.user as IUser;
       if (!user) {
-        res.status(401).json({ error: 'Authentication failed' });
+        res.redirect(`${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`);
         return;
       }
 
       const token = generateToken(user._id);
-
-      // Redirect to frontend with token
-      res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}`);
+      res.redirect(`${process.env.CLIENT_URL}/dashboard?token=${token}`);
     } catch (error) {
-      res.status(500).json({ error: 'Error processing Google authentication' });
+      console.error('Google callback error:', error);
+      res.redirect(`${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`);
     }
   }
 };

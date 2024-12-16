@@ -8,10 +8,12 @@ interface JwtPayload {
 
 export const auth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    // Try to get token from Authorization header or query parameter
+    let token = req.header('Authorization')?.replace('Bearer ', '') || req.query.token as string;
 
     if (!token) {
-      throw new Error();
+      res.status(401).json({ message: 'Authentication token missing' });
+      return;
     }
 
     const secret = process.env.JWT_SECRET;
@@ -23,12 +25,14 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
     const user = await User.findById(decoded.userId);
 
     if (!user) {
-      throw new Error();
+      res.status(401).json({ message: 'User not found' });
+      return;
     }
 
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Please authenticate' });
+    console.error('Authentication error:', error);
+    res.status(401).json({ message: 'Please authenticate' });
   }
 };

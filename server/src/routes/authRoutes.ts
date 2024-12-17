@@ -3,6 +3,7 @@ import passport from 'passport';
 import { authController } from '../controllers/authController';
 import { auth } from '../middleware/auth';
 import { body } from 'express-validator';
+import { Request, Response, NextFunction } from 'express';
 import { validateRequest } from '../middleware/validateRequest';
 
 const router = express.Router();
@@ -41,12 +42,26 @@ router.post('/logout', authController.logout);
 // Google OAuth routes
 router.get(
   '/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+  (req: Request, res: Response, next: NextFunction) => {
+    const state = Math.random().toString(36).substring(7);
+    (req.session as any).oauthState = state;
+    passport.authenticate('google', { 
+      scope: ['profile', 'email'],
+      session: false,
+      state,
+      prompt: 'select_account'
+    })(req, res, next);
+  }
 );
 
 router.get(
   '/google/callback',
-  passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+  (req: Request, res: Response, next: NextFunction) => {
+    passport.authenticate('google', { 
+      session: false,
+      failureRedirect: `${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`
+    })(req, res, next);
+  },
   authController.googleCallback
 );
 

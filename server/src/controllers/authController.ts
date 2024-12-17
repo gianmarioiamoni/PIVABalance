@@ -102,7 +102,19 @@ export const authController = {
   // Logout user
   logout: async (req: Request, res: Response): Promise<void> => {
     try {
-      res.status(200).json({ message: 'Logged out successfully' });
+      // Clear the session
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Session destruction error:', err);
+          res.status(500).json({ message: 'Error during logout' });
+          return;
+        }
+        
+        // Clear the auth cookie
+        res.clearCookie('token');
+        
+        res.status(200).json({ message: 'Logged out successfully' });
+      });
     } catch (error) {
       console.error('Logout error:', error);
       res.status(500).json({ message: 'Error during logout' });
@@ -114,12 +126,28 @@ export const authController = {
     try {
       const user = req.user as IUser;
       if (!user) {
+        console.error('No user found in Google callback');
         res.redirect(`${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`);
         return;
       }
 
+      console.log('Google callback - generating token for user:', user._id);
       const token = generateToken(user._id);
-      res.redirect(`${process.env.CLIENT_URL}/dashboard?token=${token}`);
+
+      // Set token in cookie for added security
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+      
+      // Also pass token in URL for immediate client-side access
+      const dashboardUrl = new URL('/dashboard', process.env.CLIENT_URL);
+      dashboardUrl.searchParams.set('token', token);
+      
+      console.log('Redirecting to:', dashboardUrl.toString());
+      res.redirect(dashboardUrl.toString());
     } catch (error) {
       console.error('Google callback error:', error);
       res.redirect(`${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`);

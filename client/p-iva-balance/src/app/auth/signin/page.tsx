@@ -46,8 +46,17 @@ export default function SignIn() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    window.location.href = 'http://localhost:5000/api/auth/google';
+  const handleGoogleSignIn = async () => {
+    try {
+      // Store current URL to handle the redirect after Google auth
+      localStorage.setItem('preAuthPath', window.location.pathname);
+      
+      // Redirect to Google auth
+      window.location.href = 'http://localhost:5000/api/auth/google';
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      setError('Failed to initiate Google sign in');
+    }
   };
 
   return (

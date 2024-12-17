@@ -3,30 +3,18 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useAuthContext } from '../providers/AuthProvider';
 
-interface NavbarProps {
-  user?: {
-    name: string;
-    email: string;
-  } | null;
-}
-
-export default function Navbar({ user }: NavbarProps) {
+export default function Navbar() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, logout } = useAuthContext();
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        localStorage.removeItem('token'); // Remove the JWT token
-        router.push('/');
-        router.refresh();
-      }
+      await logout();
+      router.push('/');
+      router.refresh();
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -60,7 +48,7 @@ export default function Navbar({ user }: NavbarProps) {
               <div className="space-x-4">
                 <Link
                   href="/auth/signin"
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
                 >
                   Sign In
                 </Link>

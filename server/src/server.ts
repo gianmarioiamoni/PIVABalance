@@ -5,6 +5,7 @@ dotenv.config();
 import express, { Express } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import session from 'express-session';
 import passport from 'passport';
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/authRoutes';
@@ -21,8 +22,23 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json());
+
+// Session configuration - must be before passport
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Passport middleware
 app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
 app.use('/api/auth', authRoutes);

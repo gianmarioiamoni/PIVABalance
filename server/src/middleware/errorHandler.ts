@@ -1,10 +1,20 @@
-import { Request, Response, NextFunction } from 'express';
+import { ErrorRequestHandler } from 'express';
+import { Request, Response, NextFunction } from 'express-serve-static-core';
+import { IUser } from '../models/User';
+
+// Extend Express Request
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: IUser;
+    token?: string;
+  }
+}
 
 interface CustomError extends Error {
   statusCode?: number;
 }
 
-export const errorHandler = (
+const errorHandler: ErrorRequestHandler<any, any, any, any, Record<string, any>> = (
   err: CustomError,
   req: Request,
   res: Response,
@@ -19,4 +29,4 @@ export const errorHandler = (
   });
 };
 
-export {};
+export { errorHandler };

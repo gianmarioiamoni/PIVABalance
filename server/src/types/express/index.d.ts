@@ -12,6 +12,10 @@ declare global {
       session: Session & {
         oauthState?: string;
       }
+      user?: {
+        userId: string;
+      };
+      token?: string;
     }
   }
 }

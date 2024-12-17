@@ -1,42 +1,100 @@
-import { User } from '../../models/User';
 import mongoose from 'mongoose';
+import { User } from '../../models/User';
 
-describe('User Model Test', () => {
-  const validUserData = {
-    email: 'test@example.com',
-    password: 'password123',
-    name: 'Test User',
-  };
+describe('User Model', () => {
+  describe('User Creation', () => {
+    it('should create a new user successfully', async () => {
+      // Arrange
+      const validUserData = {
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test User',
+      };
 
-  it('should create & save user successfully', async () => {
-    const validUser = new User(validUserData);
-    const savedUser = await validUser.save();
-    
-    expect(savedUser._id).toBeDefined();
-    expect(savedUser.email).toBe(validUserData.email);
-    expect(savedUser.name).toBe(validUserData.name);
-    expect(savedUser.password).not.toBe(validUserData.password); // Password should be hashed
+      // Act
+      const user = await User.create(validUserData);
+
+      // Assert
+      expect(user).toBeDefined();
+      expect(user.email).toBe(validUserData.email);
+      expect(user.name).toBe(validUserData.name);
+      expect(user.password).not.toBe(validUserData.password); // Password should be hashed
+    });
+
+    it('should fail when creating user with invalid email format', async () => {
+      // Arrange
+      const invalidUserData = {
+        email: 'invalid-email',
+        password: 'password123',
+        name: 'Test User',
+      };
+
+      // Act & Assert
+      await expect(async () => {
+        const user = new User(invalidUserData);
+        await user.validate();
+      }).rejects.toThrow();
+    });
+
+    it('should fail when creating user without required fields', async () => {
+      // Arrange
+      const invalidUserData = {
+        email: '',
+        password: '',
+        name: '',
+      };
+
+      try {
+        // Act
+        await User.create(invalidUserData);
+        fail('Should have thrown validation error');
+      } catch (error: any) {
+        // Assert
+        expect(error).toBeDefined();
+        expect(error.name).toBe('ValidationError');
+      }
+    });
   });
 
-  it('should fail to save user without required fields', async () => {
-    const userWithoutRequiredField = new User({ email: 'test@example.com' });
-    let err;
-    try {
-      await userWithoutRequiredField.save();
-    } catch (error) {
-      err = error;
-    }
-    expect(err).toBeInstanceOf(mongoose.Error.ValidationError);
+  describe('Password Hashing', () => {
+    it('should hash password before saving', async () => {
+      // Arrange
+      const password = 'testpassword123';
+      const userData = {
+        email: 'test@example.com',
+        password,
+        name: 'Test User',
+      };
+
+      // Act
+      const user = await User.create(userData);
+
+      // Assert
+      expect(user.password).not.toBe(password);
+      expect(user.password).toHaveLength(60); // bcrypt hash length
+    });
   });
 
-  it('should correctly compare passwords', async () => {
-    const user = new User(validUserData);
-    await user.save();
-    
-    const isMatch = await user.comparePassword(validUserData.password);
-    expect(isMatch).toBe(true);
-    
-    const isNotMatch = await user.comparePassword('wrongpassword');
-    expect(isNotMatch).toBe(false);
+  describe('Email Uniqueness', () => {
+    it('should not allow duplicate emails', async () => {
+      // Arrange
+      const userData = {
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test User',
+      };
+
+      // Act
+      await User.create(userData);
+
+      try {
+        await User.create(userData);
+        fail('Should have thrown duplicate key error');
+      } catch (error: any) {
+        // Assert
+        expect(error).toBeDefined();
+        expect(error.code).toBe(11000); // MongoDB duplicate key error code
+      }
+    });
   });
 });

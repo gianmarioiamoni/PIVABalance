@@ -1,18 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import { User, IUser } from '../models/User';
 
-interface JwtPayload {
-  userId: string;
-}
+// Store invalidated tokens
+const invalidatedTokens = new Set<string>();
 
 export const auth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    // Try to get token from Authorization header or query parameter
-    let token = req.header('Authorization')?.replace('Bearer ', '') || req.query.token as string;
-
-    if (!token) {
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
       res.status(401).json({ message: 'Authentication token missing' });
+      return;
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+
+    // Check if token is invalidated
+    if (invalidatedTokens.has(token)) {
+      res.status(401).json({ message: 'Please authenticate' });
       return;
     }
 
@@ -21,18 +27,38 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
       throw new Error('JWT_SECRET is not defined');
     }
 
-    const decoded = jwt.verify(token, secret) as JwtPayload;
-    const user = await User.findById(decoded.userId);
+    try {
+      const decoded = jwt.verify(token, secret) as { userId: string };
+      const user = await User.findById(decoded.userId);
+      
+      if (!user) {
+        res.status(401).json({ message: 'User not found' });
+        return;
+      }
 
-    if (!user) {
-      res.status(401).json({ message: 'User not found' });
-      return;
+      req.user = user;
+      req.token = token;
+      next();
+    } catch (jwtError) {
+      res.status(401).json({ message: 'Please authenticate' });
     }
-
-    req.user = user;
-    next();
   } catch (error) {
     console.error('Authentication error:', error);
     res.status(401).json({ message: 'Please authenticate' });
   }
 };
+
+export const invalidateToken = (token: string): void => {
+  if (!token) return;
+  
+  const cleanToken = token.replace('Bearer ', '');
+  invalidatedTokens.add(cleanToken);
+};
+
+// Clean up old tokens periodically
+const cleanup = setInterval(() => {
+  invalidatedTokens.clear();
+}, 24 * 60 * 60 * 1000);
+
+// Prevent the timer from keeping the process alive
+cleanup.unref();

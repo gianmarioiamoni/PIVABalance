@@ -23,6 +23,7 @@ export default function Navbar({ user }: NavbarProps) {
       });
 
       if (response.ok) {
+        localStorage.removeItem('token'); // Remove the JWT token
         router.push('/');
         router.refresh();
       }

@@ -1,53 +1,33 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-
-interface User {
-  name: string;
-  email: string;
-}
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Dashboard() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          router.push('/auth/signin');
-          return;
-        }
+    if (!loading && !user) {
+      router.push('/auth/signin');
+    }
+  }, [loading, user, router]);
 
-        const response = await fetch('http://localhost:5000/api/auth/me', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-          credentials: 'include',
-        });
-
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        } else {
-          localStorage.removeItem('token'); // Clear invalid token
-          router.push('/auth/signin');
-        }
-      } catch (error) {
-        console.error('Failed to fetch user:', error);
-        localStorage.removeItem('token'); // Clear token on error
-        router.push('/auth/signin');
-      }
-    };
-
-    fetchUser();
-  }, [router]);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar user={null} />
+        <div className="flex justify-center items-center h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
-    return <div>Loading...</div>;
+    return null; // Will redirect in useEffect
   }
 
   return (

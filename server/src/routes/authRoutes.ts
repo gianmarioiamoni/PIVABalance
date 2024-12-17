@@ -36,6 +36,7 @@ const loginValidation = [
 router.post('/register', registerValidation, validateRequest, authController.register);
 router.post('/login', loginValidation, validateRequest, authController.login);
 router.get('/me', auth, authController.getCurrentUser);
+router.post('/logout', authController.logout);
 
 // Google OAuth routes
 router.get(

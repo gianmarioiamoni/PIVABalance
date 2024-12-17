@@ -48,7 +48,7 @@ export default function Navbar() {
               <div className="space-x-4">
                 <Link
                   href="/auth/signin"
-                  className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium"
                 >
                   Sign In
                 </Link>

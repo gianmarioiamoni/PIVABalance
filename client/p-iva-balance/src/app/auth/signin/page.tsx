@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function SignIn() {
   const router = useRouter();
+  const { checkAuth } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -36,7 +38,10 @@ export default function SignIn() {
       if (data.token) {
         // Store the token
         localStorage.setItem('token', data.token);
-        router.push('/dashboard');
+        // Update auth state before navigation
+        await checkAuth();
+        // Instead of using router.push, redirect with window.location
+        window.location.href = '/dashboard';
       } else {
         setError('No authentication token received');
       }

@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function SignUp() {
   const router = useRouter();
+  const { checkAuth } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -45,9 +47,22 @@ export default function SignUp() {
       }
 
       if (data.token) {
-        // Store the token
-        localStorage.setItem('token', data.token);
-        router.push('/dashboard');
+        try {
+          // Store the token
+          localStorage.setItem('token', data.token);
+          
+          // Update auth state and wait for it to complete
+          await checkAuth();
+          
+          // Small delay to ensure state is propagated
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          // Only redirect after state is updated
+          window.location.href = '/dashboard';
+        } catch (err) {
+          console.error('Error during post-registration:', err);
+          setError('An error occurred after registration');
+        }
       } else {
         setError('No authentication token received');
       }

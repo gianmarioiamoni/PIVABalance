@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { User, IUser } from "../models/User";
 import { invalidateToken } from "../middleware/auth";
 import "express-session";
+import passport from "passport";
 
 // Extend Express Request type to include our user property
 declare module "express" {
@@ -197,5 +198,31 @@ export const authController = {
         `${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`
       );
     }
+  },
+
+  // Google signin
+  handleGoogleSignIn: async (req: Request, res: Response, next: NextFunction) => {
+    const state = Math.random().toString(36).substring(7);
+    (req.session as any).oauthState = state;
+    passport.authenticate('google', { 
+      scope: ['profile', 'email'],
+      session: false,
+      state,
+      prompt: 'select_account'
+    })(req, res, next);
+  },
+
+  // Get Google Callback
+  getGoogleCallback: async (req: Request, res: Response, next: NextFunction) => {
+    passport.authenticate('google', { 
+      session: false,
+      failureRedirect: `${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`
+    }, (err, user) => {
+      if (err || !user) {
+        return res.redirect(`${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`);
+      }
+      req.user = user;
+      return authController.googleCallback(req, res);
+    })(req, res, next);
   },
 };

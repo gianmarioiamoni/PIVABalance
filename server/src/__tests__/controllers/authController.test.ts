@@ -4,6 +4,47 @@ import { User } from '../../models/User';
 import jwt from 'jsonwebtoken';
 import { app } from '../../server';
 
+// Mock passport and its strategies
+jest.mock('passport-google-oauth20', () => ({
+  Strategy: jest.fn().mockImplementation(() => {})
+}));
+
+jest.mock('passport', () => {
+  const serializeUserMock = jest.fn();
+  const deserializeUserMock = jest.fn();
+
+  return {
+    use: jest.fn(),
+    authenticate: jest.fn((strategy, options, callback) => (req: any, res: any, next: any) => {
+      if (strategy === 'google') {
+        if (callback) {
+          // Simulate successful authentication for callback route
+          const mockUser = {
+            _id: 'mock_user_id',
+            email: 'test@example.com',
+            name: 'Test User'
+          };
+          callback(null, mockUser);
+        } else {
+          // Simulate redirect to Google for initial auth
+          res.redirect('https://accounts.google.com/o/oauth2/v2/auth');
+        }
+      }
+    }),
+    initialize: jest.fn(() => (req: any, res: any, next: any) => next()),
+    session: jest.fn(() => (req: any, res: any, next: any) => next()),
+    serializeUser: serializeUserMock,
+    deserializeUser: deserializeUserMock
+  };
+});
+
+// Mock process.env
+process.env.GOOGLE_CLIENT_ID = 'mock_client_id';
+process.env.GOOGLE_CLIENT_SECRET = 'mock_client_secret';
+process.env.GOOGLE_CALLBACK_URL = 'mock_callback_url';
+process.env.CLIENT_URL = 'http://localhost:3000';
+process.env.JWT_SECRET = 'test_secret';
+
 describe('Auth Controller', () => {
   describe('User Registration (POST /api/auth/register)', () => {
     it('should register a new user successfully', async () => {
@@ -223,13 +264,53 @@ describe('Auth Controller', () => {
       expect(meResponse.body.message).toBe('Please authenticate');
     });
 
-    it('should handle logout without token', async () => {
+    it('should reject logout without token', async () => {
       // Act
       const response = await request(app).post('/api/auth/logout');
 
       // Assert
-      expect(response.status).toBe(200);
-      expect(response.body.message).toBe('Logged out successfully');
+      expect(response.status).toBe(401);
+      expect(response.body.message).toBe('Authentication token missing');
+    });
+  });
+
+  describe('Google OAuth Authentication', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should initiate Google OAuth flow', async () => {
+      const response = await request(app)
+        .get('/api/auth/google');
+      
+      expect(response.status).toBe(302);
+      expect(response.header.location).toBe('https://accounts.google.com/o/oauth2/v2/auth');
+    });
+
+    it('should handle Google OAuth callback successfully', async () => {
+      const response = await request(app)
+        .get('/api/auth/google/callback')
+        .query({ code: 'mock_auth_code' });
+
+      expect(response.status).toBe(302);
+      expect(response.header.location).toContain('/dashboard');
+      expect(response.header.location).toContain('token=');
+    });
+
+    it('should handle Google OAuth callback failure', async () => {
+      // Override passport authenticate for this test only
+      require('passport').authenticate.mockImplementationOnce(
+        (strategy: any, options: any, callback: (arg0: Error, arg1: null) => void) => (req: any, res: any, next: any) => {
+          callback(new Error('Authentication failed'), null);
+        }
+      );
+
+      const response = await request(app)
+        .get('/api/auth/google/callback')
+        .query({ error: 'access_denied' });
+
+      expect(response.status).toBe(302);
+      expect(response.header.location).toBe(`${process.env.CLIENT_URL}/auth/signin?error=Authentication%20failed`);
     });
   });
 });

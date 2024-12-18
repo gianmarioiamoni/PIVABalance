@@ -1,13 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function SignIn() {
-  const router = useRouter();
-  const { checkAuth } = useAuth();
+  const { refetch } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -39,7 +37,7 @@ export default function SignIn() {
         // Store the token
         localStorage.setItem('token', data.token);
         // Update auth state before navigation
-        await checkAuth();
+        await refetch();
         // Instead of using router.push, redirect with window.location
         window.location.href = '/dashboard';
       } else {

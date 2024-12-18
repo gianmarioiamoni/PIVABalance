@@ -7,37 +7,32 @@ import { useAuth } from '@/hooks/useAuth';
 export default function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, loading } = useAuth();
+  const { user, isLoading, setToken } = useAuth();
 
   useEffect(() => {
     const token = searchParams.get('token');
     if (token) {
-      localStorage.setItem('token', token);
+      setToken(token);
       // Clean up URL
       window.history.replaceState({}, '', '/dashboard');
-      
-      // Force refresh auth state
-      window.location.reload();
       return;
     }
 
-    if (!loading && !user) {
+    if (!isLoading && !user) {
       router.push('/auth/signin');
     }
-  }, [loading, user, router, searchParams]);
+  }, [searchParams, user, isLoading, router, setToken]);
 
-  if (loading || searchParams.get('token')) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="flex justify-center items-center h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div>Loading...</div>
       </div>
     );
   }
 
   if (!user) {
-    return null; // Will redirect in useEffect
+    return null;
   }
 
   return (

@@ -2,24 +2,23 @@
 
 import { createContext, useContext, ReactNode } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { User } from '../services/authService';
 
 interface AuthContextType {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-  } | null;
-  loading: boolean;
+  user: User | null | undefined;
+  isLoading: boolean;
+  checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
+  refetch: () => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { user, loading, logout } = useAuth();
+  const { user, isLoading, checkAuth, logout, refetch } = useAuth();
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, checkAuth, logout, refetch }}>
       {children}
     </AuthContext.Provider>
   );

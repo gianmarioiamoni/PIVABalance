@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useAuthContext } from '@/providers/AuthProvider';
 
 export default function Home() {
-  const { user, loading } = useAuthContext();
+  const { user, isLoading } = useAuthContext();
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="flex justify-center items-center h-screen">

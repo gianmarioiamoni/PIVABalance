@@ -1,69 +1,39 @@
-import { useState, useEffect, useCallback } from 'react';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
+import { useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { authService, User } from '../services/authService';
+import { useLocalStorage } from './useLocalStorage';
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const [token, setToken, isLoaded] = useLocalStorage('token');
+  
+  const { data: user, isLoading, refetch } = useQuery<User | null>({
+    queryKey: ['auth'],
+    queryFn: authService.checkAuth,
+    enabled: isLoaded && !!token,
+    retry: false,
+    staleTime: Infinity, // Only refetch when we explicitly invalidate
+  });
 
   const checkAuth = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch('http://localhost:5000/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else {
-        localStorage.removeItem('token');
-        setUser(null);
-      }
+      await queryClient.invalidateQueries({ queryKey: ['auth'] });
     } catch (error) {
       console.error('Auth check failed:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
     }
-  }, []);
+  }, [queryClient]);
 
   const logout = useCallback(async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+    setToken(null);
+    await queryClient.invalidateQueries({ queryKey: ['auth'] });
+  }, [queryClient, setToken]);
 
-      if (response.ok) {
-        localStorage.removeItem('token');
-        setUser(null);
-      }
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  return { user, loading, logout, checkAuth };
+  return {
+    user,
+    isLoading: !isLoaded || isLoading,
+    checkAuth,
+    logout,
+    refetch,
+    setToken
+  };
 }

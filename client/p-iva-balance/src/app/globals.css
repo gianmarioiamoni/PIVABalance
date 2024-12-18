@@ -2,15 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Color Theme Swatches in Hex */
+.Neutral-Beige-Color-Palette-1-hex { color: #9C8867; }
+.Neutral-Beige-Color-Palette-2-hex { color: #C5BAA7; }
+.Neutral-Beige-Color-Palette-3-hex { color: #D9DACC; }
+.Neutral-Beige-Color-Palette-4-hex { color: #AEACA3; }
+.Neutral-Beige-Color-Palette-5-hex { color: #BDBBB7; }
+
+/* Color Theme Swatches in RGBA */
+.Neutral-Beige-Color-Palette-1-rgba { color: rgba(156, 136, 103, 1); }
+.Neutral-Beige-Color-Palette-2-rgba { color: rgba(197, 186, 167, 1); }
+.Neutral-Beige-Color-Palette-3-rgba { color: rgba(217, 218, 204, 1); }
+.Neutral-Beige-Color-Palette-4-rgba { color: rgba(174, 172, 163, 1); }
+.Neutral-Beige-Color-Palette-5-rgba { color: rgba(189, 187, 183, 1); }
+
+/* Color Theme Swatches in HSLA */
+.Neutral-Beige-Color-Palette-1-hsla { color: hsla(37, 21, 50, 1); }
+.Neutral-Beige-Color-Palette-2-hsla { color: hsla(37, 20, 71, 1); }
+.Neutral-Beige-Color-Palette-3-hsla { color: hsla(64, 15, 82, 1); }
+.Neutral-Beige-Color-Palette-4-hsla { color: hsla(49, 6, 66, 1); }
+.Neutral-Beige-Color-Palette-5-hsla { color: hsla(39, 4, 72, 1); }
+
+
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #D9DACC;
+  --foreground: #9C8867;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: gray-;
+    --foreground: #9C8867;
   }
 }
 

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import api from './api';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -10,12 +11,45 @@ const axiosInstance = axios.create({
 
 export interface User {
   id: string;
-  name: string;
   email: string;
+  name: string;
+}
+
+export interface SignInCredentials {
+  email: string;
+  password: string;
+}
+
+export interface SignUpCredentials extends SignInCredentials {
+  name: string;
 }
 
 class AuthService {
   private baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+  async signIn(credentials: SignInCredentials): Promise<{ token: string; user: User }> {
+    const response = await axiosInstance.post('/auth/login', credentials, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = response.data;
+    localStorage.setItem('token', data.token);
+    return data;
+  }
+
+  async signUp(credentials: SignUpCredentials): Promise<{ token: string; user: User }> {
+    const response = await axiosInstance.post('/auth/register', credentials, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = response.data;
+    localStorage.setItem('token', data.token);
+    return data;
+  }
 
   async checkAuth(): Promise<User | null> {
     const token = localStorage.getItem('token');
@@ -38,21 +72,6 @@ class AuthService {
       localStorage.removeItem('token');
       return null;
     }
-  }
-
-  async login(email: string, password: string): Promise<User> {
-    const response = await axiosInstance.post('/auth/login', {
-      email,
-      password,
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    const data = response.data;
-    localStorage.setItem('token', data.token);
-    return data.user;
   }
 
   async logout(): Promise<void> {

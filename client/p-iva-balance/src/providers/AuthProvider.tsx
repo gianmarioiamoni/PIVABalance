@@ -7,7 +7,7 @@ import { User } from '../services/authService';
 interface AuthContextType {
   user: User | null | undefined;
   isLoading: boolean;
-  checkAuth: () => Promise<void>;
+  checkAuth: () => Promise<User | null | undefined>;
   logout: () => Promise<void>;
   refetch: () => Promise<any>;
 }

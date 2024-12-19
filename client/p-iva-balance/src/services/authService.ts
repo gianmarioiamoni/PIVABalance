@@ -1,12 +1,15 @@
 import axios from 'axios';
 import api from './api';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 // Configure axios defaults
 const axiosInstance = axios.create({
   baseURL: API_URL,
-  withCredentials: true, 
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
 export interface User {
@@ -25,29 +28,21 @@ export interface SignUpCredentials extends SignInCredentials {
 }
 
 class AuthService {
-  private baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-
   async signIn(credentials: SignInCredentials): Promise<{ token: string; user: User }> {
-    const response = await axiosInstance.post('/auth/login', credentials, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
+    const response = await axiosInstance.post('/api/auth/login', credentials);
     const data = response.data;
-    localStorage.setItem('token', data.token);
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+    }
     return data;
   }
 
   async signUp(credentials: SignUpCredentials): Promise<{ token: string; user: User }> {
-    const response = await axiosInstance.post('/auth/register', credentials, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
+    const response = await axiosInstance.post('/api/auth/register', credentials);
     const data = response.data;
-    localStorage.setItem('token', data.token);
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+    }
     return data;
   }
 
@@ -56,7 +51,7 @@ class AuthService {
     if (!token) return null;
 
     try {
-      const response = await axiosInstance.get('/auth/me', {
+      const response = await axiosInstance.get('/api/auth/me', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -78,7 +73,7 @@ class AuthService {
     const token = localStorage.getItem('token');
     
     try {
-      await axiosInstance.post('/auth/logout', null, {
+      await axiosInstance.post('/api/auth/logout', null, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

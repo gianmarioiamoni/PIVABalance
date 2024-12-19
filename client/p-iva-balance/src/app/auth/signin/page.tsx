@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useSignIn } from '@/hooks/useSignIn';
+import { sanitizeInput, escapeHtml } from '@/utils/security';
 
 export default function SignIn() {
   const { signIn, isLoading, error } = useSignIn();
@@ -20,7 +21,7 @@ export default function SignIn() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: sanitizeInput(value)
     }));
   };
 
@@ -41,7 +42,7 @@ export default function SignIn() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                <span className="block sm:inline">{error}</span>
+                <span className="block sm:inline">{escapeHtml(error)}</span>
               </div>
             )}
             

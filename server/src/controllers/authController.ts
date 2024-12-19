@@ -5,6 +5,7 @@ import { User, IUser } from "../models/User";
 import { invalidateToken } from "../middleware/auth";
 import "express-session";
 import passport from "passport";
+import { sanitizeUserInput } from "../utils/sanitization";
 
 // Extend Express Request type to include our user property
 declare module "express" {
@@ -25,18 +26,22 @@ const generateToken = (userId: mongoose.Types.ObjectId | string): string => {
 export const authController = {
   // Register new user
   register: async (req: Request, res: Response): Promise<void> => {
-    const { email, password, name } = req.body;
-
     try {
+      const { email, password, name } = sanitizeUserInput.sanitizeObject(req.body);
+
       // Check if user already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        res.status(400).json({ message: "Email already registered" });
+        res.status(400).json({ success: false, message: "Email already registered" });
         return;
       }
 
       // Create new user
-      const user = new User({ email, password, name });
+      const user = new User({ 
+        email: sanitizeUserInput.email(email),
+        password: password, // La password viene già hashata nel modello
+        name: sanitizeUserInput.name(name)
+      });
 
       try {
         await user.validate();
@@ -44,72 +49,61 @@ export const authController = {
 
         const token = generateToken(user._id);
         res.status(201).json({
+          success: true,
           user: {
             id: user._id,
             email: user.email,
             name: user.name,
           },
-          token,
+          token
         });
       } catch (validationError: any) {
-        res.status(400).json({
-          message: "Validation failed",
-          errors: Object.values(validationError.errors || {}).map(
-            (err: any) => err.message
-          ),
+        res.status(400).json({ 
+          success: false, 
+          message: "Validation failed", 
+          errors: validationError.errors 
         });
       }
     } catch (error) {
-      console.error("Registration error:", error);
-      res.status(500).json({ message: "Error registering user" });
+      res.status(500).json({ 
+        success: false, 
+        message: "Server error during registration" 
+      });
     }
   },
 
   // Login user
   login: async (req: Request, res: Response): Promise<void> => {
-    const { email, password } = req.body;
-
     try {
-      // Basic validation
-      if (!email || !password) {
-        res.status(400).json({
-          message: "Validation failed",
-          errors: ["Email and password are required"],
-        });
-        return;
-      }
+      const { email, password } = sanitizeUserInput.sanitizeObject(req.body);
 
-      // Find user
       const user = await User.findOne({ email });
       if (!user) {
-        res.status(401).json({ message: "Invalid email or password" });
+        res.status(401).json({ success: false, message: "Invalid credentials" });
         return;
       }
 
-      // Check password
-      try {
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
-          res.status(401).json({ message: "Invalid email or password" });
-          return;
-        }
-
-        const token = generateToken(user._id);
-
-        res.json({
-          user: {
-            id: user._id,
-            email: user.email,
-            name: user.name,
-          },
-          token,
-        });
-      } catch (error) {
-        res.status(401).json({ message: "Invalid email or password" });
+      const isMatch = await user.comparePassword(password);
+      if (!isMatch) {
+        res.status(401).json({ success: false, message: "Invalid credentials" });
+        return;
       }
+
+      const token = generateToken(user._id);
+      res.json({
+        success: true,
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name,
+        },
+        token
+      });
     } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ message: "Error logging in" });
+      res.status(500).json({ 
+        success: false, 
+        message: "Server error during login" 
+      });
     }
   },
 

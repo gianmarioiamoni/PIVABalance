@@ -19,7 +19,6 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log('Google profile:', profile);
         
         if (!profile.emails?.[0]?.value) {
           console.error('No email found in Google profile');
@@ -41,12 +40,10 @@ passport.use(
             email: profile.emails[0].value,
             name: profile.displayName,
           });
-          console.log('Created new user:', user);
         } else if (!user.googleId) {
           // If user exists but doesn't have googleId (email signup), add googleId
           user.googleId = profile.id;
           await user.save();
-          console.log('Updated existing user with googleId:', user);
         } else {
           console.log('Found existing user:', user);
         }

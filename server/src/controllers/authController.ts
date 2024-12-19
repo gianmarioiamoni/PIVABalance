@@ -175,7 +175,6 @@ export const authController = {
         return;
       }
 
-      console.log("Google callback - generating token for user:", user._id);
       const token = generateToken(user._id);
 
       // Set token in cookie for added security
@@ -190,7 +189,6 @@ export const authController = {
       const dashboardUrl = new URL("/dashboard", process.env.CLIENT_URL);
       dashboardUrl.searchParams.set("token", token);
 
-      console.log("Redirecting to:", dashboardUrl.toString());
       res.redirect(dashboardUrl.toString());
     } catch (error) {
       console.error("Google callback error:", error);

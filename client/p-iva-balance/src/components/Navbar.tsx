@@ -31,12 +31,12 @@ export default function Navbar() {
           <div className="flex items-center">
             {user ? (
               <div className="flex items-center space-x-4">
-                <span className="text-gray-700">Welcome, {user.name}</span>
+                <span className="text-gray-700">Benvenuto, {user.name}</span>
                 <button
                   onClick={handleLogout}
                   className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium"
                 >
-                  Logout
+                  Esci
                 </button>
                 <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
                   {user.name.charAt(0).toUpperCase()}
@@ -48,13 +48,13 @@ export default function Navbar() {
                   href="/auth/signin"
                   className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium"
                 >
-                  Sign In
+                  Accedi
                 </Link>
                 <Link
                   href="/auth/signup"
                   className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium"
                 >
-                  Sign Up
+                  Registrati
                 </Link>
               </div>
             )}

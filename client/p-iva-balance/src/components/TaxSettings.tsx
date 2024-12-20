@@ -1,5 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { UserSettings, settingsService } from '@/services/settingsService';
+import Tooltip from './Tooltip';
+
+const taxRegimeInfo = (
+  <div className="space-y-4">
+    <div>
+      <h4 className="font-semibold mb-2">Regime forfettario:</h4>
+      <ul className="list-disc pl-4 space-y-2">
+        <li>Reddito imponibile calcolato come percentuale dei ricavi (determinata dal coefficiente di redditività).</li>
+        <li>Imposta sostitutiva al 15% (ridotta al 5% per i primi 5 anni, se soddisfi determinati requisiti).</li>
+        <li>Esenzione IVA: non applichi l'IVA sulle fatture emesse, ma non puoi detrarre quella sugli acquisti.</li>
+        <li>Limiti: ricavi fino a 85.000€ annui (dal 2023).</li>
+      </ul>
+    </div>
+    <div>
+      <h4 className="font-semibold mb-2">Regime ordinario:</h4>
+      <ul className="list-disc pl-4 space-y-2">
+        <li>Reddito imponibile = Ricavi - Costi deducibili.</li>
+        <li>Tassazione basata sull'IRPEF a scaglioni.</li>
+        <li>Applicazione e gestione dell'IVA su fatture emesse e ricevute (con possibilità di detrazione dell'IVA sugli acquisti).</li>
+        <li>Obbligo di tenuta della contabilità completa (registri IVA, libro giornale, ecc.).</li>
+      </ul>
+    </div>
+  </div>
+);
+
+const profitabilityInfo = (
+  <div className="space-y-2">
+    <p>
+      Il coefficiente di redditività serve a determinare la parte del fatturato che viene considerata "reddito imponibile" 
+      su cui calcolare le imposte (imposta sostitutiva) e i contributi previdenziali.
+    </p>
+    <p>
+      Ogni attività economica ha un coefficiente di redditività specifico, stabilito in base al codice ATECO che 
+      identifica la tua attività. Questo coefficiente rappresenta la percentuale del fatturato considerata 
+      effettivamente come "utile" ai fini fiscali.
+    </p>
+    <p>
+      Il restante fatturato viene invece considerato una stima forfettaria dei costi di esercizio e non è tassato.
+    </p>
+  </div>
+);
 
 export default function TaxSettings() {
   const [settings, setSettings] = useState<UserSettings>({
@@ -81,13 +122,16 @@ export default function TaxSettings() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Regime Fiscale
-          </label>
+          <div className="flex items-center">
+            <label className="block text-sm font-medium text-gray-700">
+              Regime Fiscale
+            </label>
+            <Tooltip content={taxRegimeInfo} />
+          </div>
           <select
             value={settings.taxRegime}
             onChange={(e) => handleChange('taxRegime', e.target.value)}
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            className="mt-2 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
           >
             <option value="forfettario">Regime Forfettario</option>
             <option value="ordinario">Regime Ordinario</option>
@@ -97,13 +141,15 @@ export default function TaxSettings() {
         {settings.taxRegime === 'forfettario' && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Imposta Sostitutiva
-              </label>
+              <div className="flex items-center">
+                <label className="block text-sm font-medium text-gray-700">
+                  Imposta Sostitutiva
+                </label>
+              </div>
               <select
                 value={settings.substituteRate}
                 onChange={(e) => handleChange('substituteRate', Number(e.target.value))}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                className="mt-2 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
               >
                 <option value={5}>5% (primi 5 anni)</option>
                 <option value={25}>25% (dal sesto anno)</option>
@@ -111,10 +157,13 @@ export default function TaxSettings() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Coefficiente di Redditività (%)
-              </label>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center">
+                <label className="block text-sm font-medium text-gray-700">
+                  Coefficiente di Redditività (%)
+                </label>
+                <Tooltip content={profitabilityInfo} />
+              </div>
+              <div className="flex items-center space-x-2 mt-2">
                 <input
                   type="number"
                   min="0"
@@ -122,7 +171,7 @@ export default function TaxSettings() {
                   step="0.1"
                   value={settings.profitabilityRate}
                   onChange={(e) => handleChange('profitabilityRate', Number(e.target.value))}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                   placeholder="78"
                 />
                 <button

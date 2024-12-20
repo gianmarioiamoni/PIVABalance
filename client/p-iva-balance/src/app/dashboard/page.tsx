@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import TaxSettings from '@/components/TaxSettings';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -25,8 +26,8 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-300 flex items-center justify-center">
-        <div>Loading...</div>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -36,15 +37,21 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-300">
-      <main className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-gray-900">
-            Welcome, {user.name}!
-          </h1>
-          <p className="mt-3 text-xl text-gray-500">
-            This is your dashboard. Here you can manage your finances and track your business performance.
-          </p>
+    <div className="min-h-screen bg-gray-100">
+      <main className="max-w-7xl mx-auto py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">
+        <div className="space-y-8">
+          <div className="text-center">
+            <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+              Benvenuto, {user.name}!
+            </h1>
+            <p className="mt-3 text-xl text-gray-500">
+              Gestisci le tue impostazioni fiscali e monitora le tue performance finanziarie.
+            </p>
+          </div>
+
+          <div className="mt-8">
+            <TaxSettings />
+          </div>
         </div>
       </main>
     </div>

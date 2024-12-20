@@ -12,6 +12,7 @@ import cookieParser from "cookie-parser";
 import { errorHandler } from "./middleware/errorHandler";
 import { securityHeaders } from "./middleware/securityHeaders";
 import authRoutes from "./routes/authRoutes";
+import settingsRoutes from "./routes/settingsRoutes";
 import "./config/passport";
 
 const app: Express = express();
@@ -73,6 +74,7 @@ app.get('/api/csrf-token', (req, res) => {
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/settings", settingsRoutes);
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

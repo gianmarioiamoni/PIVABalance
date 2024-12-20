@@ -10,12 +10,16 @@ import passport from "passport";
 import csrf from "csurf";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middleware/errorHandler";
+import { securityHeaders } from "./middleware/securityHeaders";
 import authRoutes from "./routes/authRoutes";
 import "./config/passport";
 
 const app: Express = express();
 export { app }; // Export for testing
 const PORT = process.env.PORT || 5000;
+
+// Security Headers
+app.use(securityHeaders);
 
 // Middleware
 app.use(express.json());
@@ -26,109 +30,45 @@ app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:3000",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-CSRF-Token",
-      "x-csrf-token",
-      "XSRF-TOKEN",
-      "x-xsrf-token"
-    ],
-    exposedHeaders: ["X-CSRF-Token"]
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+    exposedHeaders: ['X-CSRF-Token']
   })
 );
 
 // Cookie parser middleware
-app.use(cookieParser(process.env.SESSION_SECRET || "your-secret-key"));
+app.use(cookieParser());
 
 // Session configuration
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "your-secret-key",
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       httpOnly: true
     }
   })
 );
 
-// Passport middleware
+// Passport initialization
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Initialize CSRF protection
-const csrfMiddleware = csrf({
-  cookie: {
-    key: '_csrf',
-    path: '/',
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax"
-  }
-});
+// CSRF protection
+app.use(csrf());
 
-// Generate and send CSRF token
-app.get('/api/csrf-token', (req: Request, res: Response, next: NextFunction) => {
-  csrfMiddleware(req, res, (err) => {
-    if (err) {
-      console.error('CSRF setup error:', err);
-      return res.status(500).json({ error: 'Failed to setup CSRF protection' });
-    }
-    try {
-      const token = req.csrfToken();
-      res.cookie('XSRF-TOKEN', token, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-        path: '/'
-      });
-      res.json({ csrfToken: token });
-    } catch (error) {
-      console.error('Error generating CSRF token:', error);
-      res.status(500).json({ error: 'Failed to generate CSRF token' });
-    }
+// CSRF token endpoint
+app.get('/api/csrf-token', (req, res) => {
+  const token = req.csrfToken();
+  res.cookie('XSRF-TOKEN', token, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
   });
-});
-
-// Apply CSRF protection to all non-GET routes except /api/csrf-token
-app.use((req: Request, res: Response, next: NextFunction) => {
-  if (req.method === 'GET' || req.path === '/api/csrf-token') {
-    return next();
-  }
-  
-  csrfMiddleware(req, res, (err) => {
-    if (err) {
-      console.error('CSRF validation error:', {
-        error: err,
-        path: req.path,
-        method: req.method,
-        token: req.headers['x-csrf-token'],
-        cookies: req.cookies
-      });
-    }
-    next(err);
-  });
-});
-
-// Error handler for CSRF token errors
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  if (err.code === 'EBADCSRFTOKEN') {
-    console.error('CSRF Error:', {
-      path: req.path,
-      method: req.method,
-      token: req.headers['x-xsrf-token'],
-      cookies: req.cookies
-    });
-    return res.status(403).json({
-      error: 'Invalid CSRF token',
-      message: 'Form has been tampered with'
-    });
-  }
-  next(err);
+  res.json({ csrfToken: token });
 });
 
 // Routes

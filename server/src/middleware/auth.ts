@@ -10,7 +10,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
   try {
     const authHeader = req.header('Authorization');
     if (!authHeader) {
-      res.status(401).json({ message: 'Authentication token missing' });
+      res.status(401).json({ message: 'Token di autenticazione mancante' });
       return;
     }
 
@@ -18,7 +18,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
 
     // Check if token is invalidated
     if (invalidatedTokens.has(token)) {
-      res.status(401).json({ message: 'Please authenticate' });
+      res.status(401).json({ message: 'Per favore autenticati' });
       return;
     }
 
@@ -32,7 +32,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
       const user = await User.findById(decoded.userId);
       
       if (!user) {
-        res.status(401).json({ message: 'User not found' });
+        res.status(401).json({ message: 'Token di autenticazione mancante' });
         return;
       }
 
@@ -40,11 +40,11 @@ export const auth = async (req: Request, res: Response, next: NextFunction): Pro
       req.token = token;
       next();
     } catch (jwtError) {
-      res.status(401).json({ message: 'Please authenticate' });
+      res.status(401).json({ message: 'Per favore autenticati' });
     }
   } catch (error) {
     console.error('Authentication error:', error);
-    res.status(401).json({ message: 'Please authenticate' });
+    res.status(401).json({ message: 'Per favore autenticati' });
   }
 };
 

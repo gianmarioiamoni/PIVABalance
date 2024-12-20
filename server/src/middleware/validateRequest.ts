@@ -5,25 +5,37 @@ import { body, validationResult } from 'express-validator';
 export const registerValidation = [
   body('email')
     .isEmail()
-    .withMessage('Please enter a valid email')
+    .withMessage('Inserisci un indirizzo email valido')
     .normalizeEmail(),
   body('password')
     .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long'),
+    .withMessage('La password deve essere di almeno 6 caratteri'),
   body('name')
     .trim()
     .notEmpty()
-    .withMessage('Name is required')
+    .withMessage('Il nome è obbligatorio')
 ];
 
 export const loginValidation = [
   body('email')
+    .custom((value) => {
+      if (value !== value.replace(/<[^>]*>/g, '')) {
+        throw new Error('Email o password non validi');
+      }
+      return true;
+    })
     .isEmail()
-    .withMessage('Please enter a valid email')
+    .withMessage('Email o password non validi')
     .normalizeEmail(),
   body('password')
+    .custom((value) => {
+      if (value !== value.replace(/<[^>]*>/g, '')) {
+        throw new Error('Email o password non validi');
+      }
+      return true;
+    })
     .notEmpty()
-    .withMessage('Password is required')
+    .withMessage('Email o password non validi')
 ];
 
 export const validateRequest = (
@@ -33,8 +45,14 @@ export const validateRequest = (
 ): void => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.status(400).json({ 
-      message: 'Validation failed',
+    // Check if any error is related to malicious input
+    const hasMaliciousInput = errors.array().some(err => 
+      err.msg === 'Email o password non validi' && 
+      ('path' in err && (err.path === 'email' || err.path === 'password'))
+    );
+
+    res.status(hasMaliciousInput ? 401 : 400).json({
+      message: hasMaliciousInput ? 'Email o password non validi' : 'Validazione fallita',
       errors: errors.array().map(err => err.msg)
     });
     return;

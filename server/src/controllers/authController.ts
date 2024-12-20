@@ -27,133 +27,148 @@ export const authController = {
   // Register new user
   register: async (req: Request, res: Response): Promise<void> => {
     try {
-      const { email, password, name } = sanitizeUserInput.sanitizeObject(req.body);
+      const { email, password, name } = req.body;
+
+      // Validate input
+      if (!email || !password || !name) {
+        res.status(400).json({ 
+          message: 'Tutti i campi sono obbligatori',
+          errors: ['Email, password e nome sono obbligatori']
+        });
+        return;
+      }
 
       // Check if user already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        res.status(400).json({ success: false, message: "Email already registered" });
+        res.status(400).json({ message: 'Email già registrata' });
         return;
       }
 
       // Create new user
-      const user = new User({ 
-        email: sanitizeUserInput.email(email),
-        password: password, // La password viene già hashata nel modello
+      const user = new User({
+        email,
+        password,
         name: sanitizeUserInput.name(name)
       });
 
-      try {
-        await user.validate();
-        await user.save();
+      await user.save();
 
-        const token = generateToken(user._id);
-        res.status(201).json({
-          success: true,
-          user: {
-            id: user._id,
-            email: user.email,
-            name: user.name,
-          },
-          token
-        });
-      } catch (validationError: any) {
-        res.status(400).json({ 
-          success: false, 
-          message: "Validation failed", 
-          errors: validationError.errors 
-        });
-      }
-    } catch (error) {
-      res.status(500).json({ 
-        success: false, 
-        message: "Server error during registration" 
+      const token = generateToken(user._id);
+      res.status(201).json({
+        message: 'Registrazione completata con successo',
+        token,
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name
+        }
       });
+    } catch (error) {
+      console.error('Registration error:', error);
+      res.status(500).json({ message: 'Errore durante la registrazione' });
     }
   },
 
   // Login user
   login: async (req: Request, res: Response): Promise<void> => {
     try {
-      const { email, password } = sanitizeUserInput.sanitizeObject(req.body);
+      const { email, password } = req.body;
 
-      const user = await User.findOne({ email });
-      if (!user) {
-        res.status(401).json({ success: false, message: "Invalid credentials" });
+      // First check if required fields are present
+      if (!email || !password) {
+        res.status(401).json({ message: 'Email o password non validi' });
         return;
       }
 
-      const isMatch = await user.comparePassword(password);
+      // Sanitize inputs
+      const sanitizedEmail = sanitizeUserInput.email(email);
+      const sanitizedPassword = sanitizeUserInput.password(password);
+
+      // If sanitization removes all content, treat as invalid credentials
+      if (!sanitizedEmail || !sanitizedPassword || sanitizedEmail !== email || sanitizedPassword !== password) {
+        res.status(401).json({ message: 'Email o password non validi' });
+        return;
+      }
+
+      const user = await User.findOne({ email: sanitizedEmail });
+      if (!user) {
+        res.status(401).json({ message: 'Email o password non validi' });
+        return;
+      }
+
+      const isMatch = await user.comparePassword(sanitizedPassword);
       if (!isMatch) {
-        res.status(401).json({ success: false, message: "Invalid credentials" });
+        res.status(401).json({ message: 'Email o password non validi' });
         return;
       }
 
       const token = generateToken(user._id);
       res.json({
-        success: true,
+        message: 'Login effettuato con successo',
+        token,
         user: {
           id: user._id,
           email: user.email,
-          name: user.name,
-        },
-        token
+          name: user.name
+        }
       });
     } catch (error) {
-      res.status(500).json({ 
-        success: false, 
-        message: "Server error during login" 
-      });
+      console.error('Login error:', error);
+      res.status(500).json({ message: 'Errore durante il login' });
     }
   },
 
   // Get current user
   getCurrentUser: async (req: Request, res: Response): Promise<void> => {
     try {
-      if (!req.user) {
-        res.status(401).json({ message: "Authentication required" });
+      if (!req.headers.authorization) {
+        res.status(401).json({ message: "Token di autenticazione mancante" });
         return;
       }
 
-      const userId = req.user._id;
+      if (!req.user) {
+        res.status(401).json({ message: "Per favore autenticati" });
+        return;
+      }
+
+      const userId = (req.user as IUser)._id;
       const user = await User.findById(userId);
       if (!user) {
-        res.status(404).json({ message: "User not found" });
+        res.status(404).json({ message: "Utente non trovato" });
         return;
       }
 
       res.json({
         id: user._id,
         email: user.email,
-        name: user.name,
+        name: user.name
       });
     } catch (error) {
       console.error("Get current user error:", error);
-      res.status(500).json({ message: "Error getting current user" });
+      res.status(500).json({ message: "Errore durante il recupero dell'utente" });
     }
   },
 
   // Logout user
   logout: async (req: Request, res: Response): Promise<void> => {
     try {
-      const authHeader = req.header("Authorization");
-      if (authHeader) {
-        invalidateToken(authHeader);
+      if (!req.headers.authorization) {
+        res.status(401).json({ message: "Token di autenticazione mancante" });
+        return;
       }
 
-      // Clear the session
-      if (req.session) {
-        req.session.destroy((err) => {
-          if (err) {
-            console.error("Session destruction error:", err);
-          }
-        });
+      if (!req.user) {
+        res.status(401).json({ message: "Per favore autenticati" });
+        return;
       }
 
-      res.status(200).json({ message: "Logged out successfully" });
+      const token = req.headers.authorization.split(' ')[1];
+      await invalidateToken(token);
+      res.status(200).json({ message: "Disconnesso con successo" });
     } catch (error) {
       console.error("Logout error:", error);
-      res.status(500).json({ message: "Error during logout" });
+      res.status(500).json({ message: "Errore durante la disconnessione" });
     }
   },
 
@@ -164,7 +179,7 @@ export const authController = {
       if (!user) {
         console.error("No user found in Google callback");
         res.redirect(
-          `${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`
+          `${process.env.CLIENT_URL}/auth/signin?error=Autenticazione fallita`
         );
         return;
       }
@@ -187,7 +202,7 @@ export const authController = {
     } catch (error) {
       console.error("Google callback error:", error);
       res.redirect(
-        `${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`
+        `${process.env.CLIENT_URL}/auth/signin?error=Autenticazione fallita`
       );
     }
   },
@@ -208,10 +223,10 @@ export const authController = {
   getGoogleCallback: async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('google', { 
       session: false,
-      failureRedirect: `${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`
+      failureRedirect: `${process.env.CLIENT_URL}/auth/signin?error=Autenticazione fallita`
     }, (err, user) => {
       if (err || !user) {
-        return res.redirect(`${process.env.CLIENT_URL}/auth/signin?error=Authentication failed`);
+        return res.redirect(`${process.env.CLIENT_URL}/auth/signin?error=Autenticazione fallita`);
       }
       req.user = user;
       return authController.googleCallback(req, res);

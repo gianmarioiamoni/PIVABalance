@@ -7,7 +7,16 @@ export const sanitizeUserInput = {
   },
 
   name: (name: string): string => {
-    return xss(validator.trim(name));
+    // First remove script tags and their content
+    let sanitized = name.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    // Then remove all HTML tags
+    sanitized = sanitized.replace(/<[^>]*>/g, '');
+    // Apply XSS sanitization
+    sanitized = xss(sanitized);
+    // Decode HTML entities
+    sanitized = sanitized.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&amp;/g, '&');
+    // Finally trim
+    return validator.trim(sanitized);
   },
 
   password: (password: string): string => {

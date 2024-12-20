@@ -27,49 +27,41 @@ const getCSRFToken = () => {
 // Function to fetch CSRF token
 const fetchCSRFToken = async () => {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/csrf-token`, {
+    await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/csrf-token`, {
       withCredentials: true
     });
-    return getCSRFToken(); // Get token from cookie instead of response
+    const token = getCSRFToken();
+    if (!token) {
+      throw new Error('Failed to get CSRF token from cookie');
+    }
+    return token;
   } catch (error) {
     console.error('Error fetching CSRF token:', error);
-    return null;
+    throw error;
   }
 };
 
 // Request interceptor
 api.interceptors.request.use(
   async (config) => {
-    // Add auth token if available
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    // Add CSRF token for non-GET requests
     if (config.method && config.method.toLowerCase() !== 'get') {
       try {
-        let csrfToken = getCSRFToken();
-        if (!csrfToken) {
-          await fetchCSRFToken();
-          csrfToken = getCSRFToken();
-        }
-
-        if (csrfToken) {
-          config.headers['X-CSRF-Token'] = csrfToken;
-        } else {
-          console.error('Failed to get CSRF token');
-        }
+        const token = await fetchCSRFToken();
+        config.headers['X-CSRF-Token'] = token;
       } catch (error) {
         console.error('Error setting CSRF token:', error);
+        throw error;
       }
+    }
+
+    const authToken = localStorage.getItem('token');
+    if (authToken) {
+      config.headers.Authorization = `Bearer ${authToken}`;
     }
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Response interceptor

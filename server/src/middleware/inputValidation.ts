@@ -6,26 +6,26 @@ export const registerValidation: ValidationChain[] = [
   body('email')
     .trim()
     .isEmail()
-    .withMessage('Please enter a valid email')
+    .withMessage('Inserisci un indirizzo email valido')
     .normalizeEmail()
     .customSanitizer(value => sanitizeUserInput.email(value)),
 
   body('password')
     .trim()
     .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters long')
+    .withMessage('La password deve essere di almeno 8 caratteri')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number and one special character')
+    .withMessage('La password deve contenere almeno una lettera maiuscola, una minuscola, un numero e un carattere speciale')
     .customSanitizer(value => sanitizeUserInput.password(value)),
 
   body('name')
     .trim()
     .notEmpty()
-    .withMessage('Name is required')
+    .withMessage('Il nome è obbligatorio')
     .isLength({ min: 2, max: 50 })
-    .withMessage('Name must be between 2 and 50 characters')
+    .withMessage('Il nome deve essere tra 2 e 50 caratteri')
     .matches(/^[a-zA-Z\s]*$/)
-    .withMessage('Name can only contain letters and spaces')
+    .withMessage('Il nome può contenere solo lettere e spazi')
     .customSanitizer(value => sanitizeUserInput.name(value))
 ];
 
@@ -33,14 +33,14 @@ export const loginValidation: ValidationChain[] = [
   body('email')
     .trim()
     .isEmail()
-    .withMessage('Please enter a valid email')
+    .withMessage('Inserisci un indirizzo email valido')
     .normalizeEmail()
     .customSanitizer(value => sanitizeUserInput.email(value)),
 
   body('password')
     .trim()
     .notEmpty()
-    .withMessage('Password is required')
+    .withMessage('La password è obbligatoria')
     .customSanitizer(value => sanitizeUserInput.password(value))
 ];
 
@@ -49,19 +49,14 @@ export const validateRequest = (
   res: Response,
   next: NextFunction
 ): void => {
-  const errors: Result = validationResult(req);
+  const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.status(400).json({ 
-      success: false,
-      message: 'Validation failed',
-      errors: errors.array().map(err => ({
-        field: err.type === 'field' ? err.path : err.type,
-        message: err.msg
-      }))
+    res.status(400).json({
+      message: 'Validazione fallita',
+      errors: errors.array().map(err => err.msg)
     });
     return;
   }
-
   // Sanitize the entire request body
   req.body = sanitizeUserInput.sanitizeObject(req.body);
   
@@ -75,9 +70,9 @@ export const sanitizeQueryParams = (
   next: NextFunction
 ): void => {
   if (req.query) {
-    for (const [key, value] of Object.entries(req.query)) {
-      if (typeof value === 'string') {
-        req.query[key] = sanitizeUserInput.text(value);
+    for (const key in req.query) {
+      if (typeof req.query[key] === 'string') {
+        req.query[key] = sanitizeUserInput.text(req.query[key] as string);
       }
     }
   }

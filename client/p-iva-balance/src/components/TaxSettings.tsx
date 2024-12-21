@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserSettings, settingsService } from '@/services/settingsService';
 import Tooltip from './Tooltip';
+import ProfitabilityRateTable, { ProfitabilityRate } from './ProfitabilityRateTable';
 
 const taxRegimeInfo = (
   <div className="space-y-4">
@@ -39,6 +40,9 @@ const profitabilityInfo = (
     <p>
       Il restante fatturato viene invece considerato una stima forfettaria dei costi di esercizio e non è tassato.
     </p>
+    <p className="font-medium mt-2">
+      Clicca "Seleziona da Tabella" per visualizzare tutti i coefficienti per categoria ATECO.
+    </p>
   </div>
 );
 
@@ -51,6 +55,7 @@ export default function TaxSettings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [showRateTable, setShowRateTable] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -94,6 +99,11 @@ export default function TaxSettings() {
         profitabilityRate: undefined
       } : {})
     }));
+  };
+
+  const handleRateSelect = (rate: ProfitabilityRate) => {
+    handleChange('profitabilityRate', rate.rate);
+    setShowRateTable(false);
   };
 
   if (loading) {
@@ -159,31 +169,39 @@ export default function TaxSettings() {
             <div>
               <div className="flex items-center">
                 <label className="block text-sm font-medium text-gray-700">
-                  Coefficiente di Redditività (%)
+                  Coefficiente di Redditività
                 </label>
                 <Tooltip content={profitabilityInfo} />
               </div>
-              <div className="flex items-center space-x-2 mt-2">
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  value={settings.profitabilityRate}
-                  onChange={(e) => handleChange('profitabilityRate', Number(e.target.value))}
-                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                  placeholder="78"
-                />
+              <div className="mt-2 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                <div className="flex-1 relative rounded-md shadow-sm">
+                  <input
+                    type="number"
+                    value={settings.profitabilityRate}
+                    readOnly
+                    className="block w-full pl-3 pr-12 py-2 text-base border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <span className="text-gray-500 sm:text-sm">%</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowRateTable(true)}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Seleziona da Tabella
+                </button>
                 <button
                   type="button"
                   onClick={() => handleChange('profitabilityRate', 78)}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   Reset (78%)
                 </button>
               </div>
               <p className="mt-1 text-sm text-gray-500">
-                Valore predefinito: 78%. Modificare solo se necessario.
+                Seleziona il coefficiente in base al tuo codice ATECO
               </p>
             </div>
           </>
@@ -199,6 +217,14 @@ export default function TaxSettings() {
           </button>
         </div>
       </form>
+
+      {showRateTable && (
+        <ProfitabilityRateTable
+          onSelect={handleRateSelect}
+          selectedRate={settings.profitabilityRate}
+          onClose={() => setShowRateTable(false)}
+        />
+      )}
     </div>
   );
 }

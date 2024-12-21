@@ -79,6 +79,7 @@ export default function TaxSettings() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [showRateTable, setShowRateTable] = useState(false);
+  const [fundSelectTouched, setFundSelectTouched] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -284,6 +285,9 @@ export default function TaxSettings() {
                     pensionSystem: value,
                     professionalFundId: value === 'INPS' ? undefined : prev.professionalFundId
                   }));
+                  if (value === 'PROFESSIONAL_FUND') {
+                    setFundSelectTouched(true);
+                  }
                 }}
                 className="mt-2 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
               >
@@ -296,11 +300,22 @@ export default function TaxSettings() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Seleziona la Cassa Professionale
+                  {fundSelectTouched && !settings.professionalFundId && (
+                    <span className="text-red-500 ml-1">*</span>
+                  )}
                 </label>
                 <select
                   value={settings.professionalFundId || ''}
-                  onChange={(e) => handleChange('professionalFundId', e.target.value)}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  onChange={(e) => {
+                    handleChange('professionalFundId', e.target.value);
+                    setFundSelectTouched(true);
+                  }}
+                  onFocus={() => setFundSelectTouched(true)}
+                  className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm rounded-md ${
+                    fundSelectTouched && !settings.professionalFundId
+                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                  }`}
                 >
                   <option value="" disabled>Seleziona una cassa...</option>
                   {PENSION_FUNDS.map(fund => (

@@ -10,20 +10,20 @@ export const settingsController = {
         return res.status(401).json({ message: 'Utente non autorizzato' });
       }
 
-      let settings = await UserSettings.findOne({ userId });
+      const settings = await UserSettings.findOne({ userId });
       
       if (!settings) {
-        // Create default settings if none exist
-        settings = await UserSettings.create({
-          userId,
+        // Return default settings if none exist
+        return res.json({
           taxRegime: 'forfettario',
           substituteRate: 5,
-          profitabilityRate: 78
+          profitabilityRate: 78,
+          pensionSystem: 'INPS'
         });
       }
 
       res.json(settings);
-    } catch (error) {
+    } catch (error: Error | any) {
       console.error('Error fetching user settings:', error);
       res.status(500).json({ message: 'Errore nel recupero delle impostazioni' });
     }
@@ -37,11 +37,27 @@ export const settingsController = {
         return res.status(401).json({ message: 'Utente non autorizzato' });
       }
 
-      const { taxRegime, substituteRate, profitabilityRate } = req.body;
+      const { 
+        taxRegime, 
+        substituteRate, 
+        profitabilityRate,
+        pensionSystem,
+        professionalFundId
+      } = req.body;
 
-      // Validate input
-      if (taxRegime && !['forfettario', 'ordinario'].includes(taxRegime)) {
+      // Validate tax regime
+      if (!['forfettario', 'ordinario'].includes(taxRegime)) {
         return res.status(400).json({ message: 'Regime fiscale non valido' });
+      }
+
+      // Validate pension system
+      if (!['INPS', 'PROFESSIONAL_FUND'].includes(pensionSystem)) {
+        return res.status(400).json({ message: 'Sistema previdenziale non valido' });
+      }
+
+      // Validate professional fund ID if pension system is PROFESSIONAL_FUND
+      if (pensionSystem === 'PROFESSIONAL_FUND' && !professionalFundId) {
+        return res.status(400).json({ message: 'Cassa professionale non selezionata' });
       }
 
       if (taxRegime === 'forfettario') {
@@ -56,19 +72,27 @@ export const settingsController = {
 
       const settings = await UserSettings.findOneAndUpdate(
         { userId },
-        { 
+        {
           taxRegime,
-          ...(taxRegime === 'forfettario' ? { substituteRate, profitabilityRate } : {
-            $unset: { substituteRate: 1, profitabilityRate: 1 }
-          })
+          substituteRate: taxRegime === 'forfettario' ? substituteRate : undefined,
+          profitabilityRate: taxRegime === 'forfettario' ? profitabilityRate : undefined,
+          pensionSystem,
+          professionalFundId: pensionSystem === 'PROFESSIONAL_FUND' ? professionalFundId : undefined
         },
-        { new: true, upsert: true }
+        { 
+          new: true, 
+          upsert: true,
+          runValidators: true 
+        }
       );
 
       res.json(settings);
-    } catch (error) {
+    } catch (error: Error | any) {
       console.error('Error updating user settings:', error);
-      res.status(500).json({ message: 'Errore nell\'aggiornamento delle impostazioni' });
+      if (error.name === 'ValidationError') {
+        return res.status(400).json({ message: 'Dati non validi' });
+      }
+      res.status(500).json({ message: 'Errore nel salvataggio delle impostazioni' });
     }
   }
 };

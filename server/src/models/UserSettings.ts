@@ -3,8 +3,11 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IUserSettings extends Document {
   userId: mongoose.Types.ObjectId;
   taxRegime: 'forfettario' | 'ordinario';
-  substituteRate?: number; // 5 or 25
-  profitabilityRate?: number; // default 78
+  substituteRate: number;
+  profitabilityRate: number;
+  pensionSystem: 'INPS' | 'PROFESSIONAL_FUND';
+  professionalFundId?: string;
+  createdAt: Date;
   updatedAt: Date;
 }
 
@@ -23,25 +26,44 @@ const UserSettingsSchema = new Schema<IUserSettings>({
   },
   substituteRate: {
     type: Number,
-    enum: [5, 25],
-    default: 5,
-    required: function(this: IUserSettings) {
-      return this.taxRegime === 'forfettario';
-    }
+    required: true,
+    validate: {
+      validator: function(v: number) {
+        return [5, 25].includes(v);
+      },
+      message: 'Substitute rate must be either 5 or 25'
+    },
+    default: 5
   },
   profitabilityRate: {
     type: Number,
+    required: true,
     min: 0,
     max: 100,
-    default: 78,
-    required: function(this: IUserSettings) {
-      return this.taxRegime === 'forfettario';
-    }
+    default: 78
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now
+  pensionSystem: {
+    type: String,
+    enum: ['INPS', 'PROFESSIONAL_FUND'],
+    required: true
+  },
+  professionalFundId: {
+    type: String,
+    required: function(this: IUserSettings) {
+      return this.pensionSystem === 'PROFESSIONAL_FUND';
+    },
+    validate: {
+      validator: function(this: IUserSettings, v: string | undefined) {
+        if (this.pensionSystem === 'PROFESSIONAL_FUND') {
+          return typeof v === 'string' && v.length > 0;
+        }
+        return true;
+      },
+      message: 'Professional fund ID is required when pension system is PROFESSIONAL_FUND'
+    }
   }
+}, {
+  timestamps: true
 });
 
 // Update the updatedAt field on save

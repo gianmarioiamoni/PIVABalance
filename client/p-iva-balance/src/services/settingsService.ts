@@ -1,9 +1,12 @@
 import api from './api';
+import { PensionSystemType } from '@/data/pensionFunds';
 
 export interface UserSettings {
   taxRegime: 'forfettario' | 'ordinario';
-  substituteRate?: number;
-  profitabilityRate?: number;
+  substituteRate: number;
+  profitabilityRate: number;
+  pensionSystem: PensionSystemType;
+  professionalFundId?: string;
 }
 
 class SettingsService {

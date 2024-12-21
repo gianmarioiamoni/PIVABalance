@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserSettings, settingsService } from '@/services/settingsService';
 import Tooltip from './Tooltip';
 import ProfitabilityRateTable, { ProfitabilityRate } from './ProfitabilityRateTable';
+import { PENSION_FUNDS, PensionSystemType } from '@/data/pensionFunds';
 
 const taxRegimeInfo = (
   <div className="space-y-4">
@@ -46,11 +47,32 @@ const profitabilityInfo = (
   </div>
 );
 
+const pensionSystemInfo = (
+  <div className="space-y-2">
+    <div>
+      <h4 className="font-semibold mb-2">Gestione Separata INPS:</h4>
+      <p>
+        Sistema previdenziale obbligatorio per i liberi professionisti senza cassa di previdenza dedicata 
+        e per i lavoratori autonomi con partita IVA.
+      </p>
+    </div>
+    <div>
+      <h4 className="font-semibold mb-2">Cassa Professionale:</h4>
+      <p>
+        Sistema previdenziale specifico per determinate categorie professionali, gestito da enti previdenziali dedicati.
+        Ogni cassa ha le proprie regole e aliquote contributive.
+      </p>
+    </div>
+  </div>
+);
+
 export default function TaxSettings() {
   const [settings, setSettings] = useState<UserSettings>({
     taxRegime: 'forfettario',
     substituteRate: 5,
     profitabilityRate: 78,
+    pensionSystem: 'INPS',
+    professionalFundId: undefined,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -216,6 +238,63 @@ export default function TaxSettings() {
                   </p>
                 </div>
               </>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
+            <h3 className="text-lg leading-6 font-medium text-gray-900">
+              Parametri Calcolo Contributi Previdenziali
+            </h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Imposta i parametri per il calcolo dei contributi previdenziali
+            </p>
+          </div>
+          
+          <div className="px-4 py-5 sm:p-6 space-y-6">
+            <div>
+              <div className="flex items-center">
+                <label className="block text-sm font-medium text-gray-700">
+                  Cassa Previdenziale
+                </label>
+                <Tooltip content={pensionSystemInfo} />
+              </div>
+              <select
+                value={settings.pensionSystem}
+                onChange={(e) => {
+                  const value = e.target.value as PensionSystemType;
+                  setSettings(prev => ({
+                    ...prev,
+                    pensionSystem: value,
+                    professionalFundId: value === 'INPS' ? undefined : prev.professionalFundId
+                  }));
+                }}
+                className="mt-2 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              >
+                <option value="INPS">Gestione Separata INPS</option>
+                <option value="PROFESSIONAL_FUND">Cassa Professionale</option>
+              </select>
+            </div>
+
+            {settings.pensionSystem === 'PROFESSIONAL_FUND' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Seleziona la Cassa Professionale
+                </label>
+                <select
+                  value={settings.professionalFundId || ''}
+                  onChange={(e) => handleChange('professionalFundId', e.target.value)}
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                >
+                  <option value="" disabled>Seleziona una cassa...</option>
+                  {PENSION_FUNDS.map(fund => (
+                    <option key={fund.id} value={fund.id}>
+                      {fund.name} ({fund.description})
+                    </option>
+                  ))}
+                </select>
+              </div>
             )}
           </div>
         </div>

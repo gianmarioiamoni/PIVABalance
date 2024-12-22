@@ -11,12 +11,15 @@ import csrf from "csurf";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middleware/errorHandler";
 import { securityHeaders } from "./middleware/securityHeaders";
+import { auth } from './middleware/auth';
 import authRoutes from "./routes/authRoutes";
 import settingsRoutes from "./routes/settingsRoutes";
 import professionalFundRoutes from "./routes/professionalFundRoutes";
+import { irpefRateController } from './controllers/irpefRateController';
 import "./config/passport";
 import { initializeInpsParameters2024 } from "./models/InpsParameters";
 import { initializationService } from "./services/initializationService";
+import { IrpefRateService } from './services/irpefRateService';
 
 const app: Express = express();
 export { app }; // Export for testing
@@ -80,6 +83,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/professional-funds", professionalFundRoutes);
 
+// IRPEF Rate routes
+app.get('/api/irpef-rates', auth, irpefRateController.getCurrentRates);
+app.get('/api/irpef-rates/:year', auth, irpefRateController.getRatesByYear);
+app.put('/api/irpef-rates/:id', auth, irpefRateController.updateRate);
+app.delete('/api/irpef-rates/:id', auth, irpefRateController.deactivateRate);
+
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error('Error:', err);
@@ -99,17 +108,16 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 // Database connection
 async function connectDB(): Promise<void> {
   try {
-    await mongoose.connect(process.env.MONGODB_URI as string);
-    console.log("Connected to MongoDB");
+    await mongoose.connect(process.env.MONGODB_URI || '');
+    console.log('Connected to MongoDB');
     
-    // Initialize data after successful connection
-    await Promise.all([
-      initializeInpsParameters2024(),
-      initializationService.initializeProfessionalFunds()
-    ]);
-    console.log("Data initialization completed");
+    // Initialize default data
+    await initializeInpsParameters2024();
+    await initializationService.initializeProfessionalFunds();
+    await IrpefRateService.initializeDefaultRates();
+    
   } catch (error) {
-    console.error("MongoDB connection error:", error);
+    console.error('Error connecting to MongoDB:', error);
     process.exit(1);
   }
 };

@@ -21,11 +21,12 @@ export const professionalFundController = {
   getFundByCode: async (req: Request, res: Response) => {
     try {
       const { code } = req.params;
+      const userId = req.user?._id;
       
       // Ensure default funds are initialized
       await ProfessionalFundService.initializeDefaultFunds();
       
-      const fund = await ProfessionalFundService.getFundByCode(code);
+      const fund = await ProfessionalFundService.getFundByCode(code, userId?.toString());
       
       if (!fund) {
         return res.status(404).json({ message: 'Cassa professionale non trovata' });

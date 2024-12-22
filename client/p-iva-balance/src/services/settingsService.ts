@@ -8,6 +8,9 @@ export interface UserSettings {
   pensionSystem: PensionSystemType;
   professionalFundId?: string;
   inpsRateType?: 'COLLABORATOR_WITH_DISCOLL' | 'COLLABORATOR_WITHOUT_DISCOLL' | 'PROFESSIONAL' | 'PENSIONER';
+  manualContributionRate?: number;
+  manualMinimumContribution?: number;
+  manualFixedAnnualContributions?: number;
 }
 
 class SettingsService {

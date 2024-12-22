@@ -10,6 +10,7 @@ export interface IUserSettings extends Document {
   inpsRateType?: 'COLLABORATOR_WITH_DISCOLL' | 'COLLABORATOR_WITHOUT_DISCOLL' | 'PROFESSIONAL' | 'PENSIONER';
   manualContributionRate?: number;
   manualMinimumContribution?: number;
+  manualFixedAnnualContributions?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -72,12 +73,30 @@ const UserSettingsSchema = new Schema<IUserSettings>({
   },
   manualContributionRate: {
     type: Number,
-    min: 0,
-    max: 100,
+    validate: {
+      validator: function(this: IUserSettings, v: number | undefined) {
+        return !v || (v >= 0 && v <= 100);
+      },
+      message: 'Manual contribution rate must be between 0 and 100'
+    }
   },
   manualMinimumContribution: {
     type: Number,
-    min: 0,
+    validate: {
+      validator: function(v: number | undefined) {
+        return !v || v >= 0;
+      },
+      message: 'Manual minimum contribution must be greater than or equal to 0'
+    }
+  },
+  manualFixedAnnualContributions: {
+    type: Number,
+    validate: {
+      validator: function(v: number | undefined) {
+        return !v || v >= 0;
+      },
+      message: 'Manual fixed annual contributions must be greater than or equal to 0'
+    }
   }
 }, {
   timestamps: true

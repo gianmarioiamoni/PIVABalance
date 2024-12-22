@@ -8,8 +8,9 @@ export const initializationService = {
         code: 'CF',
         description: 'Cassa Nazionale di Previdenza e Assistenza Forense',
         parameters: [{
-          contributionRate: 14.5,
-          minimumContribution: 2875,
+          contributionRate: 16,
+          minimumContribution: 1677.50,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -20,7 +21,8 @@ export const initializationService = {
         description: 'Cassa Nazionale di Previdenza e Assistenza Dottori Commercialisti',
         parameters: [{
           contributionRate: 12,
-          minimumContribution: 2840,
+          minimumContribution: 3075,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -30,8 +32,9 @@ export const initializationService = {
         code: 'CNPR',
         description: 'Cassa Nazionale di Previdenza ed Assistenza a favore dei Ragionieri e Periti Commerciali',
         parameters: [{
-          contributionRate: 15,
-          minimumContribution: 3500,
+          contributionRate: 0,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -41,8 +44,9 @@ export const initializationService = {
         code: 'CIPAG',
         description: 'Cassa Italiana di Previdenza ed Assistenza dei Geometri Liberi Professionisti',
         parameters: [{
-          contributionRate: 18,
-          minimumContribution: 3340,
+          contributionRate: 0,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -53,7 +57,8 @@ export const initializationService = {
         description: 'Cassa Nazionale di Previdenza ed Assistenza per gli Ingegneri ed Architetti',
         parameters: [{
           contributionRate: 14.5,
-          minimumContribution: 2340,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -64,7 +69,8 @@ export const initializationService = {
         description: 'Ente Nazionale di Previdenza e Assistenza per i Consulenti del Lavoro',
         parameters: [{
           contributionRate: 12,
-          minimumContribution: 2400,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -74,8 +80,9 @@ export const initializationService = {
         code: 'ENPAM',
         description: 'Ente Nazionale di Previdenza ed Assistenza Medici e Odontoiatri',
         parameters: [{
-          contributionRate: 19.5,
+          contributionRate: 0,
           minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -86,7 +93,8 @@ export const initializationService = {
         description: 'Ente Nazionale di Previdenza e Assistenza dei Veterinari',
         parameters: [{
           contributionRate: 15,
-          minimumContribution: 2840,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -96,8 +104,9 @@ export const initializationService = {
         code: 'INPGI',
         description: 'Istituto Nazionale di Previdenza dei Giornalisti Italiani',
         parameters: [{
-          contributionRate: 12,
-          minimumContribution: 2400,
+          contributionRate: 0,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -108,7 +117,8 @@ export const initializationService = {
         description: 'Ente di Previdenza dei Periti Industriali',
         parameters: [{
           contributionRate: 15,
-          minimumContribution: 2000,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -119,7 +129,8 @@ export const initializationService = {
         description: 'Ente Nazionale di Previdenza ed Assistenza Psicologi',
         parameters: [{
           contributionRate: 10,
-          minimumContribution: 780,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -129,8 +140,9 @@ export const initializationService = {
         code: 'ENPAPI',
         description: 'Ente Nazionale di Previdenza e Assistenza della Professione Infermieristica',
         parameters: [{
-          contributionRate: 16,
-          minimumContribution: 1500,
+          contributionRate: 15,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -140,8 +152,9 @@ export const initializationService = {
         code: 'ENPAF',
         description: 'Ente Nazionale di Previdenza e Assistenza Farmacisti',
         parameters: [{
-          contributionRate: 15,
-          minimumContribution: 4500,
+          contributionRate: 0,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -152,7 +165,8 @@ export const initializationService = {
         description: 'Ente di Previdenza e Assistenza Pluricategoriale',
         parameters: [{
           contributionRate: 15,
-          minimumContribution: 1500,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -163,7 +177,8 @@ export const initializationService = {
         description: 'Ente Nazionale di Previdenza e Assistenza a favore dei Biologi',
         parameters: [{
           contributionRate: 15,
-          minimumContribution: 1500,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -173,8 +188,9 @@ export const initializationService = {
         code: 'ENASARCO',
         description: 'Ente Nazionale Assistenza Agenti e Rappresentanti di Commercio',
         parameters: [{
-          contributionRate: 17,
-          minimumContribution: 3000,
+          contributionRate: 0,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -184,8 +200,9 @@ export const initializationService = {
         code: 'ENPAIA',
         description: 'Ente Nazionale di Previdenza per gli Addetti e per gli Impiegati in Agricoltura',
         parameters: [{
-          contributionRate: 13,
-          minimumContribution: 2000,
+          contributionRate: 0,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -195,8 +212,9 @@ export const initializationService = {
         code: 'CNN',
         description: 'Cassa Nazionale del Notariato',
         parameters: [{
-          contributionRate: 42,
-          minimumContribution: 40000,
+          contributionRate: 0,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true
@@ -206,8 +224,9 @@ export const initializationService = {
         code: 'FASC',
         description: 'Fondazione FASC - Fondo Nazionale di Previdenza per gli Agenti Spedizionieri e Corrieri',
         parameters: [{
-          contributionRate: 14,
-          minimumContribution: 3000,
+          contributionRate: 0,
+          minimumContribution: 0,
+          fixedAnnualContributions: 0,
           year: 2024
         }],
         allowManualEdit: true

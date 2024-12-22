@@ -45,7 +45,10 @@ export const settingsController = {
         profitabilityRate,
         pensionSystem,
         professionalFundId,
-        inpsRateType
+        inpsRateType,
+        manualContributionRate,
+        manualMinimumContribution,
+        manualFixedAnnualContributions
       } = req.body;
 
       // Validate tax regime
@@ -85,7 +88,10 @@ export const settingsController = {
           profitabilityRate: taxRegime === 'forfettario' ? profitabilityRate : undefined,
           pensionSystem,
           professionalFundId: pensionSystem === 'PROFESSIONAL_FUND' ? professionalFundId : undefined,
-          inpsRateType: pensionSystem === 'INPS' ? inpsRateType : undefined
+          inpsRateType: pensionSystem === 'INPS' ? inpsRateType : undefined,
+          manualContributionRate: pensionSystem === 'PROFESSIONAL_FUND' ? manualContributionRate : undefined,
+          manualMinimumContribution: pensionSystem === 'PROFESSIONAL_FUND' ? manualMinimumContribution : undefined,
+          manualFixedAnnualContributions: pensionSystem === 'PROFESSIONAL_FUND' ? manualFixedAnnualContributions : undefined
         },
         { 
           new: true, 

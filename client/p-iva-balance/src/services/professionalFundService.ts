@@ -3,6 +3,7 @@ import api from './api';
 export interface ProfessionalFundParameters {
   contributionRate: number;
   minimumContribution: number;
+  fixedAnnualContributions: number;
   year: number;
 }
 
@@ -13,6 +14,7 @@ export interface ProfessionalFund {
   description?: string;
   parameters: ProfessionalFundParameters[];
   isActive: boolean;
+  allowManualEdit: boolean;
 }
 
 class ProfessionalFundService {

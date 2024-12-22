@@ -7,6 +7,7 @@ export interface IProfessionalFund extends Document {
   parameters: {
     contributionRate: number;  // Percentage (e.g., 16 for 16%)
     minimumContribution: number;  // In euros (e.g., 2750)
+    fixedAnnualContributions: number;  // Fixed annual contributions in euros
     year: number;  // The year these parameters are valid for
   }[];
   allowManualEdit: boolean;  // Whether to allow manual editing of contribution parameters
@@ -41,6 +42,12 @@ const ProfessionalFundSchema = new Schema<IProfessionalFund>({
     minimumContribution: {
       type: Number,
       required: true,
+      min: 0
+    },
+    fixedAnnualContributions: {
+      type: Number,
+      required: true,
+      default: 0,
       min: 0
     },
     year: {

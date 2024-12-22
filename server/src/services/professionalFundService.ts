@@ -1,4 +1,5 @@
 import { ProfessionalFund } from '../models/ProfessionalFund';
+import { UserSettings } from '../models/UserSettings';
 
 interface DefaultFundData {
   name: string;
@@ -7,6 +8,7 @@ interface DefaultFundData {
   parameters: {
     contributionRate: number;
     minimumContribution: number;
+    fixedAnnualContributions: number;
   };
 }
 
@@ -16,8 +18,9 @@ const DEFAULT_FUNDS: DefaultFundData[] = [
     code: 'FORENSE',
     description: 'Cassa Nazionale di Previdenza e Assistenza Forense',
     parameters: {
-      contributionRate: 16,
-      minimumContribution: 2750
+      contributionRate: 15,
+      minimumContribution: 2750,
+      fixedAnnualContributions: 0
     }
   }
   // Add other professional funds here as needed
@@ -47,7 +50,9 @@ export class ProfessionalFundService {
           
           if (!hasCurrentYearParams) {
             existingFund.parameters.push({
-              ...fundData.parameters,
+              contributionRate: fundData.parameters.contributionRate,
+              minimumContribution: fundData.parameters.minimumContribution,
+              fixedAnnualContributions: fundData.parameters.fixedAnnualContributions,
               year: currentYear
             });
             await existingFund.save();
@@ -61,8 +66,46 @@ export class ProfessionalFundService {
     }
   }
 
-  static async getFundByCode(code: string) {
-    return ProfessionalFund.findOne({ code, isActive: true });
+  static async getFundByCode(code: string, userId?: string) {
+    const fund = await ProfessionalFund.findOne({ code, isActive: true });
+    
+    if (!fund || !userId) {
+      return fund;
+    }
+
+    // Get user settings to check for manual overrides
+    const userSettings = await UserSettings.findOne({ 
+      userId,
+      professionalFundId: code,
+      pensionSystem: 'PROFESSIONAL_FUND'
+    });
+
+    if (userSettings?.manualContributionRate !== undefined || 
+        userSettings?.manualMinimumContribution !== undefined ||
+        userSettings?.manualFixedAnnualContributions !== undefined) {
+      const currentYear = new Date().getFullYear();
+      const currentParams = fund.parameters.find(p => p.year === currentYear);
+      
+      if (currentParams) {
+        // Create a new fund object to avoid modifying the database document
+        const fundCopy = fund.toObject();
+        const paramIndex = fundCopy.parameters.findIndex(p => p.year === currentYear);
+        
+        if (paramIndex !== -1) {
+          fundCopy.parameters[paramIndex] = {
+            ...fundCopy.parameters[paramIndex],
+            contributionRate: userSettings.manualContributionRate ?? fundCopy.parameters[paramIndex].contributionRate,
+            minimumContribution: userSettings.manualMinimumContribution ?? fundCopy.parameters[paramIndex].minimumContribution,
+            fixedAnnualContributions: userSettings.manualFixedAnnualContributions ?? fundCopy.parameters[paramIndex].fixedAnnualContributions,
+            year: currentYear
+          };
+        }
+        
+        return fundCopy;
+      }
+    }
+
+    return fund;
   }
 
   static async getAllFunds() {

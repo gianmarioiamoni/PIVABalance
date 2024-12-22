@@ -78,6 +78,7 @@ export default function TaxSettings() {
     inpsRateType: undefined,
     manualContributionRate: undefined,
     manualMinimumContribution: undefined,
+    manualFixedAnnualContributions: undefined
   });
   const [originalSettings, setOriginalSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -147,6 +148,19 @@ export default function TaxSettings() {
   const handleRateSelect = (rate: ProfitabilityRate) => {
     handleChange('profitabilityRate', rate.rate);
     setShowRateTable(false);
+  };
+
+  const handleProfessionalFundParametersChange = (params: { 
+    contributionRate: number; 
+    minimumContribution: number; 
+    fixedAnnualContributions: number 
+  }) => {
+    setSettings(prev => ({
+      ...prev,
+      manualContributionRate: params.contributionRate,
+      manualMinimumContribution: params.minimumContribution,
+      manualFixedAnnualContributions: params.fixedAnnualContributions
+    }));
   };
 
   if (loading) {
@@ -329,14 +343,13 @@ export default function TaxSettings() {
                   value={settings.professionalFundId}
                   onChange={(fundId) => handleChange('professionalFundId', fundId)}
                   onFundChange={setSelectedProfessionalFund}
-                  onParametersChange={(params) => {
-                    setSettings(prev => ({
-                      ...prev,
-                      manualContributionRate: params.contributionRate,
-                      manualMinimumContribution: params.minimumContribution
-                    }));
+                  onParametersChange={handleProfessionalFundParametersChange}
+                  error={settings.pensionSystem === 'PROFESSIONAL_FUND' && !settings.professionalFundId ? 'Seleziona una cassa professionale' : undefined}
+                  initialManualValues={{
+                    manualContributionRate: settings.manualContributionRate,
+                    manualMinimumContribution: settings.manualMinimumContribution,
+                    manualFixedAnnualContributions: settings.manualFixedAnnualContributions
                   }}
-                  error={!isValid() && !settings.professionalFundId ? 'Seleziona una cassa professionale' : undefined}
                 />
               </div>
             )}

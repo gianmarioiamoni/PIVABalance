@@ -5,8 +5,13 @@ interface ProfessionalFundSelectorProps {
   value?: string;
   onChange: (fundId: string) => void;
   onFundChange: (fund: ProfessionalFund | null) => void;
-  onParametersChange?: (params: { contributionRate: number; minimumContribution: number }) => void;
+  onParametersChange?: (params: { contributionRate: number; minimumContribution: number; fixedAnnualContributions: number }) => void;
   error?: string;
+  initialManualValues?: {
+    manualContributionRate?: number;
+    manualMinimumContribution?: number;
+    manualFixedAnnualContributions?: number;
+  };
 }
 
 export default function ProfessionalFundSelector({
@@ -14,7 +19,8 @@ export default function ProfessionalFundSelector({
   onChange,
   onFundChange,
   onParametersChange,
-  error
+  error,
+  initialManualValues
 }: ProfessionalFundSelectorProps) {
   const [funds, setFunds] = useState<ProfessionalFund[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +28,7 @@ export default function ProfessionalFundSelector({
   const [selectedFund, setSelectedFund] = useState<ProfessionalFund | null>(null);
   const [manualContributionRate, setManualContributionRate] = useState<number | null>(null);
   const [manualMinimumContribution, setManualMinimumContribution] = useState<number | null>(null);
+  const [manualFixedAnnualContributions, setManualFixedAnnualContributions] = useState<number | null>(null);
 
   useEffect(() => {
     loadFunds();
@@ -37,6 +44,20 @@ export default function ProfessionalFundSelector({
       onFundChange(null);
     }
   }, [value, funds, onFundChange]);
+
+  useEffect(() => {
+    if (initialManualValues) {
+      if (initialManualValues.manualContributionRate !== undefined) {
+        setManualContributionRate(initialManualValues.manualContributionRate);
+      }
+      if (initialManualValues.manualMinimumContribution !== undefined) {
+        setManualMinimumContribution(initialManualValues.manualMinimumContribution);
+      }
+      if (initialManualValues.manualFixedAnnualContributions !== undefined) {
+        setManualFixedAnnualContributions(initialManualValues.manualFixedAnnualContributions);
+      }
+    }
+  }, [initialManualValues]);
 
   const loadFunds = async () => {
     try {
@@ -99,95 +120,139 @@ export default function ProfessionalFundSelector({
             <div className="grid grid-cols-[150px_120px_auto] gap-2 items-center">
               <label className="text-gray-600">Aliquota contributiva:</label>
               {selectedFund.allowManualEdit ? (
-                <>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.01"
-                      value={manualContributionRate !== null ? manualContributionRate : currentParameters.contributionRate}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        setManualContributionRate(value);
-                        if (onParametersChange) {
-                          onParametersChange({
-                            contributionRate: value,
-                            minimumContribution: manualMinimumContribution !== null ? manualMinimumContribution : currentParameters.minimumContribution
-                          });
-                        }
-                      }}
-                      className="w-full p-1 border rounded text-right pr-8"
-                    />
-                    <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setManualContributionRate(null);
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    value={manualContributionRate ?? currentParameters.contributionRate}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      setManualContributionRate(value);
                       if (onParametersChange) {
                         onParametersChange({
-                          contributionRate: currentParameters.contributionRate,
-                          minimumContribution: manualMinimumContribution !== null ? manualMinimumContribution : currentParameters.minimumContribution
+                          contributionRate: value,
+                          minimumContribution: manualMinimumContribution ?? currentParameters.minimumContribution,
+                          fixedAnnualContributions: manualFixedAnnualContributions ?? currentParameters.fixedAnnualContributions
                         });
                       }
                     }}
-                    className="text-blue-600 hover:text-blue-800 text-xs justify-self-start"
-                  >
-                    Reset
-                  </button>
-                </>
-              ) : (
-                <div className="col-span-2">
-                  <span className="text-gray-700">{currentParameters.contributionRate}%</span>
+                    className="w-20 p-1 border rounded"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                  />
+                  <span>%</span>
                 </div>
+              ) : (
+                <div>{currentParameters.contributionRate}%</div>
+              )}
+              {selectedFund.allowManualEdit && (
+                <button
+                  onClick={() => {
+                    setManualContributionRate(null);
+                    if (onParametersChange) {
+                      onParametersChange({
+                        contributionRate: currentParameters.contributionRate,
+                        minimumContribution: manualMinimumContribution ?? currentParameters.minimumContribution,
+                        fixedAnnualContributions: manualFixedAnnualContributions ?? currentParameters.fixedAnnualContributions
+                      });
+                    }
+                  }}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  Reset
+                </button>
               )}
             </div>
-            
+
             <div className="grid grid-cols-[150px_120px_auto] gap-2 items-center">
               <label className="text-gray-600">Contributo minimo:</label>
               {selectedFund.allowManualEdit ? (
-                <>
-                  <div className="relative">
-                    <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={manualMinimumContribution !== null ? manualMinimumContribution : currentParameters.minimumContribution}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        setManualMinimumContribution(value);
-                        if (onParametersChange) {
-                          onParametersChange({
-                            contributionRate: manualContributionRate !== null ? manualContributionRate : currentParameters.contributionRate,
-                            minimumContribution: value
-                          });
-                        }
-                      }}
-                      className="w-full p-1 border rounded text-right pl-8"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setManualMinimumContribution(null);
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    value={manualMinimumContribution ?? currentParameters.minimumContribution}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      setManualMinimumContribution(value);
                       if (onParametersChange) {
                         onParametersChange({
-                          contributionRate: manualContributionRate !== null ? manualContributionRate : currentParameters.contributionRate,
-                          minimumContribution: currentParameters.minimumContribution
+                          contributionRate: manualContributionRate ?? currentParameters.contributionRate,
+                          minimumContribution: value,
+                          fixedAnnualContributions: manualFixedAnnualContributions ?? currentParameters.fixedAnnualContributions
                         });
                       }
                     }}
-                    className="text-blue-600 hover:text-blue-800 text-xs justify-self-start"
-                  >
-                    Reset
-                  </button>
-                </>
-              ) : (
-                <div className="col-span-2">
-                  <span className="text-gray-700">€{currentParameters.minimumContribution.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</span>
+                    className="w-20 p-1 border rounded"
+                    min="0"
+                    step="0.01"
+                  />
+                  <span>€</span>
                 </div>
+              ) : (
+                <div>{currentParameters.minimumContribution}€</div>
+              )}
+              {selectedFund.allowManualEdit && (
+                <button
+                  onClick={() => {
+                    setManualMinimumContribution(null);
+                    if (onParametersChange) {
+                      onParametersChange({
+                        contributionRate: manualContributionRate ?? currentParameters.contributionRate,
+                        minimumContribution: currentParameters.minimumContribution,
+                        fixedAnnualContributions: manualFixedAnnualContributions ?? currentParameters.fixedAnnualContributions
+                      });
+                    }
+                  }}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-[150px_120px_auto] gap-2 items-center">
+              <label className="text-gray-600">Contributi annuali fissi:</label>
+              {selectedFund.allowManualEdit ? (
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    value={manualFixedAnnualContributions ?? currentParameters.fixedAnnualContributions}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      setManualFixedAnnualContributions(value);
+                      if (onParametersChange) {
+                        onParametersChange({
+                          contributionRate: manualContributionRate ?? currentParameters.contributionRate,
+                          minimumContribution: manualMinimumContribution ?? currentParameters.minimumContribution,
+                          fixedAnnualContributions: value
+                        });
+                      }
+                    }}
+                    className="w-20 p-1 border rounded"
+                    min="0"
+                    step="0.01"
+                  />
+                  <span>€</span>
+                </div>
+              ) : (
+                <div>{currentParameters.fixedAnnualContributions}€</div>
+              )}
+              {selectedFund.allowManualEdit && (
+                <button
+                  onClick={() => {
+                    setManualFixedAnnualContributions(null);
+                    if (onParametersChange) {
+                      onParametersChange({
+                        contributionRate: manualContributionRate ?? currentParameters.contributionRate,
+                        minimumContribution: manualMinimumContribution ?? currentParameters.minimumContribution,
+                        fixedAnnualContributions: currentParameters.fixedAnnualContributions
+                      });
+                    }
+                  }}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  Reset
+                </button>
               )}
             </div>
           </div>

@@ -13,7 +13,10 @@ import { errorHandler } from "./middleware/errorHandler";
 import { securityHeaders } from "./middleware/securityHeaders";
 import authRoutes from "./routes/authRoutes";
 import settingsRoutes from "./routes/settingsRoutes";
+import professionalFundRoutes from "./routes/professionalFundRoutes";
 import "./config/passport";
+import { initializeInpsParameters2024 } from "./models/InpsParameters";
+import { initializationService } from "./services/initializationService";
 
 const app: Express = express();
 export { app }; // Export for testing
@@ -75,6 +78,7 @@ app.get('/api/csrf-token', (req, res) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/professional-funds", professionalFundRoutes);
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
@@ -93,12 +97,17 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Database connection
-const connectDB = async (): Promise<void> => {
+async function connectDB(): Promise<void> {
   try {
-    const mongoUri = process.env.MONGODB_URI || "mongodb://localhost:27017/piva-balance";
-    console.log("MongoDB URI:", mongoUri);
-    await mongoose.connect(mongoUri);
-    console.log("MongoDB connected successfully");
+    await mongoose.connect(process.env.MONGODB_URI as string);
+    console.log("Connected to MongoDB");
+    
+    // Initialize data after successful connection
+    await Promise.all([
+      initializeInpsParameters2024(),
+      initializationService.initializeProfessionalFunds()
+    ]);
+    console.log("Data initialization completed");
   } catch (error) {
     console.error("MongoDB connection error:", error);
     process.exit(1);

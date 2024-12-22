@@ -7,6 +7,7 @@ export interface UserSettings {
   profitabilityRate: number;
   pensionSystem: PensionSystemType;
   professionalFundId?: string;
+  inpsRateType?: 'COLLABORATOR_WITH_DISCOLL' | 'COLLABORATOR_WITHOUT_DISCOLL' | 'PROFESSIONAL' | 'PENSIONER';
 }
 
 class SettingsService {

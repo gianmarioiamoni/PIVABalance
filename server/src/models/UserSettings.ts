@@ -3,10 +3,13 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IUserSettings extends Document {
   userId: mongoose.Types.ObjectId;
   taxRegime: 'forfettario' | 'ordinario';
-  substituteRate: number;
-  profitabilityRate: number;
+  substituteRate?: number;
+  profitabilityRate?: number;
   pensionSystem: 'INPS' | 'PROFESSIONAL_FUND';
   professionalFundId?: string;
+  inpsRateType?: 'COLLABORATOR_WITH_DISCOLL' | 'COLLABORATOR_WITHOUT_DISCOLL' | 'PROFESSIONAL' | 'PENSIONER';
+  manualContributionRate?: number;
+  manualMinimumContribution?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,7 +29,6 @@ const UserSettingsSchema = new Schema<IUserSettings>({
   },
   substituteRate: {
     type: Number,
-    required: true,
     validate: {
       validator: function(v: number) {
         return [5, 25].includes(v);
@@ -37,7 +39,6 @@ const UserSettingsSchema = new Schema<IUserSettings>({
   },
   profitabilityRate: {
     type: Number,
-    required: true,
     min: 0,
     max: 100,
     default: 78
@@ -49,9 +50,6 @@ const UserSettingsSchema = new Schema<IUserSettings>({
   },
   professionalFundId: {
     type: String,
-    required: function(this: IUserSettings) {
-      return this.pensionSystem === 'PROFESSIONAL_FUND';
-    },
     validate: {
       validator: function(this: IUserSettings, v: string | undefined) {
         if (this.pensionSystem === 'PROFESSIONAL_FUND') {
@@ -61,6 +59,25 @@ const UserSettingsSchema = new Schema<IUserSettings>({
       },
       message: 'Professional fund ID is required when pension system is PROFESSIONAL_FUND'
     }
+  },
+  inpsRateType: {
+    type: String,
+    enum: ['COLLABORATOR_WITH_DISCOLL', 'COLLABORATOR_WITHOUT_DISCOLL', 'PROFESSIONAL', 'PENSIONER'],
+    validate: {
+      validator: function(this: IUserSettings, v: string | undefined) {
+        return this.pensionSystem !== 'INPS' || v !== undefined;
+      },
+      message: 'INPS rate type is required when pension system is INPS'
+    }
+  },
+  manualContributionRate: {
+    type: Number,
+    min: 0,
+    max: 100,
+  },
+  manualMinimumContribution: {
+    type: Number,
+    min: 0,
   }
 }, {
   timestamps: true

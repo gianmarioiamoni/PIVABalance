@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { UserSettings, settingsService } from '@/services/settingsService';
+import { ProfessionalFund } from '@/services/professionalFundService';
 import Tooltip from './Tooltip';
 import ProfitabilityRateTable, { ProfitabilityRate } from './ProfitabilityRateTable';
 import { PENSION_FUNDS, PensionSystemType } from '@/data/pensionFunds';
+import ProfessionalFundSelector from './ProfessionalFundSelector';
 
 const taxRegimeInfo = (
   <div className="space-y-4">
@@ -73,13 +75,16 @@ export default function TaxSettings() {
     profitabilityRate: 78,
     pensionSystem: 'INPS',
     professionalFundId: undefined,
+    inpsRateType: undefined,
+    manualContributionRate: undefined,
+    manualMinimumContribution: undefined,
   });
   const [originalSettings, setOriginalSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [showRateTable, setShowRateTable] = useState(false);
-  const [fundSelectTouched, setFundSelectTouched] = useState(false);
+  const [selectedProfessionalFund, setSelectedProfessionalFund] = useState<ProfessionalFund | null>(null);
 
   useEffect(() => {
     loadSettings();
@@ -285,9 +290,6 @@ export default function TaxSettings() {
                     pensionSystem: value,
                     professionalFundId: value === 'INPS' ? undefined : prev.professionalFundId
                   }));
-                  if (value === 'PROFESSIONAL_FUND') {
-                    setFundSelectTouched(true);
-                  }
                 }}
                 className="mt-2 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
               >
@@ -296,34 +298,46 @@ export default function TaxSettings() {
               </select>
             </div>
 
-            {settings.pensionSystem === 'PROFESSIONAL_FUND' && (
+            {settings.pensionSystem === 'INPS' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Seleziona la Cassa Professionale
-                  {fundSelectTouched && !settings.professionalFundId && (
-                    <span className="text-red-500 ml-1">*</span>
-                  )}
+                  Tipo di Attività per Gestione Separata INPS
                 </label>
                 <select
-                  value={settings.professionalFundId || ''}
-                  onChange={(e) => {
-                    handleChange('professionalFundId', e.target.value);
-                    setFundSelectTouched(true);
-                  }}
-                  onFocus={() => setFundSelectTouched(true)}
-                  className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm rounded-md ${
-                    fundSelectTouched && !settings.professionalFundId
-                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                  }`}
+                  value={settings.inpsRateType || ''}
+                  onChange={(e) => handleChange('inpsRateType', e.target.value)}
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                 >
-                  <option value="" disabled>Seleziona una cassa...</option>
-                  {PENSION_FUNDS.map(fund => (
-                    <option key={fund.id} value={fund.id}>
-                      {fund.name} ({fund.description})
-                    </option>
-                  ))}
+                  <option value="" disabled>Seleziona il tipo di attività...</option>
+                  <option value="COLLABORATOR_WITH_DISCOLL">Collaboratori con DIS-COLL (35,03%)</option>
+                  <option value="COLLABORATOR_WITHOUT_DISCOLL">Collaboratori senza DIS-COLL (33,72%)</option>
+                  <option value="PROFESSIONAL">Professionisti senza altra copertura (26,07%)</option>
+                  <option value="PENSIONER">Pensionati o con altra copertura (24,00%)</option>
                 </select>
+                <p className="mt-1 text-sm text-gray-500">
+                  Seleziona il tipo di attività per determinare l'aliquota contributiva corretta
+                </p>
+              </div>
+            )}
+
+            {settings.pensionSystem === 'PROFESSIONAL_FUND' && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Cassa Professionale
+                </label>
+                <ProfessionalFundSelector
+                  value={settings.professionalFundId}
+                  onChange={(fundId) => handleChange('professionalFundId', fundId)}
+                  onFundChange={setSelectedProfessionalFund}
+                  onParametersChange={(params) => {
+                    setSettings(prev => ({
+                      ...prev,
+                      manualContributionRate: params.contributionRate,
+                      manualMinimumContribution: params.minimumContribution
+                    }));
+                  }}
+                  error={!isValid() && !settings.professionalFundId ? 'Seleziona una cassa professionale' : undefined}
+                />
               </div>
             )}
           </div>

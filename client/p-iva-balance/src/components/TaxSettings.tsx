@@ -32,12 +32,12 @@ const taxRegimeInfo = (
 const profitabilityInfo = (
   <div className="space-y-2">
     <p>
-      Il coefficiente di redditività serve a determinare la parte del fatturato che viene considerata "reddito imponibile" 
+      Il coefficiente di redditività serve a determinare la parte del fatturato che viene considerata "reddito imponibile"
       su cui calcolare le imposte (imposta sostitutiva) e i contributi previdenziali.
     </p>
     <p>
-      Ogni attività economica ha un coefficiente di redditività specifico, stabilito in base al codice ATECO che 
-      identifica la tua attività. Questo coefficiente rappresenta la percentuale del fatturato considerata 
+      Ogni attività economica ha un coefficiente di redditività specifico, stabilito in base al codice ATECO che
+      identifica la tua attività. Questo coefficiente rappresenta la percentuale del fatturato considerata
       effettivamente come "utile" ai fini fiscali.
     </p>
     <p>
@@ -54,7 +54,7 @@ const pensionSystemInfo = (
     <div>
       <h4 className="font-semibold mb-2">Gestione Separata INPS:</h4>
       <p>
-        Sistema previdenziale obbligatorio per i liberi professionisti senza cassa di previdenza dedicata 
+        Sistema previdenziale obbligatorio per i liberi professionisti senza cassa di previdenza dedicata
         e per i lavoratori autonomi con partita IVA.
       </p>
     </div>
@@ -150,10 +150,10 @@ export default function TaxSettings() {
     setShowRateTable(false);
   };
 
-  const handleProfessionalFundParametersChange = (params: { 
-    contributionRate: number; 
-    minimumContribution: number; 
-    fixedAnnualContributions: number 
+  const handleProfessionalFundParametersChange = (params: {
+    contributionRate: number;
+    minimumContribution: number;
+    fixedAnnualContributions: number
   }) => {
     setSettings(prev => ({
       ...prev,
@@ -174,13 +174,13 @@ export default function TaxSettings() {
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Impostazioni Fiscali</h2>
-      
+
       {error && (
         <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
           {error}
         </div>
       )}
-      
+
       {success && (
         <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
           Impostazioni salvate con successo!
@@ -197,7 +197,7 @@ export default function TaxSettings() {
               Imposta i parametri per il calcolo del reddito imponibile in base al tuo regime fiscale
             </p>
           </div>
-          
+
           <div className="px-4 py-5 sm:p-6 space-y-6">
             <div>
               <div className="flex items-center">
@@ -286,7 +286,7 @@ export default function TaxSettings() {
               Imposta i parametri per il calcolo dei contributi previdenziali
             </p>
           </div>
-          
+
           <div className="px-4 py-5 sm:p-6 space-y-6">
             <div>
               <div className="flex items-center">

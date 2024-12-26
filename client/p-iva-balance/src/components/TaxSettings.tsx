@@ -1,39 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { UserSettings, settingsService } from '@/services/settingsService';
-import { ProfessionalFund } from '@/services/professionalFundService';
+import React from 'react';
 import Tooltip from './Tooltip';
 import ProfitabilityRateTable, { ProfitabilityRate } from './ProfitabilityRateTable';
-import { PENSION_FUNDS, PensionSystemType } from '@/data/pensionFunds';
-import ProfessionalFundSelector from './ProfessionalFundSelector';
 import { taxRegimeInfo, profitabilityInfo, pensionSystemInfo } from './tooltips/TooltipsText';
-
+import ProfessionalFundSelector from './ProfessionalFundSelector';
+import { useTaxSettings } from '@/hooks/useTaxSettings';
+import { UserSettings, settingsService } from '@/services/settingsService';
+import { ProfessionalFund } from '@/services/professionalFundService';
+import { PENSION_FUNDS, PensionSystemType } from '@/data/pensionFunds';
 
 export default function TaxSettings() {
-  const [settings, setSettings] = useState<UserSettings>({
-    taxRegime: 'forfettario',
-    substituteRate: 5,
-    profitabilityRate: 78,
-    pensionSystem: 'INPS',
-    professionalFundId: undefined,
-    inpsRateType: undefined,
-    manualContributionRate: undefined,
-    manualMinimumContribution: undefined,
-    manualFixedAnnualContributions: undefined
-  });
-  const [originalSettings, setOriginalSettings] = useState<UserSettings | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [showRateTable, setShowRateTable] = useState(false);
-  const [selectedProfessionalFund, setSelectedProfessionalFund] = useState<ProfessionalFund | null>(null);
-
-  useEffect(() => {
-    loadSettings();
-  }, []);
+  const {
+    state: { settings, loading, error, success, showRateTable, selectedProfessionalFund },
+    actions: {
+      handleChange,
+      handleSubmit,
+      handleRateSelect,
+      handleProfessionalFundParametersChange,
+      setShowRateTable,
+      setSelectedProfessionalFund
+    }
+  } = useTaxSettings();
 
   const hasChanges = () => {
-    if (!originalSettings) return false;
-    return JSON.stringify(settings) !== JSON.stringify(originalSettings);
+    return JSON.stringify(settings) !== JSON.stringify(settingsService.getUserSettings());
   };
 
   const isValid = () => {
@@ -41,66 +30,6 @@ export default function TaxSettings() {
       return false;
     }
     return true;
-  };
-
-  const loadSettings = async () => {
-    try {
-      const userSettings = await settingsService.getUserSettings();
-      setSettings(userSettings);
-      setOriginalSettings(userSettings);
-      setError(null);
-    } catch (err) {
-      setError('Errore nel caricamento delle impostazioni');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await settingsService.updateSettings(settings);
-      setSuccess(true);
-      setError(null);
-      setOriginalSettings(settings);
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      setError('Errore nel salvataggio delle impostazioni');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleChange = (field: keyof UserSettings, value: any) => {
-    setSettings(prev => ({
-      ...prev,
-      [field]: value,
-      ...(field === 'taxRegime' && value === 'ordinario' ? {
-        substituteRate: undefined,
-        profitabilityRate: undefined
-      } : {})
-    }));
-  };
-
-  const handleRateSelect = (rate: ProfitabilityRate) => {
-    handleChange('profitabilityRate', rate.rate);
-    setShowRateTable(false);
-  };
-
-  const handleProfessionalFundParametersChange = (params: {
-    contributionRate: number;
-    minimumContribution: number;
-    fixedAnnualContributions: number
-  }) => {
-    setSettings(prev => ({
-      ...prev,
-      manualContributionRate: params.contributionRate,
-      manualMinimumContribution: params.minimumContribution,
-      manualFixedAnnualContributions: params.fixedAnnualContributions
-    }));
   };
 
   if (loading) {
@@ -239,11 +168,10 @@ export default function TaxSettings() {
                 value={settings.pensionSystem}
                 onChange={(e) => {
                   const value = e.target.value as PensionSystemType;
-                  setSettings(prev => ({
-                    ...prev,
-                    pensionSystem: value,
-                    professionalFundId: value === 'INPS' ? undefined : prev.professionalFundId
-                  }));
+                  handleChange('pensionSystem', value);
+                  if (value === 'INPS') {
+                    handleChange('professionalFundId', undefined);
+                  }
                 }}
                 className="mt-2 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
               >

@@ -8,6 +8,7 @@ interface TooltipProps {
 export default function Tooltip({ content, children }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -20,9 +21,35 @@ export default function Tooltip({ content, children }: TooltipProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (isVisible && tooltipRef.current && buttonRef.current) {
+      const tooltipRect = tooltipRef.current.getBoundingClientRect();
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      
+      // Reset any previous transforms
+      tooltipRef.current.style.transform = 'translateX(-50%)';
+      
+      // Get the updated tooltip position
+      const tooltipTop = buttonRect.bottom + 8; // 8px spacing
+      const tooltipBottom = tooltipTop + tooltipRect.height;
+      
+      // Check if tooltip would go below viewport
+      if (tooltipBottom > viewportHeight) {
+        // Position above the button if it would go below viewport
+        tooltipRef.current.style.top = `${buttonRect.top - tooltipRect.height - 8}px`;
+      } else {
+        tooltipRef.current.style.top = `${tooltipTop}px`;
+      }
+      
+      tooltipRef.current.style.left = `${buttonRect.left + (buttonRect.width / 2)}px`;
+    }
+  }, [isVisible]);
+
   return (
     <div className="relative inline-block">
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setIsVisible(!isVisible)}
         className="ml-2 text-gray-400 hover:text-gray-500 focus:outline-none"
@@ -45,9 +72,15 @@ export default function Tooltip({ content, children }: TooltipProps) {
       {isVisible && (
         <div
           ref={tooltipRef}
-          className="absolute z-10 w-96 px-4 py-3 text-sm bg-white border border-gray-200 rounded-lg shadow-lg right-0 mt-2"
+          className="fixed z-50 px-4 py-3 text-sm bg-white border border-gray-200 rounded-lg shadow-lg"
+          style={{
+            width: 'min(500px, 90vw)',
+            transform: 'translateX(-50%)',
+            maxHeight: '80vh',
+            overflowY: 'auto'
+          }}
         >
-          <div className="text-gray-700">{content}</div>
+          <div className="text-gray-700 whitespace-normal">{content}</div>
         </div>
       )}
     </div>

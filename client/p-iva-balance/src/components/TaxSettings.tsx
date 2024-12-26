@@ -17,20 +17,11 @@ export default function TaxSettings() {
       handleRateSelect,
       handleProfessionalFundParametersChange,
       setShowRateTable,
-      setSelectedProfessionalFund
+      setSelectedProfessionalFund,
+      hasChanges,
+      isValid
     }
   } = useTaxSettings();
-
-  const hasChanges = () => {
-    return JSON.stringify(settings) !== JSON.stringify(settingsService.getUserSettings());
-  };
-
-  const isValid = () => {
-    if (settings.pensionSystem === 'PROFESSIONAL_FUND' && !settings.professionalFundId) {
-      return false;
-    }
-    return true;
-  };
 
   if (loading) {
     return (

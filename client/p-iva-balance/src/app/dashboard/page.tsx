@@ -1,14 +1,19 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import TaxSettings from '@/components/TaxSettings';
+
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ');
+}
 
 export default function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isLoading, setToken } = useAuth();
+  const [activeTab, setActiveTab] = useState('settings');
 
   useEffect(() => {
     const token = searchParams.get('token');
@@ -49,8 +54,45 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="mt-8">
-            <TaxSettings />
+          <div>
+            <div className="border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                <button
+                  onClick={() => setActiveTab('settings')}
+                  className={classNames(
+                    activeTab === 'settings'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                    'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
+                  )}
+                >
+                  Impostazioni
+                </button>
+                <button
+                  onClick={() => setActiveTab('invoices')}
+                  className={classNames(
+                    activeTab === 'invoices'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                    'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
+                  )}
+                >
+                  Fatture
+                </button>
+              </nav>
+            </div>
+
+            <div className="mt-6">
+              {activeTab === 'settings' && <TaxSettings />}
+              {activeTab === 'invoices' && (
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Fatture</h2>
+                  <p className="text-gray-500">
+                    Questa sezione è in fase di sviluppo. Presto potrai gestire le tue fatture qui.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </main>

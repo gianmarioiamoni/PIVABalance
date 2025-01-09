@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import TaxSettings from '@/components/TaxSettings';
+import Invoices from '@/components/Invoices';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -84,14 +85,7 @@ export default function Dashboard() {
 
             <div className="mt-6">
               {activeTab === 'settings' && <TaxSettings />}
-              {activeTab === 'invoices' && (
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Fatture</h2>
-                  <p className="text-gray-500">
-                    Questa sezione è in fase di sviluppo. Presto potrai gestire le tue fatture qui.
-                  </p>
-                </div>
-              )}
+              {activeTab === 'invoices' && <Invoices />}
             </div>
           </div>
         </div>

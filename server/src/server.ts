@@ -15,6 +15,7 @@ import { auth } from './middleware/auth';
 import authRoutes from "./routes/authRoutes";
 import settingsRoutes from "./routes/settingsRoutes";
 import professionalFundRoutes from "./routes/professionalFundRoutes";
+import invoiceRoutes from "./routes/invoiceRoutes";
 import { irpefRateController } from './controllers/irpefRateController';
 import "./config/passport";
 import { initializeInpsParameters2024 } from "./models/InpsParameters";
@@ -37,7 +38,7 @@ app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:3000",
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
     exposedHeaders: ['X-CSRF-Token']
   })
@@ -80,8 +81,9 @@ app.get('/api/csrf-token', (req, res) => {
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/settings", settingsRoutes);
-app.use("/api/professional-funds", professionalFundRoutes);
+app.use("/api/settings", auth, settingsRoutes);
+app.use("/api/professional-funds", auth, professionalFundRoutes);
+app.use("/api/invoices", auth, invoiceRoutes);
 
 // IRPEF Rate routes
 app.get('/api/irpef-rates', auth, irpefRateController.getCurrentRates);

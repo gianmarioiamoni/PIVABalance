@@ -5,6 +5,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { Invoice, invoiceService } from '@/services/invoiceService';
 import { UserSettings } from '@/services/settingsService';
 import { useTaxSettings } from '@/hooks/useTaxSettings';
+import { CalendarIcon, TrashIcon } from '@heroicons/react/24/outline';
+import ConfirmDialog from './ConfirmDialog';
 
 export default function Invoices() {
   const { user } = useAuth();
@@ -20,6 +22,7 @@ export default function Invoices() {
     issueDate: new Date(),
   });
   const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
+  const [deleteInvoiceId, setDeleteInvoiceId] = useState<string | null>(null);
 
   // Generate available years starting from 2025
   const currentYear = new Date().getFullYear();
@@ -89,6 +92,23 @@ export default function Invoices() {
     } catch (error) {
       console.error(error);
       setError('Errore nell\'aggiornamento della data di pagamento');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await invoiceService.deleteInvoice(invoiceId);
+      setDeleteInvoiceId(null); // Chiudi il dialog
+      // Refresh invoices after deletion
+      const updatedInvoices = await invoiceService.getInvoicesByYear(selectedYear);
+      setInvoices(updatedInvoices);
+    } catch (error) {
+      console.error(error);
+      setError('Errore nella cancellazione della fattura');
     } finally {
       setLoading(false);
     }
@@ -268,6 +288,9 @@ export default function Invoices() {
                       Data Pagamento
                     </th>
                   )}
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Azioni
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -301,6 +324,20 @@ export default function Invoices() {
                         )}
                       </td>
                     )}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="relative group">
+                        <button
+                          onClick={() => invoice._id && setDeleteInvoiceId(invoice._id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                          <span className="sr-only">Elimina fattura</span>
+                        </button>
+                        <div className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-1/2 transform -translate-x-1/2">
+                          Elimina fattura
+                        </div>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -308,6 +345,17 @@ export default function Invoices() {
           </div>
         )}
       </div>
+
+      {/* Dialog di conferma eliminazione */}
+      <ConfirmDialog
+        isOpen={!!deleteInvoiceId}
+        title="Elimina fattura"
+        message="Sei sicuro di voler eliminare questa fattura? Questa azione non può essere annullata."
+        confirmLabel="Elimina"
+        cancelLabel="Annulla"
+        onConfirm={() => deleteInvoiceId && handleDeleteInvoice(deleteInvoiceId)}
+        onCancel={() => setDeleteInvoiceId(null)}
+      />
     </div>
   );
 }

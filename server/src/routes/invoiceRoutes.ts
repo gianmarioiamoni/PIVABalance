@@ -17,4 +17,7 @@ router.post("/", validateInvoice, invoiceController.createInvoice);
 router.route('/:id/update')
   .post(validateInvoiceUpdate, invoiceController.updateInvoice);
 
+// Delete an invoice
+router.delete('/:id', invoiceController.deleteInvoice);
+
 export default router;

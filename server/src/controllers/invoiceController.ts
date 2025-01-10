@@ -90,5 +90,34 @@ export const invoiceController = {
       console.error('Error updating invoice:', error);
       res.status(500).json({ message: 'Error updating invoice' });
     }
+  },
+
+  // Delete an invoice
+  async deleteInvoice(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = req.user?._id;
+
+      if (!id) {
+        return res.status(400).json({ message: 'Invoice ID is required' });
+      }
+
+      if (!userId) {
+        return res.status(401).json({ message: 'User not authenticated' });
+      }
+
+      // Ensure user can only delete their own invoices
+      const invoice = await Invoice.findOne({ _id: id, userId });
+
+      if (!invoice) {
+        return res.status(404).json({ message: 'Invoice not found' });
+      }
+
+      await Invoice.deleteOne({ _id: id, userId });
+      res.status(200).json({ message: 'Invoice deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting invoice:', error);
+      res.status(500).json({ message: 'Error deleting invoice' });
+    }
   }
 };

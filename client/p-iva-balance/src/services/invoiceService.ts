@@ -42,6 +42,15 @@ class InvoiceService {
       throw error;
     }
   }
+
+  async deleteInvoice(id: string): Promise<void> {
+    try {
+      await api.delete(`/api/invoices/${id}`);
+    } catch (error) {
+      console.error('Error deleting invoice:', error);
+      throw error;
+    }
+  }
 }
 
 export const invoiceService = new InvoiceService();

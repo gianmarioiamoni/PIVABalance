@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Invoice, invoiceService } from '@/services/invoiceService';
 import { UserSettings } from '@/services/settingsService';
 import { useTaxSettings } from '@/hooks/useTaxSettings';
-import { CalendarIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import ConfirmDialog from './ConfirmDialog';
 
 export default function Invoices() {
@@ -126,11 +126,11 @@ export default function Invoices() {
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Fatture</h2>
-        <div className="flex space-x-4">
+        <div className="flex items-center space-x-4">
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            className="block w-32 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
           >
             {availableYears.map((year) => (
               <option key={year} value={year}>
@@ -138,12 +138,19 @@ export default function Invoices() {
               </option>
             ))}
           </select>
-          <button
-            onClick={() => setShowNewInvoiceForm(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Nuova Fattura
-          </button>
+          <div className="relative group">
+            <button
+              onClick={() => setShowNewInvoiceForm(true)}
+              className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            >
+              <span className="hidden sm:inline">Crea Fattura</span>
+              <PlusIcon className="h-5 w-5 sm:hidden" aria-hidden="true" />
+              <span className="sr-only">Crea nuova fattura</span>
+            </button>
+            <div className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 right-0 top-full mt-1 whitespace-nowrap sm:hidden">
+              Crea Fattura
+            </div>
+          </div>
         </div>
       </div>
 
@@ -258,92 +265,148 @@ export default function Invoices() {
         </div>
       )}
 
-      <div className="mt-6">
-        {invoices.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">
-            Nessuna fattura trovata per l'anno {selectedYear}
-          </p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Numero
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Data Emissione
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Titolo
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Cliente
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Importo
-                  </th>
-                  {taxState.settings?.taxRegime === 'forfettario' && (
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Data Pagamento
+      <div className="mt-8 flow-root">
+        <div className="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 align-middle">
+            {/* Tabella per schermi grandi */}
+            <div className="hidden sm:block">
+              <table className="min-w-full divide-y divide-gray-300">
+                <thead>
+                  <tr>
+                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">
+                      Numero
                     </th>
-                  )}
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Azioni
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {invoices.map((invoice) => (
-                  <tr key={invoice._id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{invoice.number}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(invoice.issueDate).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{invoice.title}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{invoice.clientName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      €{invoice.amount.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
-                    </td>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Data
+                    </th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Cliente
+                    </th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Importo
+                    </th>
                     {taxState.settings?.taxRegime === 'forfettario' && (
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {invoice.paymentDate ? (
-                          new Date(invoice.paymentDate).toLocaleDateString()
-                        ) : (
-                          <div>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        Data Pagamento
+                      </th>
+                    )}
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Azioni
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {invoices.map((invoice) => (
+                    <tr key={invoice._id}>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 lg:pl-8">
+                        {invoice.number}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                        {new Date(invoice.issueDate).toLocaleDateString()}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                        {invoice.clientName}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                        €{invoice.amount.toFixed(2)}
+                      </td>
+                      {taxState.settings?.taxRegime === 'forfettario' && (
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                          {invoice.paymentDate ? (
+                            new Date(invoice.paymentDate).toLocaleDateString()
+                          ) : (
                             <input
                               type="date"
-                              className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                               onChange={(e) => {
                                 if (invoice._id && e.target.value) {
                                   handleUpdatePaymentDate(invoice._id, new Date(e.target.value));
                                 }
                               }}
                             />
+                          )}
+                        </td>
+                      )}
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                        <div className="relative group">
+                          <button
+                            onClick={() => invoice._id && setDeleteInvoiceId(invoice._id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                            <span className="sr-only">Elimina fattura</span>
+                          </button>
+                          <div className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-1/2 transform -translate-x-1/2">
+                            Elimina fattura
                           </div>
-                        )}
+                        </div>
                       </td>
-                    )}
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="relative group">
-                        <button
-                          onClick={() => invoice._id && setDeleteInvoiceId(invoice._id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <TrashIcon className="h-5 w-5" aria-hidden="true" />
-                          <span className="sr-only">Elimina fattura</span>
-                        </button>
-                        <div className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-1/2 transform -translate-x-1/2">
-                          Elimina fattura
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Cards per schermi piccoli */}
+            <div className="sm:hidden space-y-4 px-4">
+              {invoices.map((invoice) => (
+                <div
+                  key={invoice._id}
+                  className="bg-white shadow rounded-lg overflow-hidden"
+                >
+                  <div className="p-4 space-y-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          Fattura #{invoice.number}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {new Date(invoice.issueDate).toLocaleDateString()}
                         </div>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <button
+                        onClick={() => invoice._id && setDeleteInvoiceId(invoice._id)}
+                        className="text-red-600 hover:text-red-900 p-1"
+                      >
+                        <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                        <span className="sr-only">Elimina fattura</span>
+                      </button>
+                    </div>
+
+                    <div className="text-sm text-gray-900">
+                      <span className="font-medium">Cliente:</span> {invoice.clientName}
+                    </div>
+
+                    <div className="text-sm text-gray-900">
+                      <span className="font-medium">Importo:</span> €{invoice.amount.toFixed(2)}
+                    </div>
+
+                    {taxState.settings?.taxRegime === 'forfettario' && (
+                      <div className="text-sm">
+                        <span className="font-medium text-gray-900">Data Pagamento:</span>
+                        {invoice.paymentDate ? (
+                          <span className="ml-2 text-gray-900">
+                            {new Date(invoice.paymentDate).toLocaleDateString()}
+                          </span>
+                        ) : (
+                          <input
+                            type="date"
+                            className="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                            onChange={(e) => {
+                              if (invoice._id && e.target.value) {
+                                handleUpdatePaymentDate(invoice._id, new Date(e.target.value));
+                              }
+                            }}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Dialog di conferma eliminazione */}

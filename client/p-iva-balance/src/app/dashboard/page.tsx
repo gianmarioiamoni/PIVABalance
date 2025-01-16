@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import TaxSettings from '@/components/TaxSettings';
@@ -15,6 +15,25 @@ export default function Dashboard() {
   const searchParams = useSearchParams();
   const { user, isLoading, setToken } = useAuth();
   const [activeTab, setActiveTab] = useState('settings');
+  const [attemptedTab, setAttemptedTab] = useState<string | null>(null);
+  const taxSettingsRef = useRef<{ hasChanges: () => boolean } | null>(null);
+
+  const handleTabChange = (newTab: string) => {
+    if (activeTab === 'settings' && taxSettingsRef.current?.hasChanges()) {
+      setAttemptedTab(newTab);
+    } else {
+      setActiveTab(newTab);
+    }
+  };
+
+  const handleConfirmTabChange = (confirmedTab: string) => {
+    setActiveTab(confirmedTab);
+    setAttemptedTab(null);
+  };
+
+  const handleCancelTabChange = () => {
+    setAttemptedTab(null);
+  };
 
   useEffect(() => {
     const token = searchParams.get('token');
@@ -59,7 +78,7 @@ export default function Dashboard() {
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                 <button
-                  onClick={() => setActiveTab('settings')}
+                  onClick={() => handleTabChange('settings')}
                   className={classNames(
                     activeTab === 'settings'
                       ? 'border-blue-500 text-blue-600'
@@ -70,7 +89,7 @@ export default function Dashboard() {
                   Impostazioni
                 </button>
                 <button
-                  onClick={() => setActiveTab('invoices')}
+                  onClick={() => handleTabChange('invoices')}
                   className={classNames(
                     activeTab === 'invoices'
                       ? 'border-blue-500 text-blue-600'
@@ -84,7 +103,15 @@ export default function Dashboard() {
             </div>
 
             <div className="mt-6">
-              {activeTab === 'settings' && <TaxSettings />}
+              {activeTab === 'settings' && (
+                <TaxSettings
+                  ref={taxSettingsRef}
+                  activeTab={activeTab}
+                  attemptedTab={attemptedTab}
+                  onTabChange={handleConfirmTabChange}
+                  onCancelTabChange={handleCancelTabChange}
+                />
+              )}
               {activeTab === 'invoices' && <Invoices />}
             </div>
           </div>

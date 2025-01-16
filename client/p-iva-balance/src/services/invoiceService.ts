@@ -10,6 +10,10 @@ export interface Invoice {
   amount: number;
   paymentDate?: Date;
   fiscalYear: number;
+  vat: {
+    type: 'standard' | 'reduced10' | 'reduced5' | 'reduced4' | 'custom';
+    rate: number;
+  };
 }
 
 class InvoiceService {

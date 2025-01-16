@@ -8,7 +8,11 @@ const invoiceSchema = z.object({
   clientName: z.string().min(1, 'Client name is required'),
   amount: z.number().positive('Amount must be positive'),
   paymentDate: z.string().or(z.date()).optional().nullable(),
-  fiscalYear: z.number().int().min(2025, 'Fiscal year must be 2025 or later')
+  fiscalYear: z.number().int().min(2025, 'Fiscal year must be 2025 or later'),
+  vat: z.object({
+    type: z.enum(['standard', 'reduced10', 'reduced5', 'reduced4', 'custom']),
+    rate: z.number().min(0).max(100)
+  })
 });
 
 const invoiceUpdateSchema = z.object({
@@ -50,7 +54,7 @@ export const validateInvoiceUpdate = (req: Request, res: Response, next: NextFun
         }))
       });
     } else {
-      res.status(400).json({ message: 'Invalid update data' });
+      res.status(400).json({ message: 'Invalid invoice update data' });
     }
   }
 };

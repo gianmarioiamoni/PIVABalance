@@ -33,6 +33,21 @@ const invoiceSchema = new mongoose.Schema({
   fiscalYear: {
     type: Number,
     required: true
+  },
+  vat: {
+    type: {
+      type: String,
+      enum: ['standard', 'reduced10', 'reduced5', 'reduced4', 'custom'],
+      required: true,
+      default: 'standard'
+    },
+    rate: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 100,
+      default: 22
+    }
   }
 }, {
   timestamps: true

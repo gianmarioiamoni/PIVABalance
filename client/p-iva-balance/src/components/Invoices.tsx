@@ -20,7 +20,7 @@ export default function Invoices() {
   const [newInvoice, setNewInvoice] = useState<Partial<Invoice>>({
     fiscalYear: selectedYear,
     issueDate: new Date(),
-    vat: { type: 'standard', rate: 22 }
+    vat: taxState.settings?.taxRegime === 'ordinario' ? { type: 'standard', rate: 22 } : undefined
   });
   const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
   const [deleteInvoiceId, setDeleteInvoiceId] = useState<string | null>(null);
@@ -44,17 +44,22 @@ export default function Invoices() {
     if (user) {
       loadInvoices();
       setUserSettings(taxState.settings);
+      // Reset newInvoice VAT when tax regime changes
+      setNewInvoice(prev => ({
+        ...prev,
+        vat: taxState.settings?.taxRegime === 'ordinario' ? { type: 'standard', rate: 22 } : undefined
+      }));
     }
-  }, [selectedYear, user, taxState.settings]);
+  }, [selectedYear, user, taxState.settings?.taxRegime]);
 
   const loadInvoices = async () => {
     setLoading(true);
     try {
       const data = await invoiceService.getInvoicesByYear(selectedYear);
-      // Add default VAT only for old invoices that don't have it
+      // Add default VAT only for old invoices in ordinario regime
       const updatedData = data.map(invoice => ({
         ...invoice,
-        vat: invoice.vat || { type: 'standard', rate: 22 } // Solo per fatture vecchie senza IVA
+        vat: taxState.settings?.taxRegime === 'ordinario' ? (invoice.vat || { type: 'standard', rate: 22 }) : undefined
       }));
       setInvoices(updatedData);
       setError(null);
@@ -78,7 +83,8 @@ export default function Invoices() {
         fiscalYear: selectedYear,
         issueDate: new Date(newInvoice.issueDate!),
         paymentDate: newInvoice.paymentDate ? new Date(newInvoice.paymentDate) : undefined,
-        vat: newInvoice.vat // Usa il valore IVA scelto nel form
+        // Include VAT only for ordinario regime
+        vat: taxState.settings?.taxRegime === 'ordinario' ? newInvoice.vat : undefined
       } as Omit<Invoice, '_id'>;
 
       const createdInvoice = await invoiceService.createInvoice(invoiceData);
@@ -87,7 +93,7 @@ export default function Invoices() {
       setNewInvoice({ 
         fiscalYear: selectedYear, 
         issueDate: new Date(),
-        vat: { type: 'standard', rate: 22 }
+        vat: taxState.settings?.taxRegime === 'ordinario' ? { type: 'standard', rate: 22 } : undefined
       });
       setError(null);
     } catch (err) {
@@ -109,7 +115,7 @@ export default function Invoices() {
         // Add default VAT for invoices that don't have it
         const updatedData = updatedInvoices.map(invoice => ({
           ...invoice,
-          vat: invoice.vat || { type: 'standard', rate: 22 }
+          vat: taxState.settings?.taxRegime === 'ordinario' ? (invoice.vat || { type: 'standard', rate: 22 }) : undefined
         }));
         setInvoices(updatedData);
       }
@@ -132,7 +138,7 @@ export default function Invoices() {
       // Add default VAT for invoices that don't have it
       const updatedData = updatedInvoices.map(invoice => ({
         ...invoice,
-        vat: invoice.vat || { type: 'standard', rate: 22 }
+        vat: taxState.settings?.taxRegime === 'ordinario' ? (invoice.vat || { type: 'standard', rate: 22 }) : undefined
       }));
       setInvoices(updatedData);
     } catch (error) {
@@ -268,61 +274,68 @@ export default function Invoices() {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  IVA
-                </label>
-                <div className="mt-1 flex space-x-4">
-                  <select
-                    value={newInvoice.vat?.type || 'standard'}
-                    onChange={(e) => {
-                      const selectedType = e.target.value as Invoice['vat']['type'];
-                      const selectedOption = vatOptions.find(opt => opt.type === selectedType);
-                      setNewInvoice(prev => ({
-                        ...prev,
-                        vat: {
-                          type: selectedType,
-                          rate: selectedOption?.rate || (selectedType === 'custom' ? 0 : 22)
-                        }
-                      }));
-                    }}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  >
-                    {vatOptions.map(option => (
-                      <option key={option.type} value={option.type}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  {newInvoice.vat?.type === 'custom' && (
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        value={newInvoice.vat?.rate || 0}
-                        onChange={(e) => setNewInvoice(prev => ({
+              {/* Campo IVA solo per regime ordinario */}
+              {taxState.settings?.taxRegime === 'ordinario' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    IVA
+                  </label>
+                  <div className="mt-1 flex space-x-4">
+                    <select
+                      value={newInvoice.vat?.type ?? 'standard'}
+                      onChange={(e) => {
+                        const selectedType = e.target.value as 'standard' | 'reduced10' | 'reduced5' | 'reduced4' | 'custom';
+                        const selectedOption = vatOptions.find(opt => opt.type === selectedType);
+                        setNewInvoice(prev => ({
                           ...prev,
                           vat: {
-                            type: 'custom',
-                            rate: Number(e.target.value)
+                            type: selectedType,
+                            rate: selectedOption?.rate || (selectedType === 'custom' ? 0 : 22)
                           }
-                        }))}
-                        className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
-                      <span className="text-gray-500">%</span>
-                    </div>
-                  )}
+                        }));
+                      }}
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    >
+                      {vatOptions.map(option => (
+                        <option key={option.type} value={option.type}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    {newInvoice.vat?.type === 'custom' && (
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          value={newInvoice.vat?.rate || 0}
+                          onChange={(e) => setNewInvoice(prev => ({
+                            ...prev,
+                            vat: {
+                              type: 'custom',
+                              rate: Number(e.target.value)
+                            }
+                          }))}
+                          className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                        <span className="text-gray-500">%</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
                 onClick={() => {
                   setShowNewInvoiceForm(false);
-                  setNewInvoice({ fiscalYear: selectedYear, issueDate: new Date(), vat: { type: 'standard', rate: 22 } });
+                  setNewInvoice({ 
+                    fiscalYear: selectedYear, 
+                    issueDate: new Date(),
+                    vat: taxState.settings?.taxRegime === 'ordinario' ? { type: 'standard', rate: 22 } : undefined
+                  });
                 }}
                 className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
@@ -360,9 +373,12 @@ export default function Invoices() {
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Importo
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      IVA
-                    </th>
+                    {/* Colonna IVA solo per regime ordinario */}
+                    {taxState.settings?.taxRegime === 'ordinario' && (
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        IVA
+                      </th>
+                    )}
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Data Pagamento
                     </th>
@@ -386,9 +402,12 @@ export default function Invoices() {
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
                         €{invoice.amount.toFixed(2)}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
-                        {invoice.vat?.rate}%
-                      </td>
+                      {/* Cella IVA solo per regime ordinario */}
+                      {taxState.settings?.taxRegime === 'ordinario' && (
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                          {invoice.vat?.rate}%
+                        </td>
+                      )}
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
                         {invoice.paymentDate ? (
                           new Date(invoice.paymentDate).toLocaleDateString()
@@ -458,9 +477,12 @@ export default function Invoices() {
                       <span className="font-medium">Importo:</span> €{invoice.amount.toFixed(2)}
                     </div>
 
-                    <div className="text-sm text-gray-900">
-                      <span className="font-medium">IVA:</span> {invoice.vat?.rate}%
-                    </div>
+                    {/* IVA nella vista mobile solo per regime ordinario */}
+                    {taxState.settings?.taxRegime === 'ordinario' && (
+                      <div className="text-sm text-gray-900">
+                        <span className="font-medium">IVA:</span> {invoice.vat?.rate}%
+                      </div>
+                    )}
 
                     <div className="text-sm">
                       <span className="font-medium text-gray-900">Data Pagamento:</span>

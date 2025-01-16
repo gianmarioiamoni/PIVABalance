@@ -10,7 +10,7 @@ export interface Invoice {
   amount: number;
   paymentDate?: Date;
   fiscalYear: number;
-  vat: {
+  vat?: {
     type: 'standard' | 'reduced10' | 'reduced5' | 'reduced4' | 'custom';
     rate: number;
   };

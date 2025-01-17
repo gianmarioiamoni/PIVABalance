@@ -29,10 +29,29 @@ class InvoiceService {
 
   async createInvoice(invoice: Omit<Invoice, '_id'>): Promise<Invoice> {
     try {
+      console.log('Request payload:', JSON.stringify(invoice, null, 2));
       const response = await api.post('/api/invoices', invoice);
+      console.log('Server response:', response);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating invoice:', error);
+      if (error.response) {
+        console.error('Server error details:', {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+          headers: error.response.headers,
+          config: {
+            url: error.config.url,
+            method: error.config.method,
+            data: error.config.data
+          }
+        });
+      } else if (error.request) {
+        console.error('Request was made but no response received:', error.request);
+      } else {
+        console.error('Error setting up request:', error.message);
+      }
       throw error;
     }
   }

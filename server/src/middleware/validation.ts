@@ -10,9 +10,9 @@ const invoiceSchema = z.object({
   paymentDate: z.string().or(z.date()).optional().nullable(),
   fiscalYear: z.number().int().min(2025, 'Fiscal year must be 2025 or later'),
   vat: z.object({
-    type: z.enum(['standard', 'reduced10', 'reduced5', 'reduced4', 'custom']),
-    rate: z.number().min(0).max(100)
-  })
+    vatType: z.enum(['standard', 'reduced10', 'reduced5', 'reduced4', 'custom']),
+    vatRate: z.number().min(0).max(100)
+  }).optional()
 });
 
 const invoiceUpdateSchema = z.object({

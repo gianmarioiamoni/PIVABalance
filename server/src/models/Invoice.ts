@@ -1,5 +1,17 @@
 import mongoose from 'mongoose';
 
+const vatSchema = new mongoose.Schema({
+  vatType: {
+    type: String,
+    enum: ['standard', 'reduced10', 'reduced5', 'reduced4', 'custom'],
+  },
+  vatRate: {
+    type: Number,
+    min: 0,
+    max: 100,
+  }
+}, { _id: false });
+
 const invoiceSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -35,19 +47,7 @@ const invoiceSchema = new mongoose.Schema({
     required: true
   },
   vat: {
-    type: {
-      type: String,
-      enum: ['standard', 'reduced10', 'reduced5', 'reduced4', 'custom'],
-      required: true,
-      default: 'standard'
-    },
-    rate: {
-      type: Number,
-      required: true,
-      min: 0,
-      max: 100,
-      default: 22
-    }
+    type: vatSchema,
   }
 }, {
   timestamps: true

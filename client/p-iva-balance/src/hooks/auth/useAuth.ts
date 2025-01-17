@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { authService, User } from '../services/authService';
+import { authService, User } from '@/services/authService';
 import { useLocalStorage } from './useLocalStorage';
 import { useRouter } from 'next/navigation';
 

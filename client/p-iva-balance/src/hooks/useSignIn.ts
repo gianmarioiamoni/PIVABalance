@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { authService, SignInCredentials } from '@/services/authService';
-import { useAuth } from './useAuth';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 export function useSignIn() {
   const router = useRouter();

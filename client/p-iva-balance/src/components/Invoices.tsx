@@ -1,28 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { Invoice, invoiceService } from '@/services/invoiceService';
-import { UserSettings } from '@/services/settingsService';
+import React, { useState } from 'react';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { useTaxSettings } from '@/hooks/useTaxSettings';
-import { CalendarIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { useInvoices } from '@/hooks/invoices/useInvoices';
+import { useNewInvoice, vatOptions } from '@/hooks/invoices/useNewInvoice';
+import { TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import ConfirmDialog from './ConfirmDialog';
 
 export default function Invoices() {
   const { user } = useAuth();
   const { state: taxState } = useTaxSettings();
   const [selectedYear, setSelectedYear] = useState(2025);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showNewInvoiceForm, setShowNewInvoiceForm] = useState(false);
-  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
-  const [newInvoice, setNewInvoice] = useState<Partial<Invoice>>({
-    fiscalYear: selectedYear,
-    issueDate: new Date(),
-    vat: taxState.settings?.taxRegime === 'ordinario' ? { type: 'standard', rate: 22 } : undefined
-  });
-  const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
   const [deleteInvoiceId, setDeleteInvoiceId] = useState<string | null>(null);
 
   // Generate available years starting from 2025
@@ -32,122 +21,32 @@ export default function Invoices() {
     (_, i) => 2025 + i
   );
 
-  const vatOptions = [
-    { type: 'standard', label: 'IVA 22%', rate: 22 },
-    { type: 'reduced10', label: 'IVA 10%', rate: 10 },
-    { type: 'reduced5', label: 'IVA 5%', rate: 5 },
-    { type: 'reduced4', label: 'IVA 4%', rate: 4 },
-    { type: 'custom', label: 'IVA Personalizzata', rate: 0 }
-  ];
+  const {
+    invoices,
+    loading,
+    error,
+    handleUpdatePaymentDate,
+    handleDeleteInvoice,
+    refreshInvoices
+  } = useInvoices(selectedYear, taxState.settings?.taxRegime);
 
-  useEffect(() => {
-    if (user) {
-      loadInvoices();
-      setUserSettings(taxState.settings);
-      // Reset newInvoice VAT when tax regime changes
-      setNewInvoice(prev => ({
-        ...prev,
-        vat: taxState.settings?.taxRegime === 'ordinario' ? { type: 'standard', rate: 22 } : undefined
-      }));
-    }
-  }, [selectedYear, user, taxState.settings?.taxRegime]);
-
-  const loadInvoices = async () => {
-    setLoading(true);
-    try {
-      const data = await invoiceService.getInvoicesByYear(selectedYear);
-      // Add default VAT only for old invoices in ordinario regime
-      const updatedData = data.map(invoice => ({
-        ...invoice,
-        vat: taxState.settings?.taxRegime === 'ordinario' ? (invoice.vat || { type: 'standard', rate: 22 }) : undefined
-      }));
-      setInvoices(updatedData);
-      setError(null);
-    } catch (err) {
-      setError('Errore nel caricamento delle fatture');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreateInvoice = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-
-    setLoading(true);
-    try {
-      const invoiceData = {
-        ...newInvoice,
-        userId: user.id,
-        fiscalYear: selectedYear,
-        issueDate: new Date(newInvoice.issueDate!),
-        paymentDate: newInvoice.paymentDate ? new Date(newInvoice.paymentDate) : undefined,
-        // Include VAT only for ordinario regime
-        vat: taxState.settings?.taxRegime === 'ordinario' ? newInvoice.vat : undefined
-      } as Omit<Invoice, '_id'>;
-
-      const createdInvoice = await invoiceService.createInvoice(invoiceData);
-      setInvoices(prev => [...prev, createdInvoice]);
+  const {
+    showNewInvoiceForm,
+    setShowNewInvoiceForm,
+    newInvoice,
+    setNewInvoice,
+    handleCreateInvoice,
+    handleVatChange,
+    resetForm
+  } = useNewInvoice({
+    selectedYear,
+    taxRegime: taxState.settings?.taxRegime,
+    userId: user?.id || '',
+    onSuccess: () => {
       setShowNewInvoiceForm(false);
-      setNewInvoice({ 
-        fiscalYear: selectedYear, 
-        issueDate: new Date(),
-        vat: taxState.settings?.taxRegime === 'ordinario' ? { type: 'standard', rate: 22 } : undefined
-      });
-      setError(null);
-    } catch (err) {
-      setError('Errore nella creazione della fattura');
-      console.error(err);
-    } finally {
-      setLoading(false);
+      refreshInvoices(); // Reload the invoices list after creating a new one
     }
-  };
-
-  const handleUpdatePaymentDate = async (invoiceId: string, date: Date) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await invoiceService.updateInvoice(invoiceId, { paymentDate: date });
-      // Refresh invoices
-      if (selectedYear) {
-        const updatedInvoices = await invoiceService.getInvoicesByYear(selectedYear);
-        // Add default VAT for invoices that don't have it
-        const updatedData = updatedInvoices.map(invoice => ({
-          ...invoice,
-          vat: taxState.settings?.taxRegime === 'ordinario' ? (invoice.vat || { type: 'standard', rate: 22 }) : undefined
-        }));
-        setInvoices(updatedData);
-      }
-    } catch (error) {
-      console.error(error);
-      setError('Errore nell\'aggiornamento della data di pagamento');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteInvoice = async (invoiceId: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await invoiceService.deleteInvoice(invoiceId);
-      setDeleteInvoiceId(null); // Chiudi il dialog
-      // Refresh invoices after deletion
-      const updatedInvoices = await invoiceService.getInvoicesByYear(selectedYear);
-      // Add default VAT for invoices that don't have it
-      const updatedData = updatedInvoices.map(invoice => ({
-        ...invoice,
-        vat: taxState.settings?.taxRegime === 'ordinario' ? (invoice.vat || { type: 'standard', rate: 22 }) : undefined
-      }));
-      setInvoices(updatedData);
-    } catch (error) {
-      console.error(error);
-      setError('Errore nella cancellazione della fattura');
-    } finally {
-      setLoading(false);
-    }
-  };
+  });
 
   if (loading && !invoices.length) {
     return (
@@ -274,7 +173,6 @@ export default function Invoices() {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 />
               </div>
-              {/* Campo IVA solo per regime ordinario */}
               {taxState.settings?.taxRegime === 'ordinario' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
@@ -285,14 +183,7 @@ export default function Invoices() {
                       value={newInvoice.vat?.type ?? 'standard'}
                       onChange={(e) => {
                         const selectedType = e.target.value as 'standard' | 'reduced10' | 'reduced5' | 'reduced4' | 'custom';
-                        const selectedOption = vatOptions.find(opt => opt.type === selectedType);
-                        setNewInvoice(prev => ({
-                          ...prev,
-                          vat: {
-                            type: selectedType,
-                            rate: selectedOption?.rate || (selectedType === 'custom' ? 0 : 22)
-                          }
-                        }));
+                        handleVatChange(selectedType);
                       }}
                       className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                     >
@@ -310,13 +201,7 @@ export default function Invoices() {
                           max="100"
                           step="0.1"
                           value={newInvoice.vat?.rate || 0}
-                          onChange={(e) => setNewInvoice(prev => ({
-                            ...prev,
-                            vat: {
-                              type: 'custom',
-                              rate: Number(e.target.value)
-                            }
-                          }))}
+                          onChange={(e) => handleVatChange('custom', Number(e.target.value))}
                           className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                         />
                         <span className="text-gray-500">%</span>
@@ -329,14 +214,7 @@ export default function Invoices() {
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
-                onClick={() => {
-                  setShowNewInvoiceForm(false);
-                  setNewInvoice({ 
-                    fiscalYear: selectedYear, 
-                    issueDate: new Date(),
-                    vat: taxState.settings?.taxRegime === 'ordinario' ? { type: 'standard', rate: 22 } : undefined
-                  });
-                }}
+                onClick={resetForm}
                 className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Annulla
@@ -373,7 +251,6 @@ export default function Invoices() {
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Importo
                     </th>
-                    {/* Colonna IVA solo per regime ordinario */}
                     {taxState.settings?.taxRegime === 'ordinario' && (
                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         IVA
@@ -402,7 +279,6 @@ export default function Invoices() {
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
                         €{invoice.amount.toFixed(2)}
                       </td>
-                      {/* Cella IVA solo per regime ordinario */}
                       {taxState.settings?.taxRegime === 'ordinario' && (
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
                           {invoice.vat?.rate}%
@@ -477,7 +353,6 @@ export default function Invoices() {
                       <span className="font-medium">Importo:</span> €{invoice.amount.toFixed(2)}
                     </div>
 
-                    {/* IVA nella vista mobile solo per regime ordinario */}
                     {taxState.settings?.taxRegime === 'ordinario' && (
                       <div className="text-sm text-gray-900">
                         <span className="font-medium">IVA:</span> {invoice.vat?.rate}%
@@ -517,7 +392,12 @@ export default function Invoices() {
         message="Sei sicuro di voler eliminare questa fattura? Questa azione non può essere annullata."
         confirmLabel="Elimina"
         cancelLabel="Annulla"
-        onConfirm={() => deleteInvoiceId && handleDeleteInvoice(deleteInvoiceId)}
+        onConfirm={async () => {
+          if (deleteInvoiceId) {
+            await handleDeleteInvoice(deleteInvoiceId);
+            setDeleteInvoiceId(null);
+          }
+        }}
         onCancel={() => setDeleteInvoiceId(null)}
       />
     </div>

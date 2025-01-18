@@ -37,9 +37,11 @@ export default function ProfessionalFundSelector({
   useEffect(() => {
     if (value && funds.length > 0) {
       const fund = funds.find(f => f.code === value) || null;
-      setSelectedFund(fund);
-      onFundChange(fund);
-    } else {
+      if (fund?.code !== selectedFund?.code) {
+        setSelectedFund(fund);
+        onFundChange(fund);
+      }
+    } else if (value === undefined && selectedFund !== null) {
       setSelectedFund(null);
       onFundChange(null);
     }
@@ -75,10 +77,9 @@ export default function ProfessionalFundSelector({
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const fundCode = event.target.value;
-    onChange(fundCode);
-    
     const fund = funds.find(f => f.code === fundCode) || null;
     setSelectedFund(fund);
+    onChange(fundCode);
     onFundChange(fund);
   };
 

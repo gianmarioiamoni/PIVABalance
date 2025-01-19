@@ -20,7 +20,7 @@ export interface ProfessionalFund {
 class ProfessionalFundService {
   async getAllFunds(): Promise<ProfessionalFund[]> {
     try {
-      const response = await api.get('/api/professional-funds');
+      const response = await api.get('/api/professional-fund');
       return response.data;
     } catch (error) {
       console.error('Error fetching professional funds:', error);
@@ -30,7 +30,7 @@ class ProfessionalFundService {
 
   async getFundByCode(code: string): Promise<ProfessionalFund> {
     try {
-      const response = await api.get(`/api/professional-funds/${code}`);
+      const response = await api.get(`/api/professional-fund/${code}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching professional fund:', error);

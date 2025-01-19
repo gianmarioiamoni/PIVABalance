@@ -6,7 +6,20 @@ export interface PensionFund {
 
 export type PensionSystemType = 'INPS' | 'PROFESSIONAL_FUND';
 
-export const PENSION_FUNDS: PensionFund[] = [
+export const PENSION_SYSTEMS = {
+  INPS: {
+    id: 'INPS',
+    name: 'Gestione Separata INPS',
+    description: 'Gestione Separata INPS'
+  },
+  PROFESSIONAL_FUND: {
+    id: 'PROFESSIONAL_FUND',
+    name: 'Cassa Professionale',
+    description: 'Cassa Professionale di categoria'
+  }
+};
+
+export const PROFESSIONAL_FUNDS: PensionFund[] = [
   {
     id: 'forense',
     name: 'Cassa Forense',

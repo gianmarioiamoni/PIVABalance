@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/auth/useAuth';
 import TaxSettings from '@/components/TaxSettings';
 import Invoices from '@/components/Invoices';
+import Costs from '@/components/Costs';
+import { useTaxSettings } from '@/hooks/useTaxSettings';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -17,8 +19,29 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('settings');
   const [attemptedTab, setAttemptedTab] = useState<string | undefined>(undefined);
   const taxSettingsRef = useRef<{ hasChanges: () => boolean } | null>(null);
+  const { state: { settings } } = useTaxSettings();
+
+  const isOrdinaryRegime = settings?.taxRegime === 'ordinario';
+
+  useEffect(() => {
+    const token = searchParams.get('token');
+    if (token) {
+      setToken(token);
+      // Clean up URL
+      window.history.replaceState({}, '', '/dashboard');
+      return;
+    }
+
+    if (!isLoading && !user) {
+      router.push('/auth/signin');
+    }
+  }, [searchParams, user, isLoading, router, setToken]);
 
   const handleTabChange = (newTab: string) => {
+    if (newTab === 'costs' && !isOrdinaryRegime) {
+      return;
+    }
+    
     if (activeTab === 'settings' && taxSettingsRef.current?.hasChanges()) {
       setAttemptedTab(newTab);
     } else {
@@ -34,20 +57,6 @@ export default function Dashboard() {
   const handleCancelTabChange = () => {
     setAttemptedTab(undefined);
   };
-
-  useEffect(() => {
-    const token = searchParams.get('token');
-    if (token) {
-      setToken(token);
-      // Clean up URL
-      window.history.replaceState({}, '', '/dashboard');
-      return;
-    }
-
-    if (!isLoading && !user) {
-      router.push('/auth/signin');
-    }
-  }, [searchParams, user, isLoading, router, setToken]);
 
   if (isLoading) {
     return (
@@ -75,44 +84,88 @@ export default function Dashboard() {
           </div>
 
           <div>
-            <div className="border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                <button
-                  onClick={() => handleTabChange('settings')}
-                  className={classNames(
-                    activeTab === 'settings'
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                    'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
-                  )}
-                >
-                  Impostazioni
-                </button>
-                <button
-                  onClick={() => handleTabChange('invoices')}
-                  className={classNames(
-                    activeTab === 'invoices'
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                    'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
-                  )}
-                >
-                  Fatture
-                </button>
-              </nav>
-            </div>
+            <div className="lg:col-span-3">
+              <div className="px-4 sm:px-0">
+                <nav className="isolate flex divide-x divide-gray-200 rounded-lg shadow" aria-label="Tabs">
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange('settings')}
+                    className={classNames(
+                      activeTab === 'settings'
+                        ? 'text-gray-900'
+                        : 'text-gray-500 hover:text-gray-700',
+                      'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 focus:z-10'
+                    )}
+                    aria-current={activeTab === 'settings' ? 'page' : undefined}
+                  >
+                    <span>Impostazioni</span>
+                    <span
+                      aria-hidden="true"
+                      className={classNames(
+                        activeTab === 'settings' ? 'bg-indigo-500' : 'bg-transparent',
+                        'absolute inset-x-0 bottom-0 h-0.5'
+                      )}
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange('invoices')}
+                    className={classNames(
+                      activeTab === 'invoices'
+                        ? 'text-gray-900'
+                        : 'text-gray-500 hover:text-gray-700',
+                      'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 focus:z-10'
+                    )}
+                    aria-current={activeTab === 'invoices' ? 'page' : undefined}
+                  >
+                    <span>Fatture</span>
+                    <span
+                      aria-hidden="true"
+                      className={classNames(
+                        activeTab === 'invoices' ? 'bg-indigo-500' : 'bg-transparent',
+                        'absolute inset-x-0 bottom-0 h-0.5'
+                      )}
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange('costs')}
+                    className={classNames(
+                      activeTab === 'costs'
+                        ? 'text-gray-900'
+                        : 'text-gray-500',
+                      !isOrdinaryRegime ? 'cursor-not-allowed opacity-50' : 'hover:text-gray-700 hover:bg-gray-50',
+                      'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium focus:z-10'
+                    )}
+                    aria-current={activeTab === 'costs' ? 'page' : undefined}
+                    disabled={!isOrdinaryRegime}
+                    title={!isOrdinaryRegime ? "Costi attivi solo per Regime Ordinario" : undefined}
+                  >
+                    <span>Costi</span>
+                    <span
+                      aria-hidden="true"
+                      className={classNames(
+                        activeTab === 'costs' ? 'bg-indigo-500' : 'bg-transparent',
+                        'absolute inset-x-0 bottom-0 h-0.5'
+                      )}
+                    />
+                  </button>
+                </nav>
+              </div>
 
-            <div className="mt-6">
-              {activeTab === 'settings' && (
-                <TaxSettings
-                  ref={taxSettingsRef}
-                  activeTab={activeTab}
-                  attemptedTab={attemptedTab}
-                  onTabChange={handleConfirmTabChange}
-                  onCancelTabChange={handleCancelTabChange}
-                />
-              )}
-              {activeTab === 'invoices' && <Invoices />}
+              <div className="mt-6">
+                {activeTab === 'settings' && (
+                  <TaxSettings
+                    ref={taxSettingsRef}
+                    activeTab={activeTab}
+                    attemptedTab={attemptedTab}
+                    onTabChange={handleConfirmTabChange}
+                    onCancelTabChange={handleCancelTabChange}
+                  />
+                )}
+                {activeTab === 'invoices' && <Invoices />}
+                {activeTab === 'costs' && isOrdinaryRegime && <Costs />}
+              </div>
             </div>
           </div>
         </div>

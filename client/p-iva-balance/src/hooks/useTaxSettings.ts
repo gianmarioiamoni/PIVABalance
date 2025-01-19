@@ -65,10 +65,11 @@ export function useTaxSettings() {
     e.preventDefault();
     setLoading(true);
     try {
-      await settingsService.updateSettings(settings);
+      const updatedSettings = await settingsService.updateSettings(settings);
+      setSettings(updatedSettings);
       setSuccess(true);
       setError(null);
-      setOriginalSettings(settings);
+      setOriginalSettings(updatedSettings);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       setError("Errore nel salvataggio delle impostazioni");

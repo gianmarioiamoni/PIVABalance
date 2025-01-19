@@ -15,7 +15,7 @@ export default function Dashboard() {
   const searchParams = useSearchParams();
   const { user, isLoading, setToken } = useAuth();
   const [activeTab, setActiveTab] = useState('settings');
-  const [attemptedTab, setAttemptedTab] = useState<string | null>(null);
+  const [attemptedTab, setAttemptedTab] = useState<string | undefined>(undefined);
   const taxSettingsRef = useRef<{ hasChanges: () => boolean } | null>(null);
 
   const handleTabChange = (newTab: string) => {
@@ -28,11 +28,11 @@ export default function Dashboard() {
 
   const handleConfirmTabChange = (confirmedTab: string) => {
     setActiveTab(confirmedTab);
-    setAttemptedTab(null);
+    setAttemptedTab(undefined);
   };
 
   const handleCancelTabChange = () => {
-    setAttemptedTab(null);
+    setAttemptedTab(undefined);
   };
 
   useEffect(() => {

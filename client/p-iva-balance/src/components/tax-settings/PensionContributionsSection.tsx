@@ -3,7 +3,7 @@ import Tooltip from '../Tooltip';
 import { pensionSystemInfo } from '../tooltips/TooltipsText';
 import { UserSettings } from '@/services/settingsService';
 import { PENSION_FUNDS, PensionSystemType } from '@/data/pensionFunds';
-import ProfessionalFundSelector from '../ProfessionalFundSelector';
+import ProfessionalFundSelector from './ProfessionalFundSelector';
 import { professionalFundService } from '@/services/professionalFundService';
 
 interface PensionContributionsSectionProps {

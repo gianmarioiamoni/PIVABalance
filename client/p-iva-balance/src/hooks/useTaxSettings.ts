@@ -1,26 +1,32 @@
-import { useState, useEffect } from 'react';
-import { UserSettings, settingsService } from '@/services/settingsService';
-import { ProfessionalFund, professionalFundService } from '@/services/professionalFundService';
-import { ProfitabilityRate } from '@/components/ProfitabilityRateTable';
+import { useState, useEffect } from "react";
+import { UserSettings, settingsService } from "@/services/settingsService";
+import {
+  ProfessionalFund,
+  professionalFundService,
+} from "@/services/professionalFundService";
+import { ProfitabilityRate } from "@/components/tax-settings/ProfitabilityRateTable";
 
 export function useTaxSettings() {
   const [settings, setSettings] = useState<UserSettings>({
-    taxRegime: 'forfettario',
+    taxRegime: "forfettario",
     substituteRate: 5,
     profitabilityRate: 78,
-    pensionSystem: 'INPS',
+    pensionSystem: "INPS",
     professionalFundId: undefined,
     inpsRateType: undefined,
     manualContributionRate: undefined,
     manualMinimumContribution: undefined,
-    manualFixedAnnualContributions: undefined
+    manualFixedAnnualContributions: undefined,
   });
-  const [originalSettings, setOriginalSettings] = useState<UserSettings | null>(null);
+  const [originalSettings, setOriginalSettings] = useState<UserSettings | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [showRateTable, setShowRateTable] = useState(false);
-  const [selectedProfessionalFund, setSelectedProfessionalFund] = useState<ProfessionalFund | null>(null);
+  const [selectedProfessionalFund, setSelectedProfessionalFund] =
+    useState<ProfessionalFund | null>(null);
 
   useEffect(() => {
     loadSettings();
@@ -32,7 +38,10 @@ export function useTaxSettings() {
   };
 
   const isValid = () => {
-    if (settings.pensionSystem === 'PROFESSIONAL_FUND' && !settings.professionalFundId) {
+    if (
+      settings.pensionSystem === "PROFESSIONAL_FUND" &&
+      !settings.professionalFundId
+    ) {
       return false;
     }
     return true;
@@ -45,7 +54,7 @@ export function useTaxSettings() {
       setOriginalSettings(userSettings);
       setError(null);
     } catch (err) {
-      setError('Errore nel caricamento delle impostazioni');
+      setError("Errore nel caricamento delle impostazioni");
       console.error(err);
     } finally {
       setLoading(false);
@@ -62,7 +71,7 @@ export function useTaxSettings() {
       setOriginalSettings(settings);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setError('Errore nel salvataggio delle impostazioni');
+      setError("Errore nel salvataggio delle impostazioni");
       console.error(err);
     } finally {
       setLoading(false);
@@ -70,50 +79,52 @@ export function useTaxSettings() {
   };
 
   const handleChange = async (field: keyof UserSettings, value: any) => {
-    if (field === 'professionalFundId' && value) {
+    if (field === "professionalFundId" && value) {
       try {
         const fund = await professionalFundService.getFundByCode(value);
         const params = professionalFundService.getCurrentParameters(fund);
         if (params) {
-          setSettings(prev => ({
+          setSettings((prev) => ({
             ...prev,
             [field]: value,
             manualContributionRate: params.contributionRate,
             manualMinimumContribution: params.minimumContribution,
-            manualFixedAnnualContributions: params.fixedAnnualContributions
+            manualFixedAnnualContributions: params.fixedAnnualContributions,
           }));
           return;
         }
       } catch (error) {
-        console.error('Error fetching professional fund parameters:', error);
+        console.error("Error fetching professional fund parameters:", error);
       }
     }
-    
-    setSettings(prev => ({
+
+    setSettings((prev) => ({
       ...prev,
       [field]: value,
-      ...(field === 'taxRegime' && value === 'ordinario' ? {
-        substituteRate: undefined,
-        profitabilityRate: undefined
-      } : {})
+      ...(field === "taxRegime" && value === "ordinario"
+        ? {
+            substituteRate: undefined,
+            profitabilityRate: undefined,
+          }
+        : {}),
     }));
   };
 
   const handleRateSelect = (rate: ProfitabilityRate) => {
-    handleChange('profitabilityRate', rate.rate);
+    handleChange("profitabilityRate", rate.rate);
     setShowRateTable(false);
   };
 
   const handleProfessionalFundParametersChange = (params: {
     contributionRate: number;
     minimumContribution: number;
-    fixedAnnualContributions: number
+    fixedAnnualContributions: number;
   }) => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
       manualContributionRate: params.contributionRate,
       manualMinimumContribution: params.minimumContribution,
-      manualFixedAnnualContributions: params.fixedAnnualContributions
+      manualFixedAnnualContributions: params.fixedAnnualContributions,
     }));
   };
 
@@ -124,7 +135,7 @@ export function useTaxSettings() {
       error,
       success,
       showRateTable,
-      selectedProfessionalFund
+      selectedProfessionalFund,
     },
     actions: {
       handleChange,
@@ -134,7 +145,7 @@ export function useTaxSettings() {
       setShowRateTable,
       setSelectedProfessionalFund,
       hasChanges,
-      isValid
-    }
+      isValid,
+    },
   };
 }

@@ -1,10 +1,10 @@
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import ProfitabilityRateTable from './ProfitabilityRateTable';
+import ProfitabilityRateTable from '@/components/tax-settings/ProfitabilityRateTable';
 import { useTaxSettings } from '@/hooks/useTaxSettings';
-import { StatusMessages } from './tax-settings/StatusMessages';
-import { NavigationHandler } from './tax-settings/NavigationHandler';
-import { TaxableIncomeSection } from './tax-settings/TaxableIncomeSection';
-import { PensionContributionsSection } from './tax-settings/PensionContributionsSection';
+import { StatusMessages } from '@/components/tax-settings/StatusMessages';
+import { NavigationHandler } from '@/components/tax-settings/NavigationHandler';
+import { TaxableIncomeSection } from '@/components/tax-settings/TaxableIncomeSection';
+import { PensionContributionsSection } from '@/components/tax-settings/PensionContributionsSection';
 
 interface TaxSettingsProps {
   activeTab: string;

@@ -16,6 +16,7 @@ import authRoutes from "./routes/authRoutes";
 import settingsRoutes from "./routes/settingsRoutes";
 import professionalFundRoutes from "./routes/professionalFundRoutes";
 import invoiceRoutes from "./routes/invoiceRoutes";
+import inpsRoutes from "./routes/inpsRoutes";
 import { irpefRateController } from './controllers/irpefRateController';
 import "./config/passport";
 import { initializeInpsParameters2024 } from "./models/InpsParameters";
@@ -82,8 +83,9 @@ app.get('/api/csrf-token', (req, res) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/settings", auth, settingsRoutes);
-app.use("/api/professional-funds", auth, professionalFundRoutes);
+app.use("/api/professional-fund", auth, professionalFundRoutes);
 app.use("/api/invoices", auth, invoiceRoutes);
+app.use("/api/inps", auth, inpsRoutes);
 
 // IRPEF Rate routes
 app.get('/api/irpef-rates', auth, irpefRateController.getCurrentRates);

@@ -22,6 +22,36 @@ const DEFAULT_FUNDS: DefaultFundData[] = [
       minimumContribution: 2750,
       fixedAnnualContributions: 0
     }
+  },
+  {
+    name: 'INARCASSA',
+    code: 'INARCASSA',
+    description: 'Cassa Nazionale di Previdenza ed Assistenza per gli Ingegneri ed Architetti',
+    parameters: {
+      contributionRate: 14.5,
+      minimumContribution: 2340,
+      fixedAnnualContributions: 0
+    }
+  },
+  {
+    name: 'ENPAM',
+    code: 'ENPAM',
+    description: 'Ente Nazionale di Previdenza ed Assistenza dei Medici e degli Odontoiatri',
+    parameters: {
+      contributionRate: 19.5,
+      minimumContribution: 0,
+      fixedAnnualContributions: 0
+    }
+  },
+  {
+    name: 'CNPADC',
+    code: 'CNPADC',
+    description: 'Cassa Nazionale di Previdenza e Assistenza dei Dottori Commercialisti',
+    parameters: {
+      contributionRate: 12,
+      minimumContribution: 2685,
+      fixedAnnualContributions: 0
+    }
   }
   // Add other professional funds here as needed
 ];

@@ -50,13 +50,11 @@ export default function Costs() {
   };
 
   const handleDeleteCost = async (id: string) => {
-    if (window.confirm('Sei sicuro di voler eliminare questo costo?')) {
-      try {
-        await costService.deleteCost(id);
-        loadCosts();
-      } catch (err) {
-        console.error('Error deleting cost:', err);
-      }
+    try {
+      await costService.deleteCost(id);
+      loadCosts();
+    } catch (err) {
+      console.error('Error deleting cost:', err);
     }
   };
 

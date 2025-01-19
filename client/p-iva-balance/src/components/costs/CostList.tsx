@@ -3,6 +3,8 @@ import { Cost } from '@/services/costService';
 import CostForm from './CostForm';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import ConfirmDialog from '../ConfirmDialog';
 
 interface CostListProps {
   costs: Cost[];
@@ -12,6 +14,7 @@ interface CostListProps {
 
 const CostList: React.FC<CostListProps> = ({ costs, onUpdate, onDelete }) => {
   const [editingCost, setEditingCost] = useState<Cost | null>(null);
+  const [costToDelete, setCostToDelete] = useState<Cost | null>(null);
 
   const handleEdit = (cost: Cost) => {
     setEditingCost(cost);
@@ -21,6 +24,17 @@ const CostList: React.FC<CostListProps> = ({ costs, onUpdate, onDelete }) => {
     if (editingCost) {
       onUpdate(editingCost._id, updatedCost);
       setEditingCost(null);
+    }
+  };
+
+  const handleDeleteClick = (cost: Cost) => {
+    setCostToDelete(cost);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (costToDelete) {
+      onDelete(costToDelete._id);
+      setCostToDelete(null);
     }
   };
 
@@ -47,6 +61,16 @@ const CostList: React.FC<CostListProps> = ({ costs, onUpdate, onDelete }) => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={costToDelete !== null}
+        title="Elimina costo"
+        message={`Sei sicuro di voler eliminare il costo "${costToDelete?.description}" del ${costToDelete ? format(new Date(costToDelete.date), 'dd/MM/yyyy', { locale: it }) : ''}"?`}
+        confirmLabel="Elimina"
+        cancelLabel="Annulla"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setCostToDelete(null)}
+      />
 
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
@@ -78,18 +102,28 @@ const CostList: React.FC<CostListProps> = ({ costs, onUpdate, onDelete }) => {
                 € {cost.amount.toFixed(2)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button
-                  onClick={() => handleEdit(cost)}
-                  className="text-blue-600 hover:text-blue-900 mr-4"
-                >
-                  Modifica
-                </button>
-                <button
-                  onClick={() => onDelete(cost._id)}
-                  className="text-red-600 hover:text-red-900"
-                >
-                  Elimina
-                </button>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => handleEdit(cost)}
+                    className="text-blue-600 hover:text-blue-900 group relative"
+                  >
+                    <PencilIcon className="h-5 w-5" aria-hidden="true" />
+                    <span className="sr-only">Modifica costo</span>
+                    <span className="hidden group-hover:block absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-gray-900 rounded whitespace-nowrap">
+                      Modifica costo
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(cost)}
+                    className="text-red-600 hover:text-red-900 group relative"
+                  >
+                    <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                    <span className="sr-only">Elimina costo</span>
+                    <span className="hidden group-hover:block absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-gray-900 rounded whitespace-nowrap">
+                      Elimina costo
+                    </span>
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

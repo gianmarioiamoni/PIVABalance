@@ -4,6 +4,7 @@ import CostForm from './costs/CostForm';
 import CostList from './costs/CostList';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
+import { PlusIcon } from '@heroicons/react/24/outline';
 
 export default function Costs() {
   const [costs, setCosts] = useState<Cost[]>([]);
@@ -69,12 +70,19 @@ export default function Costs() {
                 Gestisci i costi della tua attività per l'anno {currentYear}
               </p>
             </div>
-            <button
-              onClick={() => setShowForm(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Nuovo Costo
-            </button>
+            <div className="relative group">
+              <button
+                onClick={() => setShowForm(true)}
+                className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+              >
+                <span className="hidden sm:inline">Nuovo Costo</span>
+                <PlusIcon className="h-5 w-5 sm:hidden" aria-hidden="true" />
+                <span className="sr-only">Crea nuovo costo</span>
+              </button>
+              <div className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 right-0 top-full mt-1 whitespace-nowrap sm:hidden">
+                Nuovo Costo
+              </div>
+            </div>
           </div>
 
           {error && (
@@ -107,11 +115,17 @@ export default function Costs() {
                 </div>
               )}
 
-              <CostList
-                costs={costs}
-                onUpdate={handleUpdateCost}
-                onDelete={handleDeleteCost}
-              />
+              <div className="overflow-hidden">
+                <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                  <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                    <CostList
+                      costs={costs}
+                      onUpdate={handleUpdateCost}
+                      onDelete={handleDeleteCost}
+                    />
+                  </div>
+                </div>
+              </div>
 
               {costs.length > 0 && (
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg">

@@ -5,6 +5,7 @@ import CostList from './costs/CostList';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { PlusIcon } from '@heroicons/react/24/outline';
+import { useTaxSettings } from '@/hooks/useTaxSettings';
 
 export default function Costs() {
   const [costs, setCosts] = useState<Cost[]>([]);
@@ -12,6 +13,12 @@ export default function Costs() {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const currentYear = new Date().getFullYear();
+  const { state: taxState } = useTaxSettings();
+  const isForfettario = taxState.settings?.taxRegime === 'forfettario';
+
+  useEffect(() => {
+    loadCosts();
+  }, []);
 
   const loadCosts = async () => {
     try {
@@ -26,10 +33,6 @@ export default function Costs() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    loadCosts();
-  }, []);
 
   const handleCreateCost = async (cost: Omit<Cost, '_id' | 'createdAt' | 'updatedAt'>) => {
     try {
@@ -60,85 +63,53 @@ export default function Costs() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
-        <div className="px-4 py-6 sm:p-8">
+    <div className="container mx-auto px-4 py-8">
+      {!isForfettario && (
+        <>
           <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Gestione Costi</h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Gestisci i costi della tua attività per l'anno {currentYear}
-              </p>
-            </div>
-            <div className="relative group">
-              <button
-                onClick={() => setShowForm(true)}
-                className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-              >
-                <span className="hidden sm:inline">Nuovo Costo</span>
-                <PlusIcon className="h-5 w-5 sm:hidden" aria-hidden="true" />
-                <span className="sr-only">Crea nuovo costo</span>
-              </button>
-              <div className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 right-0 top-full mt-1 whitespace-nowrap sm:hidden">
-                Nuovo Costo
-              </div>
-            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Costi {currentYear}</h1>
+            <button
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <PlusIcon className="h-5 w-5 mr-2" />
+              Nuovo Costo
+            </button>
           </div>
 
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              </div>
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+              <span className="block sm:inline">{error}</span>
             </div>
           )}
 
           {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-            </div>
+            <div className="text-center py-4">Caricamento...</div>
           ) : (
-            <>
-              {showForm && (
-                <div className="mb-6">
-                  <CostForm
-                    onSubmit={handleCreateCost}
-                    onCancel={() => setShowForm(false)}
-                  />
-                </div>
-              )}
-
-              <div className="overflow-hidden">
-                <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                  <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                    <CostList
-                      costs={costs}
-                      onUpdate={handleUpdateCost}
-                      onDelete={handleDeleteCost}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {costs.length > 0 && (
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-lg font-medium text-gray-900">
-                    Totale costi {currentYear}: €{' '}
-                    {costs.reduce((sum, cost) => sum + cost.amount, 0).toFixed(2)}
-                  </p>
-                </div>
-              )}
-            </>
+            <CostList costs={costs} onUpdate={handleUpdateCost} onDelete={handleDeleteCost} />
           )}
-        </div>
-      </div>
+
+          {showForm && (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+              <div className="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold">Nuovo Costo</h2>
+                  <button
+                    onClick={() => setShowForm(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    ×
+                  </button>
+                </div>
+                <CostForm
+                  onSubmit={handleCreateCost}
+                  onCancel={() => setShowForm(false)}
+                />
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

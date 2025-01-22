@@ -17,6 +17,7 @@ export function useTaxSettings() {
     manualContributionRate: undefined,
     manualMinimumContribution: undefined,
     manualFixedAnnualContributions: undefined,
+    irpefRate: 23, // Default IRPEF rate for the first tax bracket
   });
   const [originalSettings, setOriginalSettings] = useState<UserSettings | null>(
     null

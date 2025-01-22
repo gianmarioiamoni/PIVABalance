@@ -11,6 +11,8 @@ export interface UserSettings {
   manualContributionRate?: number;
   manualMinimumContribution?: number;
   manualFixedAnnualContributions?: number;
+  irpefRate: number;
+  previousYearContributions?: number;
 }
 
 class SettingsService {

@@ -18,6 +18,7 @@ import professionalFundRoutes from "./routes/professionalFundRoutes";
 import invoiceRoutes from "./routes/invoiceRoutes";
 import inpsRoutes from "./routes/inpsRoutes";
 import costRoutes from "./routes/costRoutes";
+import contributionsRoutes from './routes/contributionsRoutes';
 import { irpefRateController } from './controllers/irpefRateController';
 import "./config/passport";
 import { initializeInpsParameters2024 } from "./models/InpsParameters";
@@ -88,6 +89,7 @@ app.use("/api/professional-fund", auth, professionalFundRoutes);
 app.use("/api/invoices", auth, invoiceRoutes);
 app.use("/api/inps", auth, inpsRoutes);
 app.use("/api/costs", auth, costRoutes);
+app.use("/api/contributions", auth, contributionsRoutes);
 
 // IRPEF Rate routes
 app.get('/api/irpef-rates', auth, irpefRateController.getCurrentRates);

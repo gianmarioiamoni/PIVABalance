@@ -28,10 +28,11 @@ export function useTaxSettings() {
   const [showRateTable, setShowRateTable] = useState(false);
   const [selectedProfessionalFund, setSelectedProfessionalFund] =
     useState<ProfessionalFund | null>(null);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   useEffect(() => {
     loadSettings();
-  }, []);
+  }, [forceUpdate]);
 
   const hasChanges = () => {
     if (!originalSettings) return false;
@@ -67,10 +68,15 @@ export function useTaxSettings() {
     setLoading(true);
     try {
       const updatedSettings = await settingsService.updateSettings(settings);
-      setSettings(updatedSettings);
+      // Force a new object reference and trigger a reload
+      setSettings({ ...updatedSettings });
+      setOriginalSettings({ ...updatedSettings });
       setSuccess(true);
       setError(null);
-      setOriginalSettings(updatedSettings);
+      // Force a reload of settings
+      setForceUpdate((prev) => prev + 1);
+
+      // Clear success message after 3 seconds
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       setError("Errore nel salvataggio delle impostazioni");

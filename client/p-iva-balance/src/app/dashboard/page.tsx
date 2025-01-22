@@ -7,7 +7,7 @@ import TaxSettings from '@/components/TaxSettings';
 import Invoices from '@/components/Invoices';
 import Costs from '@/components/Costs';
 import TaxAndContributions from '@/components/TaxAndContributions';
-import { useTaxSettings } from '@/hooks/useTaxSettings';
+import { useTaxSettingsContext } from '@/contexts/TaxSettingsContext';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -16,29 +16,37 @@ function classNames(...classes: string[]) {
 export default function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, isLoading, setToken } = useAuth();
+  const { user, isLoading: authLoading, setToken } = useAuth();
+  const { isOrdinaryRegime, loading: settingsLoading } = useTaxSettingsContext();
   const [activeTab, setActiveTab] = useState('settings');
   const [attemptedTab, setAttemptedTab] = useState<string | undefined>(undefined);
   const taxSettingsRef = useRef<{ hasChanges: () => boolean } | null>(null);
-  const { state: { settings } } = useTaxSettings();
-
-  const isOrdinaryRegime = settings?.taxRegime === 'ordinario';
 
   useEffect(() => {
     const token = searchParams.get('token');
     if (token) {
       setToken(token);
-      // Clean up URL
       window.history.replaceState({}, '', '/dashboard');
       return;
     }
 
-    if (!isLoading && !user) {
+    if (!authLoading && !user) {
       router.push('/auth/signin');
     }
-  }, [searchParams, user, isLoading, router, setToken]);
+  }, [searchParams, user, authLoading, router, setToken]);
+
+  // Handle tab state based on tax regime
+  useEffect(() => {
+    if (!settingsLoading && !isOrdinaryRegime && activeTab === 'costs') {
+      setActiveTab('settings');
+    }
+  }, [isOrdinaryRegime, activeTab, settingsLoading]);
 
   const handleTabChange = (newTab: string) => {
+    if (newTab === 'costs' && !isOrdinaryRegime) {
+      return; // Don't allow changing to costs tab if not in ordinary regime
+    }
+
     if (activeTab === 'settings' && taxSettingsRef.current?.hasChanges()) {
       setAttemptedTab(newTab);
     } else {
@@ -55,7 +63,7 @@ export default function Dashboard() {
     setAttemptedTab(undefined);
   };
 
-  if (isLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -124,26 +132,35 @@ export default function Dashboard() {
                       )}
                     />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleTabChange('costs')}
-                    className={classNames(
-                      activeTab === 'costs'
-                        ? 'text-gray-900'
-                        : 'text-gray-500 hover:text-gray-700',
-                      'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 focus:z-10'
-                    )}
-                    aria-current={activeTab === 'costs' ? 'page' : undefined}
-                  >
-                    <span>Costi</span>
-                    <span
-                      aria-hidden="true"
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => isOrdinaryRegime && handleTabChange('costs')}
                       className={classNames(
-                        activeTab === 'costs' ? 'bg-indigo-500' : 'bg-transparent',
-                        'absolute inset-x-0 bottom-0 h-0.5'
+                        activeTab === 'costs'
+                          ? 'text-gray-900'
+                          : 'text-gray-500 hover:text-gray-700',
+                        !isOrdinaryRegime ? 'opacity-50 cursor-not-allowed hover:text-gray-500' : '',
+                        'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 focus:z-10'
                       )}
-                    />
-                  </button>
+                      aria-current={activeTab === 'costs' ? 'page' : undefined}
+                      disabled={!isOrdinaryRegime}
+                    >
+                      <span>Costi</span>
+                      <span
+                        aria-hidden="true"
+                        className={classNames(
+                          activeTab === 'costs' ? 'bg-indigo-500' : 'bg-transparent',
+                          'absolute inset-x-0 bottom-0 h-0.5'
+                        )}
+                      />
+                    </button>
+                    {!isOrdinaryRegime && (
+                      <div className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-sm rounded-md py-1 px-2 -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                        Disponibile solo in regime ordinario
+                      </div>
+                    )}
+                  </div>
                   <button
                     type="button"
                     onClick={() => handleTabChange('taxes')}

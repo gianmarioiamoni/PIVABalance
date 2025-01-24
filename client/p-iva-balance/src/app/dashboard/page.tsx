@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import TaxSettings from '@/components/TaxSettings';
 import Invoices from '@/components/Invoices';
 import Costs from '@/components/Costs';
+import { TaxContributions } from '@/components/TaxContributions';
 import { useTaxSettings } from '@/hooks/useTaxSettings';
 
 function classNames(...classes: string[]) {
@@ -150,6 +151,29 @@ export default function Dashboard() {
                       )}
                     />
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange('tax')}
+                    className={classNames(
+                      activeTab === 'tax'
+                        ? 'text-gray-900'
+                        : 'text-gray-500',
+                      isOrdinaryRegime ? 'cursor-not-allowed opacity-50' : 'hover:text-gray-700 hover:bg-gray-50',
+                      'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium focus:z-10'
+                    )}
+                    aria-current={activeTab === 'tax' ? 'page' : undefined}
+                    disabled={isOrdinaryRegime}
+                    title={isOrdinaryRegime ? "Tasse e Contributi disponibili solo per Regime Forfettario" : undefined}
+                  >
+                    <span>Tasse e Contributi</span>
+                    <span
+                      aria-hidden="true"
+                      className={classNames(
+                        activeTab === 'tax' ? 'bg-indigo-500' : 'bg-transparent',
+                        'absolute inset-x-0 bottom-0 h-0.5'
+                      )}
+                    />
+                  </button>
                 </nav>
               </div>
 
@@ -165,6 +189,7 @@ export default function Dashboard() {
                 )}
                 {activeTab === 'invoices' && <Invoices />}
                 {activeTab === 'costs' && isOrdinaryRegime && <Costs />}
+                {activeTab === 'tax' && !isOrdinaryRegime && <TaxContributions />}
               </div>
             </div>
           </div>

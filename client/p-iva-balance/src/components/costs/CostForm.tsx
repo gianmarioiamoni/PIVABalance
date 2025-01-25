@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { Cost } from '@/services/costService';
+import { CreateCostData } from '@/services/costService';
+import { format } from 'date-fns';
 
 interface CostFormProps {
-  cost?: Cost;
-  onSubmit: (cost: Omit<Cost, '_id' | 'createdAt' | 'updatedAt'>) => void;
+  cost?: CreateCostData;
+  onSubmit: (cost: CreateCostData) => void;
   onCancel: () => void;
 }
 
 const CostForm: React.FC<CostFormProps> = ({ cost, onSubmit, onCancel }) => {
   const [description, setDescription] = useState(cost?.description || '');
   const [date, setDate] = useState(cost?.date ? cost.date.split('T')[0] : new Date().toISOString().split('T')[0]);
-  const [amount, setAmount] = useState(cost?.amount.toString() || '');
+  const [amount, setAmount] = useState(cost?.amount ? cost.amount.toString() : '');
+  const [deductible, setDeductible] = useState(cost?.deductible ?? true);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const validateForm = () => {
@@ -40,7 +42,8 @@ const CostForm: React.FC<CostFormProps> = ({ cost, onSubmit, onCancel }) => {
     onSubmit({
       description,
       date: new Date(date).toISOString(),
-      amount: parseFloat(amount)
+      amount: parseFloat(amount),
+      deductible
     });
   };
 
@@ -94,6 +97,19 @@ const CostForm: React.FC<CostFormProps> = ({ cost, onSubmit, onCancel }) => {
         {errors.amount && (
           <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
         )}
+      </div>
+
+      <div className="flex items-center">
+        <input
+          type="checkbox"
+          id="deductible"
+          checked={deductible}
+          onChange={(e) => setDeductible(e.target.checked)}
+          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+        <label htmlFor="deductible" className="ml-2 block text-sm text-gray-900">
+          Costo deducibile
+        </label>
       </div>
 
       <div className="flex justify-end space-x-3">

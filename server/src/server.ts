@@ -11,18 +11,19 @@ import csrf from "csurf";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middleware/errorHandler";
 import { securityHeaders } from "./middleware/securityHeaders";
-import { auth } from './middleware/auth';
+import { auth } from "./middleware/auth";
 import authRoutes from "./routes/authRoutes";
 import settingsRoutes from "./routes/settingsRoutes";
 import professionalFundRoutes from "./routes/professionalFundRoutes";
 import invoiceRoutes from "./routes/invoiceRoutes";
 import inpsRoutes from "./routes/inpsRoutes";
 import costRoutes from "./routes/costRoutes";
-import { irpefRateController } from './controllers/irpefRateController';
+import contributionsRoutes from "./routes/contributionsRoutes";
+import { irpefRateController } from "./controllers/irpefRateController";
 import "./config/passport";
 import { initializeInpsParameters2024 } from "./models/InpsParameters";
 import { initializationService } from "./services/initializationService";
-import { IrpefRateService } from './services/irpefRateService';
+import { IrpefRateService } from "./services/irpefRateService";
 
 const app: Express = express();
 export { app }; // Export for testing
@@ -40,9 +41,9 @@ app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:3000",
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
-    exposedHeaders: ['X-CSRF-Token']
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
+    exposedHeaders: ["X-CSRF-Token"],
   })
 );
 
@@ -52,14 +53,14 @@ app.use(cookieParser());
 // Session configuration
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    secret: process.env.SESSION_SECRET || "your-secret-key",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-      httpOnly: true
-    }
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      httpOnly: true,
+    },
   })
 );
 
@@ -71,12 +72,12 @@ app.use(passport.session());
 app.use(csrf());
 
 // CSRF token endpoint
-app.get('/api/csrf-token', (req, res) => {
+app.get("/api/csrf-token", (req, res) => {
   const token = req.csrfToken();
-  res.cookie('XSRF-TOKEN', token, {
+  res.cookie("XSRF-TOKEN", token, {
     httpOnly: false,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
   });
   res.json({ csrfToken: token });
 });
@@ -88,25 +89,26 @@ app.use("/api/professional-fund", auth, professionalFundRoutes);
 app.use("/api/invoices", auth, invoiceRoutes);
 app.use("/api/inps", auth, inpsRoutes);
 app.use("/api/costs", auth, costRoutes);
+app.use("/api/contributions", auth, contributionsRoutes);
 
 // IRPEF Rate routes
-app.get('/api/irpef-rates', auth, irpefRateController.getCurrentRates);
-app.get('/api/irpef-rates/:year', auth, irpefRateController.getRatesByYear);
-app.put('/api/irpef-rates/:id', auth, irpefRateController.updateRate);
-app.delete('/api/irpef-rates/:id', auth, irpefRateController.deactivateRate);
+app.get("/api/irpef-rates", auth, irpefRateController.getCurrentRates);
+app.get("/api/irpef-rates/:year", auth, irpefRateController.getRatesByYear);
+app.put("/api/irpef-rates/:id", auth, irpefRateController.updateRate);
+app.delete("/api/irpef-rates/:id", auth, irpefRateController.deactivateRate);
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error('Error:', err);
-  if (err.code === 'EBADCSRFTOKEN') {
+  console.error("Error:", err);
+  if (err.code === "EBADCSRFTOKEN") {
     res.status(403).json({
-      error: 'Invalid CSRF token',
-      message: 'Please refresh the page and try again'
+      error: "Invalid CSRF token",
+      message: "Please refresh the page and try again",
     });
   } else {
     res.status(err.status || 500).json({
-      error: err.message || 'Internal Server Error',
-      message: 'An unexpected error occurred. Please try again later.'
+      error: err.message || "Internal Server Error",
+      message: "An unexpected error occurred. Please try again later.",
     });
   }
 });
@@ -114,19 +116,18 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 // Database connection
 async function connectDB(): Promise<void> {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || '');
-    console.log('Connected to MongoDB');
-    
+    await mongoose.connect(process.env.MONGODB_URI || "");
+    console.log("Connected to MongoDB");
+
     // Initialize default data
     await initializeInpsParameters2024();
     await initializationService.initializeProfessionalFunds();
     await IrpefRateService.initializeDefaultRates();
-    
   } catch (error) {
-    console.error('Error connecting to MongoDB:', error);
+    console.error("Error connecting to MongoDB:", error);
     process.exit(1);
   }
-};
+}
 
 // Start server
 const startServer = async (): Promise<void> => {
@@ -135,7 +136,9 @@ const startServer = async (): Promise<void> => {
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
       console.log(`CSRF protection enabled`);
-      console.log(`Client URL: ${process.env.CLIENT_URL || "http://localhost:3000"}`);
+      console.log(
+        `Client URL: ${process.env.CLIENT_URL || "http://localhost:3000"}`
+      );
     });
   } catch (error) {
     console.error("Failed to start server:", error);

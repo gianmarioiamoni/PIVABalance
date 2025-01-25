@@ -5,6 +5,7 @@ export interface Cost {
   description: string;
   date: string;
   amount: number;
+  deductible: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -13,6 +14,7 @@ export interface CreateCostData {
   description: string;
   date: string;
   amount: number;
+  deductible: boolean;
 }
 
 class CostService {

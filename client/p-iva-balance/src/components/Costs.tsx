@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Cost, costService } from '@/services/costService';
+import { useTaxSettings } from '@/hooks/useTaxSettings';
+import { taxCalculationService } from '@/services/taxCalculationService';
 import CostForm from './costs/CostForm';
 import CostList from './costs/CostList';
 import { format } from 'date-fns';
@@ -7,10 +9,13 @@ import { it } from 'date-fns/locale';
 import { PlusIcon } from '@heroicons/react/24/outline';
 
 export default function Costs() {
+  const { state: { settings } } = useTaxSettings();
   const [costs, setCosts] = useState<Cost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [previousYearContributions, setPreviousYearContributions] = useState<number>(0);
+  const inputRef = useRef<HTMLInputElement>(null);
   const currentYear = new Date().getFullYear();
 
   const loadCosts = async () => {
@@ -30,6 +35,45 @@ export default function Costs() {
   useEffect(() => {
     loadCosts();
   }, []);
+
+  // Load previous year contributions
+  useEffect(() => {
+    const loadInitialValues = async () => {
+      try {
+        const amount = await taxCalculationService.getPreviousYearContribution(currentYear - 1);
+        console.log('Initial load - Previous year contributions:', amount);
+        setPreviousYearContributions(amount);
+        if (inputRef.current) {
+          inputRef.current.value = amount.toString();
+        }
+      } catch (error) {
+        console.error('Error loading initial values:', error);
+      }
+    };
+    loadInitialValues();
+  }, [currentYear]);
+
+  const handleUpdateContributions = async () => {
+    if (!inputRef.current) return;
+
+    const value = inputRef.current.value.replace(/\D/g, '') || '0';
+    const numericValue = parseInt(value);
+    console.log('Updating contributions to:', numericValue);
+
+    try {
+      await taxCalculationService.savePreviousYearContribution(currentYear - 1, numericValue);
+      setPreviousYearContributions(numericValue);
+    } catch (error) {
+      console.error('Error updating contributions:', error);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleUpdateContributions();
+    }
+  };
 
   const handleCreateCost = async (cost: Omit<Cost, '_id' | 'createdAt' | 'updatedAt'>) => {
     try {
@@ -59,86 +103,140 @@ export default function Costs() {
     }
   };
 
+  const deductibleCosts = costs.filter(cost => cost.deductible);
+  const nonDeductibleCosts = costs.filter(cost => !cost.deductible);
+  const totalDeductibleCosts = deductibleCosts.reduce((sum, cost) => sum + cost.amount, 0);
+  const totalNonDeductibleCosts = nonDeductibleCosts.reduce((sum, cost) => sum + cost.amount, 0);
+
+  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <h2 className="text-lg font-bold mb-4">{title}</h2>
+      {children}
+    </div>
+  );
+
+  if (loading) {
+    return <div className="p-4">Caricamento...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-red-500">{error}</div>;
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
-        <div className="px-4 py-6 sm:p-8">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Gestione Costi</h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Gestisci i costi della tua attività per l'anno {currentYear}
-              </p>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Gestione Costi {currentYear}</h1>
+
+      <Section title="1. Costi Deducibili">
+        <div className="mb-6">
+          <label htmlFor="previousYearContributions" className="block text-sm font-medium text-gray-700 mb-1">
+            Totale contributi anno precedente
+          </label>
+          <div className="flex space-x-2">
+            <div className="relative flex-grow">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+              <input
+                type="text"
+                id="previousYearContributions"
+                ref={inputRef}
+                defaultValue={previousYearContributions}
+                onBlur={handleUpdateContributions}
+                onKeyDown={handleKeyDown}
+                className="w-full p-2 pl-8 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="0"
+              />
             </div>
-            <div className="relative group">
+            <button
+              onClick={handleUpdateContributions}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Aggiorna
+            </button>
+          </div>
+        </div>
+
+        {settings.taxRegime === 'ordinario' && (
+          <>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Altri costi deducibili</h3>
               <button
                 onClick={() => setShowForm(true)}
-                className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                className="flex items-center px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               >
-                <span className="hidden sm:inline">Nuovo Costo</span>
-                <PlusIcon className="h-5 w-5 sm:hidden" aria-hidden="true" />
-                <span className="sr-only">Crea nuovo costo</span>
+                <PlusIcon className="h-5 w-5 mr-1" />
+                Aggiungi Costo
               </button>
-              <div className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 right-0 top-full mt-1 whitespace-nowrap sm:hidden">
-                Nuovo Costo
-              </div>
             </div>
-          </div>
 
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
+            {showForm && (
+              <div className="mb-4">
+                <CostForm
+                  onSubmit={handleCreateCost}
+                  onCancel={() => setShowForm(false)}
+                  cost={{
+                    description: '',
+                    date: new Date().toISOString().split('T')[0],
+                    amount: 0,
+                    deductible: true
+                  }}
+                />
               </div>
+            )}
+
+            <CostList
+              costs={deductibleCosts}
+              onUpdate={handleUpdateCost}
+              onDelete={handleDeleteCost}
+            />
+
+            <div className="mt-4 text-right">
+              <p className="text-lg font-semibold">
+                Totale costi deducibili: €{totalDeductibleCosts.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
             </div>
-          )}
+          </>
+        )}
+      </Section>
 
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-            </div>
-          ) : (
-            <>
-              {showForm && (
-                <div className="mb-6">
-                  <CostForm
-                    onSubmit={handleCreateCost}
-                    onCancel={() => setShowForm(false)}
-                  />
-                </div>
-              )}
-
-              <div className="overflow-hidden">
-                <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                  <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                    <CostList
-                      costs={costs}
-                      onUpdate={handleUpdateCost}
-                      onDelete={handleDeleteCost}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {costs.length > 0 && (
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-lg font-medium text-gray-900">
-                    Totale costi {currentYear}: €{' '}
-                    {costs.reduce((sum, cost) => sum + cost.amount, 0).toFixed(2)}
-                  </p>
-                </div>
-              )}
-            </>
-          )}
+      <Section title="2. Costi Non Deducibili">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold">Gestione costi non deducibili</h3>
+          <button
+            onClick={() => setShowForm(true)}
+            className="flex items-center px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            <PlusIcon className="h-5 w-5 mr-1" />
+            Aggiungi Costo
+          </button>
         </div>
-      </div>
+
+        {showForm && (
+          <div className="mb-4">
+            <CostForm
+              onSubmit={handleCreateCost}
+              onCancel={() => setShowForm(false)}
+              cost={{
+                description: '',
+                date: new Date().toISOString().split('T')[0],
+                amount: 0,
+                deductible: false
+              }}
+            />
+          </div>
+        )}
+
+        <CostList
+          costs={nonDeductibleCosts}
+          onUpdate={handleUpdateCost}
+          onDelete={handleDeleteCost}
+        />
+
+        <div className="mt-4 text-right">
+          <p className="text-lg font-semibold">
+            Totale costi non deducibili: €{totalNonDeductibleCosts.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </p>
+        </div>
+      </Section>
     </div>
   );
 }

@@ -39,10 +39,6 @@ export default function Dashboard() {
   }, [searchParams, user, isLoading, router, setToken]);
 
   const handleTabChange = (newTab: string) => {
-    if (newTab === 'costs' && !isOrdinaryRegime) {
-      return;
-    }
-    
     if (activeTab === 'settings' && taxSettingsRef.current?.hasChanges()) {
       setAttemptedTab(newTab);
     } else {
@@ -134,13 +130,11 @@ export default function Dashboard() {
                     className={classNames(
                       activeTab === 'costs'
                         ? 'text-gray-900'
-                        : 'text-gray-500',
-                      !isOrdinaryRegime ? 'cursor-not-allowed opacity-50' : 'hover:text-gray-700 hover:bg-gray-50',
-                      'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium focus:z-10'
+                        : 'text-gray-500 hover:text-gray-700',
+                      'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 focus:z-10'
                     )}
                     aria-current={activeTab === 'costs' ? 'page' : undefined}
-                    disabled={!isOrdinaryRegime}
-                    title={!isOrdinaryRegime ? "Costi attivi solo per Regime Ordinario" : undefined}
+                    
                   >
                     <span>Costi</span>
                     <span
@@ -188,8 +182,8 @@ export default function Dashboard() {
                   />
                 )}
                 {activeTab === 'invoices' && <Invoices />}
-                {activeTab === 'costs' && isOrdinaryRegime && <Costs />}
-                {activeTab === 'tax' && !isOrdinaryRegime && <TaxContributions />}
+                {activeTab === 'costs' && <Costs />}
+                {activeTab === 'tax' && <TaxContributions />}
               </div>
             </div>
           </div>

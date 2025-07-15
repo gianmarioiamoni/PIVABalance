@@ -5,6 +5,11 @@ interface MongoConnection {
   promise: Promise<typeof mongoose> | null;
 }
 
+// Extend global object to include mongoose cache
+declare global {
+  var mongoose: MongoConnection | undefined;
+}
+
 const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://localhost:27017/p-iva-balance";
 
@@ -19,10 +24,10 @@ if (!MONGODB_URI) {
  * in development. This prevents connections growing exponentially
  * during API Route usage.
  */
-let cached: MongoConnection = (global as any).mongoose;
+let cached: MongoConnection = global.mongoose || { conn: null, promise: null };
 
 if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
 /**

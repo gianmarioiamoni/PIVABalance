@@ -1,0 +1,201 @@
+'use client';
+
+import { useAuthContext } from '@/providers/AuthProvider';
+import { LoadingSpinner } from '@/components/ui';
+
+/**
+ * Dashboard Component
+ * 
+ * Main dashboard view showing user's financial overview
+ * Will include tax contributions, recent invoices, and quick actions
+ */
+export const Dashboard = () => {
+    const { user, isLoading } = useAuthContext();
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <LoadingSpinner size="lg" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Header */}
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900">
+                    Dashboard
+                </h1>
+                <p className="mt-2 text-gray-600">
+                    Benvenuto, {user?.name}. Ecco il riepilogo della tua attività.
+                </p>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="p-5">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                                <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div className="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt className="text-sm font-medium text-gray-500 truncate">
+                                        Fatture Questo Mese
+                                    </dt>
+                                    <dd className="text-lg font-medium text-gray-900">
+                                        12
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="p-5">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                                <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div className="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt className="text-sm font-medium text-gray-500 truncate">
+                                        Ricavi Mensili
+                                    </dt>
+                                    <dd className="text-lg font-medium text-gray-900">
+                                        €15.420
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="p-5">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                                <div className="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
+                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div className="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt className="text-sm font-medium text-gray-500 truncate">
+                                        Costi Mensili
+                                    </dt>
+                                    <dd className="text-lg font-medium text-gray-900">
+                                        €3.240
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="p-5">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                                <div className="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div className="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt className="text-sm font-medium text-gray-500 truncate">
+                                        Tasse Stimate
+                                    </dt>
+                                    <dd className="text-lg font-medium text-gray-900">
+                                        €4.680
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Tax Contributions Section */}
+                <div className="lg:col-span-2">
+                    <div className="bg-white shadow rounded-lg">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <h2 className="text-lg font-medium text-gray-900">
+                                Contributi e Tasse
+                            </h2>
+                        </div>
+                        <div className="p-6">
+                            {/* TaxContributions component will be added here when migrated */}
+                            <div className="text-center py-12 text-gray-500">
+                                <p>Il componente TaxContributions verrà aggiunto dopo la migrazione.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="space-y-6">
+                    <div className="bg-white shadow rounded-lg">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <h2 className="text-lg font-medium text-gray-900">
+                                Azioni Rapide
+                            </h2>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <button className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-md font-medium transition-colors">
+                                Nuova Fattura
+                            </button>
+                            <button className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-md font-medium transition-colors">
+                                Aggiungi Costo
+                            </button>
+                            <button className="w-full bg-purple-500 hover:bg-purple-600 text-white px-4 py-3 rounded-md font-medium transition-colors">
+                                Visualizza Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="bg-white shadow rounded-lg">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <h2 className="text-lg font-medium text-gray-900">
+                                Ultime Attività
+                            </h2>
+                        </div>
+                        <div className="p-6">
+                            <div className="space-y-3 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Fattura #2024-001</span>
+                                    <span className="text-green-600">+€1.200</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Costo Materiali</span>
+                                    <span className="text-red-600">-€320</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Fattura #2024-002</span>
+                                    <span className="text-green-600">+€850</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}; 

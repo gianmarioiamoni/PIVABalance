@@ -54,7 +54,7 @@ const vatSchema = new Schema<VatInfo>(
 /**
  * Invoice Schema
  * Handles invoice data and validation
- * Follows Single Responsibility Principle
+ * Follows Single Responsibility Principle - only data persistence
  */
 const invoiceSchema = new Schema<IInvoice>(
   {
@@ -158,8 +158,6 @@ const invoiceSchema = new Schema<IInvoice>(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   }
 );
 
@@ -176,74 +174,8 @@ invoiceSchema.index({ userId: 1, issueDate: 1 });
 invoiceSchema.index({ userId: 1, paymentDate: 1 });
 
 /**
- * Virtual property for calculating VAT amount
- */
-invoiceSchema.virtual("vatAmount").get(function (this: IInvoice) {
-  if (!this.vat) return 0;
-  return (this.amount * this.vat.vatRate) / 100;
-});
-
-/**
- * Virtual property for calculating total amount including VAT
- */
-invoiceSchema.virtual("totalAmount").get(function (this: IInvoice) {
-  return this.amount + (this.vatAmount || 0);
-});
-
-/**
- * Virtual property for checking if invoice is paid
- */
-invoiceSchema.virtual("isPaid").get(function (this: IInvoice) {
-  return !!this.paymentDate;
-});
-
-/**
- * Virtual property for getting payment status
- */
-invoiceSchema.virtual("paymentStatus").get(function (this: IInvoice) {
-  if (this.paymentDate) return "paid";
-  const now = new Date();
-  const dueDate = new Date(this.issueDate);
-  dueDate.setDate(dueDate.getDate() + 30); // Assume 30 days payment terms
-
-  return now > dueDate ? "overdue" : "pending";
-});
-
-/**
- * Static method to find invoices by user and year
- */
-invoiceSchema.statics.findByUserAndYear = function (
-  userId: string,
-  year: number
-) {
-  return this.find({ userId, fiscalYear: year }).sort({ issueDate: 1 });
-};
-
-/**
- * Static method to find unpaid invoices for a user
- */
-invoiceSchema.statics.findUnpaidByUser = function (userId: string) {
-  return this.find({ userId, paymentDate: { $exists: false } }).sort({
-    issueDate: 1,
-  });
-};
-
-/**
- * Static method to calculate total revenue for user in a year
- */
-invoiceSchema.statics.calculateYearlyRevenue = async function (
-  userId: string,
-  year: number
-) {
-  const result = await this.aggregate([
-    { $match: { userId, fiscalYear: year } },
-    { $group: { _id: null, total: { $sum: "$amount" } } },
-  ]);
-  return result[0]?.total || 0;
-};
-
-/**
  * Export the Invoice model
+ * Simple data model without business logic - follows functional principles
  */
 export const Invoice =
   (models.Invoice as mongoose.Model<IInvoice>) ||

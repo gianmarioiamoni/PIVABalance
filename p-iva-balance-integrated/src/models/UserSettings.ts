@@ -4,7 +4,7 @@ import { IUserSettings, TaxRegime, PensionSystem, InpsRateType } from "@/types";
 /**
  * User Settings Schema
  * Handles user-specific tax and pension configuration
- * Follows Single Responsibility Principle
+ * Follows Single Responsibility Principle - handles only settings data persistence
  */
 const userSettingsSchema = new Schema<IUserSettings>(
   {
@@ -121,8 +121,6 @@ const userSettingsSchema = new Schema<IUserSettings>(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   }
 );
 
@@ -157,47 +155,8 @@ userSettingsSchema.pre("save", function (next) {
 });
 
 /**
- * Virtual for checking if settings are complete
- */
-userSettingsSchema.virtual("isComplete").get(function (this: IUserSettings) {
-  const hasBasicSettings = !!(this.taxRegime && this.pensionSystem);
-
-  const hasPensionSettings =
-    this.pensionSystem === "INPS"
-      ? !!this.inpsRateType
-      : !!this.professionalFundId;
-
-  const hasTaxSettings =
-    this.taxRegime === "ordinario"
-      ? true
-      : !!(this.substituteRate && this.profitabilityRate);
-
-  return hasBasicSettings && hasPensionSettings && hasTaxSettings;
-});
-
-/**
- * Static method to find settings by user ID
- */
-userSettingsSchema.statics.findByUserId = function (userId: string) {
-  return this.findOne({ userId });
-};
-
-/**
- * Static method to create default settings for a user
- */
-userSettingsSchema.statics.createDefault = function (userId: string) {
-  return this.create({
-    userId,
-    taxRegime: "forfettario",
-    substituteRate: 5,
-    profitabilityRate: 78,
-    pensionSystem: "INPS",
-    inpsRateType: "PROFESSIONAL",
-  });
-};
-
-/**
  * Export the UserSettings model
+ * Simple data model without business logic - follows functional principles
  */
 export const UserSettings =
   (models.UserSettings as mongoose.Model<IUserSettings>) ||

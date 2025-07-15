@@ -1,10 +1,10 @@
 import mongoose, { Schema, model, models } from "mongoose";
-import bcrypt from "bcryptjs";
 import { IUser } from "@/types";
+import { hashPassword } from "@/utils/userCalculations";
 
 /**
  * User Schema with enhanced validation and security features
- * Follows Single Responsibility Principle - handles only user data and authentication
+ * Follows Single Responsibility Principle - handles only user data persistence
  */
 const userSchema = new Schema<IUser>(
   {
@@ -66,9 +66,6 @@ const userSchema = new Schema<IUser>(
   },
   {
     timestamps: true,
-    // Ensure virtual fields are included in JSON output
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   }
 );
 
@@ -80,16 +77,14 @@ userSchema.index({ googleId: 1 });
 
 /**
  * Pre-save middleware to hash password
- * Implements security best practices
+ * Implements security best practices using functional approach
  */
 userSchema.pre("save", async function (next) {
   // Only hash the password if it has been modified (or is new)
   if (!this.isModified("password")) return next();
 
   try {
-    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12");
-    const salt = await bcrypt.genSalt(saltRounds);
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = await hashPassword(this.password);
     next();
   } catch (error) {
     next(error as Error);
@@ -97,61 +92,8 @@ userSchema.pre("save", async function (next) {
 });
 
 /**
- * Instance method to compare password
- * Follows Single Responsibility Principle
- */
-userSchema.methods.comparePassword = async function (
-  candidatePassword: string
-): Promise<boolean> {
-  try {
-    if (!candidatePassword || candidatePassword.trim() === "") {
-      throw new Error("Password cannot be empty");
-    }
-    if (!this.password) {
-      throw new Error("User has no password set");
-    }
-    return await bcrypt.compare(candidatePassword, this.password);
-  } catch (error) {
-    throw new Error("Password comparison failed");
-  }
-};
-
-/**
- * Virtual property to get user's full display name
- */
-userSchema.virtual("displayName").get(function (this: IUser) {
-  return this.name || this.email.split("@")[0];
-});
-
-/**
- * Transform function to remove sensitive data from JSON output
- * Implements security by design
- */
-userSchema.methods.toJSON = function () {
-  const userObject = this.toObject();
-  delete userObject.password;
-  delete userObject.__v;
-  return userObject;
-};
-
-/**
- * Static method to find user by email
- * Follows Interface Segregation Principle
- */
-userSchema.statics.findByEmail = function (email: string) {
-  return this.findOne({ email: email.toLowerCase().trim() });
-};
-
-/**
- * Static method to find user by Google ID
- */
-userSchema.statics.findByGoogleId = function (googleId: string) {
-  return this.findOne({ googleId });
-};
-
-/**
  * Export the User model
- * Use existing model if it exists (for hot reloading in development)
+ * Simple data model without business logic - follows functional principles
  */
 export const User =
   (models.User as mongoose.Model<IUser>) || model<IUser>("User", userSchema);

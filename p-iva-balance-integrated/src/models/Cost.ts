@@ -3,7 +3,7 @@ import { ICost } from "@/types";
 
 /**
  * Cost Schema for expense tracking
- * Follows Single Responsibility Principle - handles only cost data
+ * Follows Single Responsibility Principle - handles only cost data persistence
  */
 const costSchema = new Schema<ICost>(
   {
@@ -64,8 +64,6 @@ const costSchema = new Schema<ICost>(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   }
 );
 
@@ -76,83 +74,8 @@ costSchema.index({ userId: 1, date: -1 });
 costSchema.index({ userId: 1, createdAt: -1 });
 
 /**
- * Virtual property for formatted amount
- */
-costSchema.virtual("formattedAmount").get(function (this: ICost) {
-  return `€${this.amount.toFixed(2)}`;
-});
-
-/**
- * Virtual property for formatted date
- */
-costSchema.virtual("formattedDate").get(function (this: ICost) {
-  return this.date.toLocaleDateString("it-IT");
-});
-
-/**
- * Transform function to clean JSON output
- */
-costSchema.methods.toJSON = function () {
-  const costObject = this.toObject();
-  delete costObject.__v;
-  return costObject;
-};
-
-/**
- * Static method to find costs by user ID and year
- */
-costSchema.statics.findByUserAndYear = function (userId: string, year: number) {
-  const startDate = new Date(year, 0, 1);
-  const endDate = new Date(year, 11, 31, 23, 59, 59, 999);
-
-  return this.find({
-    userId,
-    date: {
-      $gte: startDate,
-      $lte: endDate,
-    },
-  }).sort({ date: -1 });
-};
-
-/**
- * Static method to find costs by user ID
- */
-costSchema.statics.findByUserId = function (userId: string) {
-  return this.find({ userId }).sort({ date: -1 });
-};
-
-/**
- * Static method to calculate total costs for user and year
- */
-costSchema.statics.getTotalByUserAndYear = function (
-  userId: string,
-  year: number
-) {
-  const startDate = new Date(year, 0, 1);
-  const endDate = new Date(year, 11, 31, 23, 59, 59, 999);
-
-  return this.aggregate([
-    {
-      $match: {
-        userId,
-        date: {
-          $gte: startDate,
-          $lte: endDate,
-        },
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        total: { $sum: "$amount" },
-        count: { $sum: 1 },
-      },
-    },
-  ]);
-};
-
-/**
  * Export the Cost model
+ * Simple data model without business logic - follows functional principles
  */
 export const Cost =
   (models.Cost as mongoose.Model<ICost>) || model<ICost>("Cost", costSchema);

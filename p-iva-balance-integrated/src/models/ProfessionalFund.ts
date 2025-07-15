@@ -66,7 +66,7 @@ const professionalFundParametersSchema = new Schema(
 
 /**
  * Professional Fund Schema
- * Follows Single Responsibility Principle - handles only professional fund data
+ * Follows Single Responsibility Principle - handles only professional fund data persistence
  */
 const professionalFundSchema = new Schema<IProfessionalFund>(
   {
@@ -135,8 +135,6 @@ const professionalFundSchema = new Schema<IProfessionalFund>(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   }
 );
 
@@ -146,28 +144,6 @@ const professionalFundSchema = new Schema<IProfessionalFund>(
 professionalFundSchema.index({ code: 1 }, { unique: true });
 professionalFundSchema.index({ isActive: 1 });
 professionalFundSchema.index({ "parameters.year": 1 });
-
-/**
- * Virtual property for current year parameters
- */
-professionalFundSchema
-  .virtual("currentYearParameters")
-  .get(function (this: IProfessionalFund) {
-    const currentYear = new Date().getFullYear();
-    return (
-      this.parameters.find((p) => p.year === currentYear) ||
-      this.parameters.sort((a, b) => b.year - a.year)[0]
-    ); // Latest year if current not found
-  });
-
-/**
- * Transform function to clean JSON output
- */
-professionalFundSchema.methods.toJSON = function () {
-  const fundObject = this.toObject();
-  delete fundObject.__v;
-  return fundObject;
-};
 
 /**
  * Pre-save validation middleware
@@ -192,43 +168,8 @@ professionalFundSchema.pre("save", function (next) {
 });
 
 /**
- * Static method to find active funds
- */
-professionalFundSchema.statics.findActive = function () {
-  return this.find({ isActive: true }).sort({ name: 1 });
-};
-
-/**
- * Static method to find fund by code
- */
-professionalFundSchema.statics.findByCode = function (code: string) {
-  return this.findOne({ code: code.toUpperCase() });
-};
-
-/**
- * Static method to find funds with parameters for a specific year
- */
-professionalFundSchema.statics.findByYear = function (year: number) {
-  return this.find({
-    "parameters.year": year,
-    isActive: true,
-  }).sort({ name: 1 });
-};
-
-/**
- * Static method to get fund parameters for a specific year
- */
-professionalFundSchema.statics.getParametersForYear = function (
-  fundId: string,
-  year: number
-) {
-  return this.findById(fundId, {
-    parameters: { $elemMatch: { year } },
-  });
-};
-
-/**
  * Export the ProfessionalFund model
+ * Simple data model without business logic - follows functional principles
  */
 export const ProfessionalFund =
   (models.ProfessionalFund as mongoose.Model<IProfessionalFund>) ||

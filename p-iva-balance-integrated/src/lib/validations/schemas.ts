@@ -210,7 +210,7 @@ export const professionalFundSchema = z.object({
   code: z.string().min(1, "Code is required").max(20, "Code too long"),
   description: z.string().max(500, "Description too long").optional(),
   parameters: z
-    .array(professionalFundParametersSchemaInternal)
+    .array(professionalFundParametersSchema)
     .min(1, "At least one parameter set is required"),
   allowManualEdit: z.boolean().default(false),
   isActive: z.boolean().default(true),

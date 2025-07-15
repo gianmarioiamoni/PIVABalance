@@ -7,6 +7,7 @@ import {
   signUpSchema,
   isValidationError,
 } from "@/lib/validations/schemas";
+import { findUserByEmail } from "@/utils/userQueries";
 import { SignUpCredentials, ApiResponse, AuthResponse } from "@/types";
 
 /**
@@ -25,7 +26,7 @@ export async function POST(
     const validatedData: SignUpCredentials = validateSchema(signUpSchema, body);
 
     // Check if user already exists
-    const existingUser = await User.findByEmail(validatedData.email);
+    const existingUser = await findUserByEmail(validatedData.email);
     if (existingUser) {
       return NextResponse.json(
         {

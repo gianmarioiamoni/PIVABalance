@@ -6,6 +6,25 @@ import { POST } from "@/app/api/auth/register/route";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { connectDB, disconnectDB } from "@/lib/database/mongodb";
 import { User } from "@/models";
+import { findUserByEmail } from "@/utils/userQueries";
+
+// Types for test data
+interface ValidUserData {
+  email: string;
+  password: string;
+  name: string;
+}
+
+interface PartialUserData {
+  email?: string;
+  password?: string;
+  name?: string;
+}
+
+type TestRequestBody =
+  | ValidUserData
+  | PartialUserData
+  | Record<string, unknown>;
 
 describe("/api/auth/register", () => {
   let mongoServer: MongoMemoryServer;
@@ -25,7 +44,7 @@ describe("/api/auth/register", () => {
     await User.deleteMany({});
   });
 
-  const createRequest = (body: any) => {
+  const createRequest = (body: TestRequestBody) => {
     return new NextRequest("http://localhost:3000/api/auth/register", {
       method: "POST",
       headers: {
@@ -58,7 +77,7 @@ describe("/api/auth/register", () => {
       expect(responseData.data.user.id).toBeDefined();
 
       // Verify user was created in database
-      const createdUser = await User.findByEmail("test@example.com");
+      const createdUser = await findUserByEmail("test@example.com");
       expect(createdUser).toBeDefined();
       expect(createdUser?.name).toBe("Test User");
     });
@@ -93,7 +112,9 @@ describe("/api/auth/register", () => {
       expect(response.status).toBe(400);
       expect(responseData.success).toBe(false);
       expect(responseData.message).toBe("Dati di registrazione non validi");
-      expect(responseData.errors).toContain("Invalid input: expected string, received undefined");
+      expect(responseData.errors).toContain(
+        "Invalid input: expected string, received undefined"
+      );
     });
 
     it("should return error for invalid email format", async () => {

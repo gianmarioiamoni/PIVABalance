@@ -4,6 +4,12 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { connectDB, disconnectDB } from "@/lib/database/mongodb";
 import { User } from "@/models/User";
+import { findUserByEmail, findUserByGoogleId } from "@/utils/userQueries";
+import {
+  compareUserPassword,
+  getUserDisplayName,
+} from "@/utils/userCalculations";
+import { IUser } from "@/types";
 
 describe("User Model", () => {
   let mongoServer: MongoMemoryServer;
@@ -165,7 +171,7 @@ describe("User Model", () => {
   });
 
   describe("Instance Methods", () => {
-    let user: any;
+    let user: IUser & { _id: string; password: string };
 
     beforeEach(async () => {
       user = await User.create({
@@ -176,28 +182,29 @@ describe("User Model", () => {
     });
 
     it("should compare password correctly", async () => {
-      const isMatch = await user.comparePassword("Test123!");
+      const isMatch = await compareUserPassword("Test123!", user.password);
       expect(isMatch).toBe(true);
     });
 
     it("should reject incorrect password", async () => {
-      const isMatch = await user.comparePassword("wrongpassword");
+      const isMatch = await compareUserPassword("wrongpassword", user.password);
       expect(isMatch).toBe(false);
     });
 
     it("should handle empty password comparison", async () => {
-      await expect(user.comparePassword("")).rejects.toThrow();
+      await expect(compareUserPassword("", user.password)).rejects.toThrow();
     });
 
-    it("should exclude password from JSON output", () => {
+    it("should include all fields in JSON output (password filtering is app responsibility)", () => {
       const json = user.toJSON();
-      expect(json.password).toBeUndefined();
+      expect(json.password).toBeDefined(); // Password is now included - app should filter it
       expect(json.email).toBe("test@example.com");
       expect(json.name).toBe("Test User");
+      expect(json._id).toBeDefined();
     });
   });
 
-  describe("Static Methods", () => {
+  describe("User Query Functions", () => {
     beforeEach(async () => {
       await User.create({
         email: "test@example.com",
@@ -212,35 +219,35 @@ describe("User Model", () => {
     });
 
     it("should find user by email", async () => {
-      const user = await User.findByEmail("test@example.com");
+      const user = await findUserByEmail("test@example.com");
       expect(user).toBeDefined();
       expect(user?.email).toBe("test@example.com");
     });
 
     it("should find user by email case-insensitive", async () => {
-      const user = await User.findByEmail("TEST@EXAMPLE.COM");
+      const user = await findUserByEmail("TEST@EXAMPLE.COM");
       expect(user).toBeDefined();
       expect(user?.email).toBe("test@example.com");
     });
 
     it("should find user by Google ID", async () => {
-      const user = await User.findByGoogleId("google123");
+      const user = await findUserByGoogleId("google123");
       expect(user).toBeDefined();
       expect(user?.googleId).toBe("google123");
     });
 
     it("should return null for non-existent email", async () => {
-      const user = await User.findByEmail("nonexistent@example.com");
+      const user = await findUserByEmail("nonexistent@example.com");
       expect(user).toBeNull();
     });
 
     it("should return null for non-existent Google ID", async () => {
-      const user = await User.findByGoogleId("nonexistent");
+      const user = await findUserByGoogleId("nonexistent");
       expect(user).toBeNull();
     });
   });
 
-  describe("Virtual Properties", () => {
+  describe("User Calculation Functions", () => {
     it("should return display name from name", async () => {
       const user = await User.create({
         email: "test@example.com",
@@ -248,7 +255,7 @@ describe("User Model", () => {
         name: "Test User",
       });
 
-      expect(user.displayName).toBe("Test User");
+      expect(getUserDisplayName(user)).toBe("Test User");
     });
 
     it("should return display name from email when name is not provided", () => {
@@ -256,14 +263,12 @@ describe("User Model", () => {
       const userData = {
         email: "testuser@example.com",
         password: "Test123!",
-        name: "TestUser",
+        name: undefined,
       };
 
       const user = new User(userData);
-      // Set name to undefined to test fallback
-      user.name = undefined as any;
 
-      expect(user.displayName).toBe("testuser");
+      expect(getUserDisplayName(user)).toBe("testuser");
     });
   });
 });

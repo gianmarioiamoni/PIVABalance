@@ -7,10 +7,11 @@ import { User } from "@/models/User";
 import { UserSettings } from "@/models/UserSettings";
 import { GET, PUT } from "@/app/api/settings/route";
 import { NextRequest } from "next/server";
+import { TestUser, TestRequestBody } from "@/types";
 
 describe("/api/settings", () => {
   let mongoServer: MongoMemoryServer;
-  let testUser: any;
+  let testUser: TestUser;
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -116,7 +117,7 @@ describe("/api/settings", () => {
   });
 
   describe("PUT /api/settings", () => {
-    const createPutRequest = (userId: string, data: any) => {
+    const createPutRequest = (userId: string, data: TestRequestBody) => {
       return new NextRequest("http://localhost:3000/api/settings", {
         method: "PUT",
         headers: {

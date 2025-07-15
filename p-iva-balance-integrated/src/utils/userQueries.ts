@@ -1,6 +1,7 @@
 import { User } from "@/models/User";
 import { IUser } from "@/types";
 import { normalizeEmail } from "./userCalculations";
+import { UserQuery } from "@/types";
 
 /**
  * Pure functions for user database queries
@@ -42,7 +43,7 @@ export const emailExists = async (
   excludeUserId?: string
 ): Promise<boolean> => {
   const normalizedEmail = normalizeEmail(email);
-  const query: any = { email: normalizedEmail };
+  const query: UserQuery = { email: normalizedEmail };
 
   if (excludeUserId) {
     query._id = { $ne: excludeUserId };
@@ -59,7 +60,7 @@ export const googleIdExists = async (
   googleId: string,
   excludeUserId?: string
 ): Promise<boolean> => {
-  const query: any = { googleId };
+  const query: UserQuery = { googleId };
 
   if (excludeUserId) {
     query._id = { $ne: excludeUserId };

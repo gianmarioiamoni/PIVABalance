@@ -1,5 +1,5 @@
 import { ProfessionalFund } from "@/models/ProfessionalFund";
-import { IProfessionalFund } from "@/types";
+import { IProfessionalFund, ProfessionalFundQuery } from "@/types";
 import {
   filterActiveFunds,
   filterFundsByYear,
@@ -98,7 +98,7 @@ export const fundCodeExists = async (
   code: string,
   excludeId?: string
 ): Promise<boolean> => {
-  const query: any = { code: code.toUpperCase() };
+  const query: ProfessionalFundQuery = { code: code.toUpperCase() };
 
   if (excludeId) {
     query._id = { $ne: excludeId };

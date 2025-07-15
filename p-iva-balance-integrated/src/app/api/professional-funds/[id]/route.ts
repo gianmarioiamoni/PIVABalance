@@ -12,20 +12,21 @@ import {
   ProfessionalFundUpdateRequest,
   ProfessionalFundResponse,
   ApiResponse,
+  RawProfessionalFund,
 } from "@/types";
 
 /**
- * Helper function to format professional fund data for response
+ * Helper function to format professional fund response
  * Pure function - follows functional programming principles
  */
 const formatProfessionalFundResponse = (
-  fund: any
+  fund: RawProfessionalFund
 ): ProfessionalFundResponse => ({
   id: fund._id.toString(),
   name: fund.name,
   code: fund.code,
   description: fund.description,
-  parameters: fund.parameters.map((param: any) => ({
+  parameters: fund.parameters.map((param) => ({
     contributionRate: param.contributionRate,
     minimumContribution: param.minimumContribution,
     fixedAnnualContributions: param.fixedAnnualContributions,
@@ -157,8 +158,8 @@ export async function PUT(
       }
     }
 
-    // Build update object
-    const updateData: any = {};
+    // Prepare update data - only include provided fields
+    const updateData: Partial<ProfessionalFundUpdateRequest> = {};
     if (validatedData.name !== undefined) {
       updateData.name = validatedData.name;
     }

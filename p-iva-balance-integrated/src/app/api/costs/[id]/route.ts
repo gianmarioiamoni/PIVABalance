@@ -8,13 +8,13 @@ import {
   costUpdateSchema,
   costIdParamSchema,
 } from "@/lib/validations/schemas";
-import { CostUpdateRequest, CostResponse, ApiResponse } from "@/types";
+import { CostUpdateRequest, CostResponse, ApiResponse, RawCost } from "@/types";
 
 /**
  * Helper function to format cost data for response
  * Pure function - follows functional programming principles
  */
-const formatCostResponse = (cost: any): CostResponse => ({
+const formatCostResponse = (cost: RawCost): CostResponse => ({
   id: cost._id.toString(),
   description: cost.description,
   date: cost.date.toISOString(),
@@ -133,8 +133,8 @@ export async function PUT(
       body
     );
 
-    // Build update object
-    const updateData: any = {};
+    // Prepare update data - only include provided fields
+    const updateData: Partial<CostUpdateRequest> = {};
     if (validatedData.description !== undefined) {
       updateData.description = validatedData.description;
     }

@@ -3,6 +3,12 @@ import { GET as GET_BY_ID, PUT, DELETE } from "@/app/api/costs/[id]/route";
 import { connectDB, disconnectDB } from "@/lib/database/mongodb";
 import { User, Cost } from "@/models";
 import { generateToken } from "@/lib/auth/jwt";
+import {
+  TestUser,
+  TestCost,
+  MockRequestOptions,
+  TestRequestBody,
+} from "@/types";
 
 /**
  * Mock NextRequest for testing
@@ -10,11 +16,7 @@ import { generateToken } from "@/lib/auth/jwt";
  */
 const createMockRequest = (
   url: string,
-  options: {
-    method?: string;
-    body?: any;
-    headers?: Record<string, string>;
-  } = {}
+  options: MockRequestOptions = {}
 ): Request => {
   const { method = "GET", body, headers = {} } = options;
 
@@ -25,11 +27,11 @@ const createMockRequest = (
       ...headers,
     },
     body: body ? JSON.stringify(body) : undefined,
-  }) as any;
+  }) as Request;
 };
 
 describe("/api/costs", () => {
-  let testUser: any;
+  let testUser: TestUser;
   let authToken: string;
 
   beforeAll(async () => {
@@ -279,7 +281,7 @@ describe("/api/costs", () => {
   });
 
   describe("GET /api/costs/[id]", () => {
-    let testCost: any;
+    let testCost: TestCost;
 
     beforeEach(async () => {
       testCost = new Cost({
@@ -355,7 +357,7 @@ describe("/api/costs", () => {
   });
 
   describe("PUT /api/costs/[id]", () => {
-    let testCost: any;
+    let testCost: TestCost;
 
     beforeEach(async () => {
       testCost = new Cost({
@@ -421,7 +423,7 @@ describe("/api/costs", () => {
   });
 
   describe("DELETE /api/costs/[id]", () => {
-    let testCost: any;
+    let testCost: TestCost;
 
     beforeEach(async () => {
       testCost = new Cost({

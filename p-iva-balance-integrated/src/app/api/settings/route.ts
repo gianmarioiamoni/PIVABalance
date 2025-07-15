@@ -7,26 +7,30 @@ import {
   isValidationError,
   userSettingsUpdateSchema,
 } from "@/lib/validations/schemas";
+import { RawUserSettings } from "@/types";
 
 /**
  * Helper function to clean settings data for response
  */
-function cleanSettingsData(settings: any) {
-  const settingsData = settings.toJSON();
-  delete settingsData._id;
-  delete settingsData.__v;
-  delete settingsData.userId;
-  delete settingsData.createdAt;
-  delete settingsData.updatedAt;
+function cleanSettingsData(settings: RawUserSettings) {
+  const settingsData = settings.toJSON?.() || settings;
+  const cleanedData = { ...settingsData };
+
+  // Remove MongoDB-specific fields
+  delete cleanedData._id;
+  delete cleanedData.__v;
+  delete cleanedData.userId;
+  delete cleanedData.createdAt;
+  delete cleanedData.updatedAt;
 
   // Remove undefined properties for cleaner response
-  Object.keys(settingsData).forEach((key) => {
-    if (settingsData[key] === undefined) {
-      delete settingsData[key];
+  Object.keys(cleanedData).forEach((key) => {
+    if (cleanedData[key] === undefined) {
+      delete cleanedData[key];
     }
   });
 
-  return settingsData;
+  return cleanedData;
 }
 
 /**

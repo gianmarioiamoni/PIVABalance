@@ -238,12 +238,110 @@ export interface ApiError {
   message: string;
   code?: string;
   statusCode: number;
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 // Validation types
 export interface ValidationError {
   field: string;
   message: string;
-  value?: any;
+  value?: unknown;
+}
+
+// Test types for better type safety
+export interface TestUser {
+  _id: string;
+  email: string;
+  password?: string;
+  name: string;
+  googleId?: string;
+}
+
+export interface TestCost {
+  _id: string;
+  userId: string;
+  description: string;
+  date: Date;
+  amount: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  save?: () => Promise<TestCost>;
+}
+
+export interface TestRequestBody {
+  [key: string]: unknown;
+}
+
+export interface MockRequestOptions {
+  method?: string;
+  body?: TestRequestBody;
+  headers?: Record<string, string>;
+}
+
+// MongoDB query types
+export interface UserQuery {
+  email?: string;
+  googleId?: string;
+  _id?: { $ne: string };
+}
+
+export interface ProfessionalFundQuery {
+  code?: string | { $regex: RegExp; $options: string };
+  isActive?: boolean;
+  _id?: { $ne: string };
+}
+
+export interface CostQuery {
+  userId: string;
+  date?: { $gte?: Date; $lte?: Date };
+}
+
+// Database document types (raw MongoDB objects)
+export interface RawMongoDocument {
+  _id: unknown;
+  toJSON?: () => Record<string, unknown>;
+  toString?: () => string;
+  [key: string]: unknown;
+}
+
+export interface RawCost extends RawMongoDocument {
+  description: string;
+  date: Date;
+  amount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface RawProfessionalFund extends RawMongoDocument {
+  name: string;
+  code: string;
+  description: string;
+  parameters: Array<{
+    contributionRate: number;
+    minimumContribution: number;
+    fixedAnnualContributions: number;
+    year: number;
+  }>;
+  allowManualEdit: boolean;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface RawUserSettings extends RawMongoDocument {
+  userId: string;
+  regime: string;
+  professionalFund?: string;
+  inpsManagement?: string;
+  taxableIncome?: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Professional fund parameter validation type
+export interface ProfessionalFundParameter {
+  contributionRate: number;
+  minimumContribution: number;
+  fixedAnnualContributions: number;
+  year: number;
 }

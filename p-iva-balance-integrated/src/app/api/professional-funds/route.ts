@@ -12,20 +12,22 @@ import {
   ProfessionalFundCreateRequest,
   ProfessionalFundResponse,
   ApiResponse,
+  RawProfessionalFund,
+  ProfessionalFundQuery,
 } from "@/types";
 
 /**
- * Helper function to format professional fund data for response
+ * Helper function to format professional fund response
  * Pure function - follows functional programming principles
  */
 const formatProfessionalFundResponse = (
-  fund: any
+  fund: RawProfessionalFund
 ): ProfessionalFundResponse => ({
   id: fund._id.toString(),
   name: fund.name,
   code: fund.code,
   description: fund.description,
-  parameters: fund.parameters.map((param: any) => ({
+  parameters: fund.parameters.map((param) => ({
     contributionRate: param.contributionRate,
     minimumContribution: param.minimumContribution,
     fixedAnnualContributions: param.fixedAnnualContributions,
@@ -62,8 +64,8 @@ export async function GET(
       queryData
     );
 
-    // Build query based on parameters
-    let query: any = {};
+    // Build query
+    let query: ProfessionalFundQuery = {};
 
     // Filter by active status if specified
     if (validatedQuery.active !== undefined) {

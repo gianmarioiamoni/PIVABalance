@@ -1,5 +1,5 @@
 import mongoose, { Schema, model, models } from "mongoose";
-import { IProfessionalFund } from "@/types";
+import { IProfessionalFund, ProfessionalFundParameter } from "@/types";
 
 /**
  * Professional Fund Parameters Schema
@@ -118,7 +118,7 @@ const professionalFundSchema = new Schema<IProfessionalFund>(
       type: [professionalFundParametersSchema],
       required: [true, "Parameters are required"],
       validate: {
-        validator: function (parameters: any[]) {
+        validator: function (parameters: ProfessionalFundParameter[]) {
           return parameters && parameters.length > 0;
         },
         message: "At least one parameter set is required",

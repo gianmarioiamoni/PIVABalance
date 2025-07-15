@@ -210,7 +210,7 @@ export const professionalFundSchema = z.object({
   code: z.string().min(1, "Code is required").max(20, "Code too long"),
   description: z.string().max(500, "Description too long").optional(),
   parameters: z
-    .array(professionalFundParametersSchema)
+    .array(professionalFundParametersSchemaInternal)
     .min(1, "At least one parameter set is required"),
   allowManualEdit: z.boolean().default(false),
   isActive: z.boolean().default(true),
@@ -347,3 +347,252 @@ export function validateSchemaWithResult<T>(
 ) {
   return schema.safeParse(data);
 }
+
+/**
+ * Cost validation schemas
+ * Follows validation rules consistent with Cost model
+ */
+export const costCreateSchema = z.object({
+  description: z
+    .string()
+    .min(3, "Description must be at least 3 characters")
+    .max(200, "Description cannot exceed 200 characters")
+    .regex(
+      /^[a-zA-ZÀ-ÿ0-9\s.,;:()\-_'"!?€$%&+/\\]+$/,
+      "Description contains invalid characters"
+    ),
+  date: z
+    .string()
+    .or(z.date())
+    .refine((val) => {
+      const date = new Date(val);
+      const minDate = new Date("2000-01-01");
+      const maxDate = new Date();
+      maxDate.setDate(maxDate.getDate() + 1);
+      return date >= minDate && date <= maxDate;
+    }, "Date must be between 2000-01-01 and today"),
+  amount: z
+    .number()
+    .min(0.01, "Amount must be greater than 0")
+    .max(999999.99, "Amount cannot exceed 999,999.99")
+    .refine(
+      (val) => Number.isFinite(val) && /^\d+(\.\d{1,2})?$/.test(val.toString()),
+      "Amount must have at most 2 decimal places"
+    ),
+});
+
+export const costUpdateSchema = z.object({
+  description: z
+    .string()
+    .min(3, "Description must be at least 3 characters")
+    .max(200, "Description cannot exceed 200 characters")
+    .regex(
+      /^[a-zA-ZÀ-ÿ0-9\s.,;:()\-_'"!?€$%&+/\\]+$/,
+      "Description contains invalid characters"
+    )
+    .optional(),
+  date: z
+    .string()
+    .or(z.date())
+    .refine((val) => {
+      if (!val) return true;
+      const date = new Date(val);
+      const minDate = new Date("2000-01-01");
+      const maxDate = new Date();
+      maxDate.setDate(maxDate.getDate() + 1);
+      return date >= minDate && date <= maxDate;
+    }, "Date must be between 2000-01-01 and today")
+    .optional(),
+  amount: z
+    .number()
+    .min(0.01, "Amount must be greater than 0")
+    .max(999999.99, "Amount cannot exceed 999,999.99")
+    .refine((val) => {
+      if (val === undefined) return true;
+      return Number.isFinite(val) && /^\d+(\.\d{1,2})?$/.test(val.toString());
+    }, "Amount must have at most 2 decimal places")
+    .optional(),
+});
+
+export const costQuerySchema = z.object({
+  year: z
+    .string()
+    .regex(/^\d{4}$/, "Year must be a 4-digit number")
+    .refine((val) => {
+      const year = parseInt(val);
+      return year >= 2000 && year <= new Date().getFullYear();
+    }, "Year must be between 2000 and current year")
+    .optional(),
+  limit: z
+    .string()
+    .regex(/^\d+$/, "Limit must be a positive number")
+    .refine((val) => parseInt(val) <= 1000, "Limit cannot exceed 1000")
+    .optional(),
+  offset: z
+    .string()
+    .regex(/^\d+$/, "Offset must be a positive number")
+    .optional(),
+});
+
+export const costIdParamSchema = z.object({
+  id: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid cost ID format"),
+});
+
+/**
+ * Professional Fund validation schemas
+ * Follows validation rules consistent with ProfessionalFund model
+ */
+const professionalFundParametersSchemaInternal = z.object({
+  contributionRate: z
+    .number()
+    .min(0, "Contribution rate cannot be negative")
+    .max(100, "Contribution rate cannot exceed 100%")
+    .refine(
+      (val) => Number.isFinite(val) && /^\d+(\.\d{1,2})?$/.test(val.toString()),
+      "Contribution rate must have at most 2 decimal places"
+    ),
+  minimumContribution: z
+    .number()
+    .min(0, "Minimum contribution cannot be negative")
+    .max(999999.99, "Minimum contribution cannot exceed 999,999.99")
+    .refine(
+      (val) => Number.isFinite(val) && /^\d+(\.\d{1,2})?$/.test(val.toString()),
+      "Minimum contribution must have at most 2 decimal places"
+    ),
+  fixedAnnualContributions: z
+    .number()
+    .min(0, "Fixed annual contributions cannot be negative")
+    .max(999999.99, "Fixed annual contributions cannot exceed 999,999.99")
+    .refine(
+      (val) => Number.isFinite(val) && /^\d+(\.\d{1,2})?$/.test(val.toString()),
+      "Fixed annual contributions must have at most 2 decimal places"
+    )
+    .default(0),
+  year: z
+    .number()
+    .int("Year must be an integer")
+    .min(2000, "Year cannot be before 2000")
+    .max(2100, "Year cannot be after 2100"),
+});
+
+export const professionalFundCreateSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name cannot exceed 100 characters")
+    .regex(
+      /^[a-zA-ZÀ-ÿ0-9\s.,;:()\-_'"!?&+/\\]+$/,
+      "Name contains invalid characters"
+    ),
+  code: z
+    .string()
+    .min(2, "Code must be at least 2 characters")
+    .max(20, "Code cannot exceed 20 characters")
+    .regex(
+      /^[A-Z0-9_-]+$/,
+      "Code can only contain uppercase letters, numbers, underscores, and hyphens"
+    )
+    .transform((val) => val.toUpperCase()),
+  description: z
+    .string()
+    .max(500, "Description cannot exceed 500 characters")
+    .regex(
+      /^[a-zA-ZÀ-ÿ0-9\s.,;:()\-_'"!?€$%&+/\\]*$/,
+      "Description contains invalid characters"
+    )
+    .optional(),
+  parameters: z
+    .array(professionalFundParametersSchemaInternal)
+    .min(1, "At least one parameter set is required")
+    .refine((params) => {
+      const years = params.map((p) => p.year);
+      const uniqueYears = new Set(years);
+      return years.length === uniqueYears.size;
+    }, "Parameters cannot have duplicate years"),
+  allowManualEdit: z.boolean().default(false),
+  isActive: z.boolean().default(true),
+});
+
+export const professionalFundUpdateSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name cannot exceed 100 characters")
+    .regex(
+      /^[a-zA-ZÀ-ÿ0-9\s.,;:()\-_'"!?&+/\\]+$/,
+      "Name contains invalid characters"
+    )
+    .optional(),
+  code: z
+    .string()
+    .min(2, "Code must be at least 2 characters")
+    .max(20, "Code cannot exceed 20 characters")
+    .regex(
+      /^[A-Z0-9_-]+$/,
+      "Code can only contain uppercase letters, numbers, underscores, and hyphens"
+    )
+    .transform((val) => val.toUpperCase())
+    .optional(),
+  description: z
+    .string()
+    .max(500, "Description cannot exceed 500 characters")
+    .regex(
+      /^[a-zA-ZÀ-ÿ0-9\s.,;:()\-_'"!?€$%&+/\\]*$/,
+      "Description contains invalid characters"
+    )
+    .optional(),
+  parameters: z
+    .array(professionalFundParametersSchemaInternal)
+    .min(1, "At least one parameter set is required")
+    .refine((params) => {
+      if (!params) return true;
+      const years = params.map((p) => p.year);
+      const uniqueYears = new Set(years);
+      return years.length === uniqueYears.size;
+    }, "Parameters cannot have duplicate years")
+    .optional(),
+  allowManualEdit: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+});
+
+export const professionalFundQuerySchema = z.object({
+  year: z
+    .string()
+    .regex(/^\d{4}$/, "Year must be a 4-digit number")
+    .refine((val) => {
+      const year = parseInt(val);
+      return year >= 2000 && year <= new Date().getFullYear() + 10;
+    }, "Year must be between 2000 and 10 years in the future")
+    .optional(),
+  active: z
+    .string()
+    .regex(/^(true|false)$/, "Active must be true or false")
+    .transform((val) => val === "true")
+    .optional(),
+  limit: z
+    .string()
+    .regex(/^\d+$/, "Limit must be a positive number")
+    .refine((val) => parseInt(val) <= 1000, "Limit cannot exceed 1000")
+    .optional(),
+  offset: z
+    .string()
+    .regex(/^\d+$/, "Offset must be a positive number")
+    .optional(),
+});
+
+export const professionalFundIdParamSchema = z.object({
+  id: z
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid professional fund ID format"),
+});
+
+export const professionalFundCodeParamSchema = z.object({
+  code: z
+    .string()
+    .min(2, "Code must be at least 2 characters")
+    .max(20, "Code cannot exceed 20 characters")
+    .regex(
+      /^[A-Z0-9_-]+$/,
+      "Code can only contain uppercase letters, numbers, underscores, and hyphens"
+    ),
+});

@@ -86,30 +86,103 @@ export interface IInvoice extends BaseDocument {
   vat?: VatInfo;
 }
 
-// Cost types
-export interface ICost extends BaseDocument {
+/**
+ * Cost Management Types
+ */
+export interface ICost {
+  _id?: string;
   userId: string;
   description: string;
   date: Date;
   amount: number;
-  deductible: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-// Professional Fund types
-export interface ProfessionalFundParameters {
-  contributionRate: number;
-  minimumContribution: number;
-  fixedAnnualContributions: number;
-  year: number;
+export interface CostCreateRequest {
+  description: string;
+  date: string | Date;
+  amount: number;
 }
 
-export interface IProfessionalFund extends BaseDocument {
+export interface CostUpdateRequest {
+  description?: string;
+  date?: string | Date;
+  amount?: number;
+}
+
+export interface CostResponse {
+  id: string;
+  description: string;
+  date: string;
+  amount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Professional Fund Management Types
+ */
+export interface IProfessionalFund {
+  _id?: string;
   name: string;
   code: string;
   description?: string;
-  parameters: ProfessionalFundParameters[];
+  parameters: {
+    contributionRate: number; // Percentage (e.g., 16 for 16%)
+    minimumContribution: number; // In euros (e.g., 2750)
+    fixedAnnualContributions: number; // Fixed annual contributions in euros
+    year: number; // The year these parameters are valid for
+  }[];
+  allowManualEdit: boolean; // Whether to allow manual editing of contribution parameters
+  isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ProfessionalFundCreateRequest {
+  name: string;
+  code: string;
+  description?: string;
+  parameters: {
+    contributionRate: number;
+    minimumContribution: number;
+    fixedAnnualContributions: number;
+    year: number;
+  }[];
+  allowManualEdit?: boolean;
+  isActive?: boolean;
+}
+
+export interface ProfessionalFundUpdateRequest {
+  name?: string;
+  code?: string;
+  description?: string;
+  parameters?: {
+    contributionRate: number;
+    minimumContribution: number;
+    fixedAnnualContributions: number;
+    year: number;
+  }[];
+  allowManualEdit?: boolean;
+  isActive?: boolean;
+}
+
+export interface ProfessionalFundResponse {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  parameters: {
+    contributionRate: number;
+    minimumContribution: number;
+    fixedAnnualContributions: number;
+    year: number;
+  }[];
   allowManualEdit: boolean;
   isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // IRPEF Rate types

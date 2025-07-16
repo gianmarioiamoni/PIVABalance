@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /**
+   * Enhanced security headers for production
+   * Updated for Next.js API Routes (no external backend)
+   */
   async headers() {
     return [
       {
@@ -19,13 +23,76 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; connect-src 'self' http://localhost:5000; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+            value: "default-src 'self'; connect-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;"
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin'
           }
         ]
       }
     ]
   },
-  // Altre configurazioni di Next.js se necessarie
+
+  /**
+   * Experimental features for better performance
+   */
+  experimental: {
+    optimizePackageImports: ['@heroicons/react'],
+  },
+
+  /**
+   * Image optimization configuration
+   */
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+  },
+
+  /**
+   * Environment variables configuration
+   */
+  env: {
+    CUSTOM_KEY: process.env.CUSTOM_KEY,
+  },
+
+  /**
+   * TypeScript configuration
+   */
+  typescript: {
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors. Only enable in emergencies.
+    ignoreBuildErrors: false,
+  },
+
+  /**
+   * ESLint configuration
+   */
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: false,
+  },
+
+  /**
+   * Bundle analyzer (enable for debugging)
+   */
+  // ...(process.env.ANALYZE === 'true' && {
+  //   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+  //     if (!isServer) {
+  //       config.plugins.push(
+  //         new (require('@next/bundle-analyzer'))({
+  //           enabled: true,
+  //         })
+  //       );
+  //     }
+  //     return config;
+  //   },
+  // }),
 }
 
 module.exports = nextConfig

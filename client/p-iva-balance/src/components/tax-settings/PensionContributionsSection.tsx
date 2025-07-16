@@ -1,94 +1,102 @@
+'use client';
+
 import React from 'react';
-import Tooltip from '../Tooltip';
-import { pensionSystemInfo } from '../tooltips/TooltipsText';
-import { UserSettings } from '@/services/settingsService';
-import { PENSION_SYSTEMS, PensionSystemType, PROFESSIONAL_FUNDS } from '@/data/pensionFunds';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import Tooltip from '@/components/Tooltip';
+import { pensionSystemInfo } from '@/components/tooltips/TooltipsText';
+import { UserSettings } from '@/types';
+import { PENSION_SYSTEMS, PensionSystemType } from '@/data/pensionFunds';
 import ProfessionalFundSelector from './ProfessionalFundSelector';
 import { InpsRateSelector } from './InpsRateSelector';
-import { professionalFundService } from '@/services/professionalFundService';
 
 interface PensionContributionsSectionProps {
   settings: UserSettings;
-  handleChange: (field: keyof UserSettings, value: any) => void;
+  handleChange: (field: keyof UserSettings, value: unknown) => void;
 }
 
-export const PensionContributionsSection: React.FC<PensionContributionsSectionProps> = ({
+export const PensionContributionsSection: React.FC<PensionContributionsSectionProps> = React.memo(({
   settings,
   handleChange,
 }) => {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-      <div className="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">
-          Parametri Calcolo Contributi Previdenziali
-        </h3>
-        <p className="mt-1 text-sm text-gray-500">
-          Imposta i parametri per il calcolo dei contributi previdenziali in base al tuo sistema previdenziale
-        </p>
-      </div>
+    <div className="space-y-6">
+      <div>
+        <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
+          Sistema Pensionistico
+          <Tooltip content={pensionSystemInfo}>
+            <InformationCircleIcon className="ml-1 h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors" />
+          </Tooltip>
+        </label>
 
-      <div className="px-4 py-5 sm:p-6 space-y-6">
-        <div>
-          <div className="flex items-center">
-            <label className="block text-sm font-medium text-gray-700">
-              Sistema Previdenziale
+        <div className="space-y-3">
+          {/* Pension System Selection */}
+          {Object.values(PENSION_SYSTEMS).map((system) => (
+            <label
+              key={system.id}
+              className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <input
+                type="radio"
+                name="pensionSystem"
+                value={system.id}
+                checked={settings.pensionSystem === system.id}
+                onChange={(e) => handleChange('pensionSystem', e.target.value as PensionSystemType)}
+                className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
+              />
+              <div className="ml-3">
+                <div className="font-medium text-gray-900">{system.name}</div>
+                <div className="text-sm text-gray-500">{system.description}</div>
+              </div>
             </label>
-            <Tooltip content={pensionSystemInfo} />
-          </div>
-          <select
-            value={settings.pensionSystem}
-            onChange={(e) => handleChange('pensionSystem', e.target.value as PensionSystemType)}
-            className="mt-2 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-          >
-            {Object.entries(PENSION_SYSTEMS).map(([key, { name }]) => (
-              <option key={key} value={key}>
-                {name}
-              </option>
-            ))}
-          </select>
+          ))}
         </div>
 
+        {/* INPS Rate Selection */}
         {settings.pensionSystem === 'INPS' && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tipo di Contribuente
-              </label>
-              <InpsRateSelector
-                value={settings.inpsRateType}
-                onChange={(type, rate, minContribution) => {
-                  handleChange('inpsRateType', type);
-                  handleChange('manualContributionRate', rate);
-                  handleChange('manualMinimumContribution', minContribution);
-                  handleChange('manualFixedAnnualContributions', 0);
-                }}
-              />
-            </div>
-          </>
+          <div className="mt-4">
+            <InpsRateSelector
+              value={settings.inpsRateType}
+              onChange={(type, rate, minContribution) => {
+                handleChange('inpsRateType', type);
+                handleChange('manualContributionRate', rate);
+                handleChange('manualMinimumContribution', minContribution);
+                handleChange('manualFixedAnnualContributions', 0);
+              }}
+            />
+          </div>
         )}
 
+        {/* Professional Fund Selection */}
         {settings.pensionSystem === 'PROFESSIONAL_FUND' && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Cassa Professionale
-            </label>
+          <div className="mt-4">
             <ProfessionalFundSelector
               value={settings.professionalFundId}
               onChange={(fundId) => handleChange('professionalFundId', fundId)}
               onFundChange={(fund) => {
-                if (fund) {
-                  const params = professionalFundService.getCurrentParameters(fund);
-                  if (params) {
-                    handleChange('manualContributionRate', params.contributionRate);
-                    handleChange('manualMinimumContribution', params.minimumContribution);
-                    handleChange('manualFixedAnnualContributions', params.fixedAnnualContributions);
-                  }
+                // Fund change is handled by the component internally
+                console.log('Selected fund:', fund);
+              }}
+              onParametersChange={(params) => {
+                if (params) {
+                  handleChange('manualContributionRate', params.contributionRate);
+                  handleChange('manualMinimumContribution', params.minimumContribution);
+                  handleChange('manualFixedAnnualContributions', params.fixedAnnualContributions);
+                } else {
+                  handleChange('manualContributionRate', undefined);
+                  handleChange('manualMinimumContribution', undefined);
+                  handleChange('manualFixedAnnualContributions', undefined);
                 }
               }}
+              aria-describedby="professional-fund-description"
             />
+            <div id="professional-fund-description" className="sr-only">
+              Seleziona la cassa professionale per la gestione dei contributi previdenziali
+            </div>
           </div>
         )}
       </div>
     </div>
   );
-};
+});
+
+PensionContributionsSection.displayName = 'PensionContributionsSection';

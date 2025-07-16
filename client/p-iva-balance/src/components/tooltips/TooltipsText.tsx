@@ -59,3 +59,27 @@ export const pensionSystemInfo = (
         </div>
     </div>
 );
+
+export const professionalFundInfo = (
+    <div className="space-y-3">
+        <p>
+            Le casse professionali sono enti previdenziali obbligatori per specifiche categorie professionali.
+            Ogni cassa gestisce la previdenza per i propri iscritti con parametri contributivi dedicati.
+        </p>
+        <div>
+            <h4 className="font-semibold mb-2">Principali casse professionali:</h4>
+            <ul className="list-disc pl-4 space-y-1 text-sm">
+                <li><strong>Cassa Forense:</strong> Avvocati e praticanti avvocati</li>
+                <li><strong>CNPDAC:</strong> Dottori commercialisti ed esperti contabili</li>
+                <li><strong>Cassa Ragionieri:</strong> Ragionieri e periti commerciali</li>
+                <li><strong>Cassa Geometri:</strong> Geometri e geometri laureati</li>
+                <li><strong>Inarcassa:</strong> Ingegneri e architetti</li>
+                <li><strong>ENPACL:</strong> Consulenti del lavoro</li>
+            </ul>
+        </div>
+        <p className="text-sm">
+            <strong>Parametri contributivi:</strong> Ogni cassa definisce aliquote, contributi minimi e contributi fissi
+            che vengono aggiornati annualmente. Alcune casse consentono la personalizzazione manuale dei parametri.
+        </p>
+    </div>
+);

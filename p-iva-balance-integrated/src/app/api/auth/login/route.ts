@@ -25,7 +25,7 @@ export async function POST(
     const validatedData: SignInCredentials = validateSchema(signInSchema, body);
 
     // Find user by email
-    const user = await User.findByEmail(validatedData.email);
+    const user = await User.findOne({ email: validatedData.email });
     if (!user) {
       return NextResponse.json(
         {

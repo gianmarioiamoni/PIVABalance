@@ -131,7 +131,7 @@ export default function SignUpPage() {
     };
 
     // Handle server-side error messages
-    const errorMessage = error?.response?.data?.message || error?.message;
+    const errorMessage = error instanceof Error ? error.message : "Errore durante la registrazione";
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">

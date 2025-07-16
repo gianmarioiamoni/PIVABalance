@@ -124,18 +124,18 @@ export default function SignInPage() {
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow-xl rounded-lg sm:px-10">
                     {/* Success message from signup */}
-                    {message && (
+                    {message ? (
                         <div className="mb-4 bg-green-50 border border-green-400 text-green-700 px-4 py-3 rounded-md">
                             <span className="block sm:inline">{decodeURIComponent(message)}</span>
                         </div>
-                    )}
+                    ) : null}
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
-                        {error && (
+                        {error ? (
                             <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-md" role="alert">
-                                <span className="block sm:inline">{escapeHtml(error as string)}</span>
+                                <span className="block sm:inline">{escapeHtml(error instanceof Error ? error.message : "Errore durante il login")}</span>
                             </div>
-                        )}
+                        ) : null}
 
                         {/* Email Field */}
                         <div>
@@ -157,9 +157,9 @@ export default function SignInPage() {
                                         }`}
                                     placeholder="esempio@email.com"
                                 />
-                                {validationErrors.email && (
+                                {validationErrors.email ? (
                                     <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
-                                )}
+                                ) : null}
                             </div>
                         </div>
 
@@ -194,9 +194,9 @@ export default function SignInPage() {
                                         {showPassword ? '👁️‍🗨️' : '👁️'}
                                     </span>
                                 </button>
-                                {validationErrors.password && (
+                                {validationErrors.password ? (
                                     <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
-                                )}
+                                ) : null}
                             </div>
                         </div>
 

@@ -256,6 +256,6 @@ export const getSettingsCompletionPercentage = (
 export const cleanSettingsForJSON = (
   settings: IUserSettings
 ): Omit<IUserSettings, "__v"> => {
-  const { __v, ...cleanSettings } = settings as any;
+  const { __v, ...cleanSettings } = settings as IUserSettings & { __v?: unknown };
   return cleanSettings;
 };

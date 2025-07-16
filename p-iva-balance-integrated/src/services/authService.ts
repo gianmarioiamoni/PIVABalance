@@ -11,6 +11,8 @@ import {
   SignUpCredentials,
 } from "@/types";
 
+export type { SignInCredentials, SignUpCredentials };
+
 export interface User {
   id: string;
   email: string;

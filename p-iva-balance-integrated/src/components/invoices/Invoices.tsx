@@ -155,7 +155,7 @@ export const Invoices = ({ taxRegime }: InvoicesProps) => {
                 </h3>
                 <div className="mt-2 text-sm text-blue-700">
                   <p>
-                    Con il regime forfettario non è necessario applicare l'IVA alle fatture.
+                    Con il regime forfettario non è necessario applicare l&apos;IVA alle fatture.
                     Le fatture saranno automaticamente gestite secondo le normative del regime forfettario.
                   </p>
                 </div>

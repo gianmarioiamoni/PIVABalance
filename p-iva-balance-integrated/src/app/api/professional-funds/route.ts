@@ -65,7 +65,7 @@ export async function GET(
     );
 
     // Build query
-    let query: ProfessionalFundQuery = {};
+    const query: ProfessionalFundQuery = {};
 
     // Filter by active status if specified
     if (validatedQuery.active !== undefined) {
@@ -81,7 +81,7 @@ export async function GET(
     }
 
     // Find professional funds
-    let funds = await ProfessionalFund.find(query).sort({ name: 1 });
+    const funds = await ProfessionalFund.find(query).sort({ name: 1 });
 
     // Apply pagination if specified
     let paginatedFunds = funds;

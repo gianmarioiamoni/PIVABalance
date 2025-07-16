@@ -183,6 +183,6 @@ export const validateFundParameters = (
 export const cleanFundForJSON = (
   fund: IProfessionalFund
 ): Omit<IProfessionalFund, "__v"> => {
-  const { __v, ...cleanFund } = fund as any;
+  const { __v, ...cleanFund } = fund as IProfessionalFund & { __v?: unknown };
   return cleanFund;
 };

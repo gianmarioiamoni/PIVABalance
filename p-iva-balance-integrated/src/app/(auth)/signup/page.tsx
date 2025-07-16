@@ -45,7 +45,7 @@ export default function SignUpPage() {
                 console.error('Authentication error:', error);
             }
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
             console.error('Sign up error:', error);
         },
     });

@@ -68,8 +68,9 @@ export const useNewInvoice = ({
       resetForm();
       onSuccess?.();
     },
-    onError: (err: any) => {
-      setError(err.message || "Errore nella creazione della fattura");
+    onError: (err: unknown) => {
+      const errorMessage = err instanceof Error ? err.message : "Errore nella creazione della fattura";
+      setError(errorMessage);
     },
   });
 

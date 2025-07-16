@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user settings or return defaults
-    let settings = await UserSettings.findOne({ userId });
+    const settings = await UserSettings.findOne({ userId });
 
     if (!settings) {
       // Return default settings

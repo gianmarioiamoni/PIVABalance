@@ -148,7 +148,7 @@ export const hasPassword = (user: IUser): boolean => {
 export const cleanUserForJSON = (
   user: IUser
 ): Omit<IUser, "password" | "__v"> => {
-  const { password, __v, ...cleanUser } = user as any;
+  const { password, __v, ...cleanUser } = user as IUser & { password?: string; __v?: unknown };
   return cleanUser;
 };
 

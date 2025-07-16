@@ -29,7 +29,7 @@ const formatCostResponse = (cost: RawCost): CostResponse => ({
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<CostResponse>>> {
   try {
     await connectDB();
@@ -47,7 +47,8 @@ export async function GET(
     }
 
     // Validate cost ID parameter
-    const validatedParams = validateSchema(costIdParamSchema, params);
+    const resolvedParams = await params;
+    const validatedParams = validateSchema(costIdParamSchema, resolvedParams);
 
     // Find cost by ID and user
     const cost = await Cost.findOne({
@@ -106,7 +107,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<CostResponse>>> {
   try {
     await connectDB();
@@ -124,7 +125,8 @@ export async function PUT(
     }
 
     // Validate cost ID parameter
-    const validatedParams = validateSchema(costIdParamSchema, params);
+    const resolvedParams = await params;
+    const validatedParams = validateSchema(costIdParamSchema, resolvedParams);
 
     // Parse and validate request body
     const body = await request.json();
@@ -218,7 +220,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<null>>> {
   try {
     await connectDB();
@@ -236,7 +238,8 @@ export async function DELETE(
     }
 
     // Validate cost ID parameter
-    const validatedParams = validateSchema(costIdParamSchema, params);
+    const resolvedParams = await params;
+    const validatedParams = validateSchema(costIdParamSchema, resolvedParams);
 
     // Delete cost
     const cost = await Cost.findOneAndDelete({

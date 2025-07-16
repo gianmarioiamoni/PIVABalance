@@ -45,15 +45,16 @@ const formatProfessionalFundResponse = (
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<ProfessionalFundResponse>>> {
   try {
     await connectDB();
 
     // Validate professional fund ID parameter
+    const resolvedParams = await params;
     const validatedParams = validateSchema(
       professionalFundIdParamSchema,
-      params
+      resolvedParams
     );
 
     // Find professional fund by ID
@@ -111,7 +112,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<ProfessionalFundResponse>>> {
   try {
     await connectDB();
@@ -129,9 +130,10 @@ export async function PUT(
     }
 
     // Validate professional fund ID parameter
+    const resolvedParams = await params;
     const validatedParams = validateSchema(
       professionalFundIdParamSchema,
-      params
+      resolvedParams
     );
 
     // Parse and validate request body
@@ -264,7 +266,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<null>>> {
   try {
     await connectDB();
@@ -282,9 +284,10 @@ export async function DELETE(
     }
 
     // Validate professional fund ID parameter
+    const resolvedParams = await params;
     const validatedParams = validateSchema(
       professionalFundIdParamSchema,
-      params
+      resolvedParams
     );
 
     // Delete professional fund

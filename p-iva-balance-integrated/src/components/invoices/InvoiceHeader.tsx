@@ -28,7 +28,7 @@ export const InvoiceHeader = ({
                 <h2 className="text-2xl font-bold text-gray-900">Fatture</h2>
                 {totalInvoices > 0 && (
                     <p className="mt-1 text-sm text-gray-600">
-                        {totalInvoices} fatture per l'anno {selectedYear}
+                        {totalInvoices} fatture per l&apos;anno {selectedYear}
                     </p>
                 )}
             </div>

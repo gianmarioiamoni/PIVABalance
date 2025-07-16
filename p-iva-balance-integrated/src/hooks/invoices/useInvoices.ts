@@ -61,8 +61,12 @@ export const useInvoices = ({
     queryFn: () => mockInvoiceService.getInvoices(selectedYear, taxRegime),
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    onError: (err: any) => {
-      setError(err.message || "Errore nel caricamento delle fatture");
+    onError: (err: unknown) => {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Errore nel caricamento delle fatture";
+      setError(errorMessage);
     },
   });
 
@@ -74,10 +78,12 @@ export const useInvoices = ({
       queryClient.invalidateQueries({ queryKey });
       setError(null);
     },
-    onError: (err: any) => {
-      setError(
-        err.message || "Errore nell'aggiornamento della data di pagamento"
-      );
+    onError: (err: unknown) => {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Errore nell'aggiornamento della data di pagamento";
+      setError(errorMessage);
     },
   });
 
@@ -89,8 +95,12 @@ export const useInvoices = ({
       queryClient.invalidateQueries({ queryKey });
       setError(null);
     },
-    onError: (err: any) => {
-      setError(err.message || "Errore nell'eliminazione della fattura");
+    onError: (err: unknown) => {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Errore nell'eliminazione della fattura";
+      setError(errorMessage);
     },
   });
 
@@ -123,8 +133,9 @@ export const useInvoices = ({
     try {
       await refetch();
       setError(null);
-    } catch (err: any) {
-      setError(err.message || "Errore nel ricaricamento delle fatture");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Errore nel ricaricamento delle fatture";
+      setError(errorMessage);
     }
   }, [refetch]);
 

@@ -116,7 +116,7 @@ export default function Home() {
                     <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Pianificazione Fiscale</p>
                   </dt>
                   <dd className="mt-2 ml-16 text-base text-gray-500">
-                    Rimani in conformità con le norme fiscali, monitora l'IVA e preparati per la stagione fiscale con facilità.
+                    Rimani in conformità con le norme fiscali, monitora l&apos;IVA e preparati per la stagione fiscale con facilità.
                   </dd>
                 </div>
               </div>

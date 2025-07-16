@@ -1,194 +1,88 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/hooks/auth/useAuth';
-import TaxSettings from '@/components/TaxSettings';
-import Invoices from '@/components/Invoices';
-import Costs from '@/components/Costs';
-import { TaxContributions } from '@/components/TaxContributions';
-import { useTaxSettings } from '@/hooks/useTaxSettings';
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
-}
-
-export default function Dashboard() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { user, isLoading, setToken } = useAuth();
-  const [activeTab, setActiveTab] = useState('settings');
-  const [attemptedTab, setAttemptedTab] = useState<string | undefined>(undefined);
-  const taxSettingsRef = useRef<{ hasChanges: () => boolean } | null>(null);
-  const { state: { settings } } = useTaxSettings();
-
-  const isOrdinaryRegime = settings?.taxRegime === 'ordinario';
-
-  useEffect(() => {
-    const token = searchParams.get('token');
-    if (token) {
-      setToken(token);
-      // Clean up URL
-      window.history.replaceState({}, '', '/dashboard');
-      return;
-    }
-
-    if (!isLoading && !user) {
-      router.push('/auth/signin');
-    }
-  }, [searchParams, user, isLoading, router, setToken]);
-
-  const handleTabChange = (newTab: string) => {
-    if (activeTab === 'settings' && taxSettingsRef.current?.hasChanges()) {
-      setAttemptedTab(newTab);
-    } else {
-      setActiveTab(newTab);
-    }
-  };
-
-  const handleConfirmTabChange = (confirmedTab: string) => {
-    setActiveTab(confirmedTab);
-    setAttemptedTab(undefined);
-  };
-
-  const handleCancelTabChange = () => {
-    setAttemptedTab(undefined);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-
+export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <main className="max-w-7xl mx-auto py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">
-        <div className="space-y-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Benvenuto, {user.name}!
-            </h1>
-            <p className="mt-3 text-xl text-gray-500">
-              Gestisci le tue impostazioni fiscali e monitora le tue performance finanziarie.
-            </p>
-          </div>
+    <div className="space-y-6">
+      {/* Dashboard Overview */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
+          <h2 className="text-lg leading-6 font-medium text-gray-900">
+            Panoramica
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Stato generale della tua attività fiscale
+          </p>
+        </div>
+        <div className="px-4 py-5 sm:p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Quick Stats Cards */}
+            <div className="bg-blue-50 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-blue-800">Fatture Anno Corrente</h3>
+              <p className="mt-2 text-2xl font-semibold text-blue-900">
+                In caricamento...
+              </p>
+            </div>
 
-          <div>
-            <div className="lg:col-span-3">
-              <div className="px-4 sm:px-0">
-                <nav className="isolate flex divide-x divide-gray-200 rounded-lg shadow" aria-label="Tabs">
-                  <button
-                    type="button"
-                    onClick={() => handleTabChange('settings')}
-                    className={classNames(
-                      activeTab === 'settings'
-                        ? 'text-gray-900'
-                        : 'text-gray-500 hover:text-gray-700',
-                      'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 focus:z-10'
-                    )}
-                    aria-current={activeTab === 'settings' ? 'page' : undefined}
-                  >
-                    <span>Impostazioni</span>
-                    <span
-                      aria-hidden="true"
-                      className={classNames(
-                        activeTab === 'settings' ? 'bg-indigo-500' : 'bg-transparent',
-                        'absolute inset-x-0 bottom-0 h-0.5'
-                      )}
-                    />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleTabChange('invoices')}
-                    className={classNames(
-                      activeTab === 'invoices'
-                        ? 'text-gray-900'
-                        : 'text-gray-500 hover:text-gray-700',
-                      'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 focus:z-10'
-                    )}
-                    aria-current={activeTab === 'invoices' ? 'page' : undefined}
-                  >
-                    <span>Fatture</span>
-                    <span
-                      aria-hidden="true"
-                      className={classNames(
-                        activeTab === 'invoices' ? 'bg-indigo-500' : 'bg-transparent',
-                        'absolute inset-x-0 bottom-0 h-0.5'
-                      )}
-                    />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleTabChange('costs')}
-                    className={classNames(
-                      activeTab === 'costs'
-                        ? 'text-gray-900'
-                        : 'text-gray-500 hover:text-gray-700',
-                      'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 focus:z-10'
-                    )}
-                    aria-current={activeTab === 'costs' ? 'page' : undefined}
-                    
-                  >
-                    <span>Costi</span>
-                    <span
-                      aria-hidden="true"
-                      className={classNames(
-                        activeTab === 'costs' ? 'bg-indigo-500' : 'bg-transparent',
-                        'absolute inset-x-0 bottom-0 h-0.5'
-                      )}
-                    />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleTabChange('tax')}
-                    className={classNames(
-                      activeTab === 'tax'
-                        ? 'text-gray-900'
-                        : 'text-gray-500',
-                      isOrdinaryRegime ? 'cursor-not-allowed opacity-50' : 'hover:text-gray-700 hover:bg-gray-50',
-                      'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium focus:z-10'
-                    )}
-                    aria-current={activeTab === 'tax' ? 'page' : undefined}
-                    disabled={isOrdinaryRegime}
-                    title={isOrdinaryRegime ? "Tasse e Contributi disponibili solo per Regime Forfettario" : undefined}
-                  >
-                    <span>Tasse e Contributi</span>
-                    <span
-                      aria-hidden="true"
-                      className={classNames(
-                        activeTab === 'tax' ? 'bg-indigo-500' : 'bg-transparent',
-                        'absolute inset-x-0 bottom-0 h-0.5'
-                      )}
-                    />
-                  </button>
-                </nav>
-              </div>
+            <div className="bg-green-50 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-green-800">Costi Anno Corrente</h3>
+              <p className="mt-2 text-2xl font-semibold text-green-900">
+                In caricamento...
+              </p>
+            </div>
 
-              <div className="mt-6">
-                {activeTab === 'settings' && (
-                  <TaxSettings
-                    ref={taxSettingsRef}
-                    activeTab={activeTab}
-                    attemptedTab={attemptedTab}
-                    onTabChange={handleConfirmTabChange}
-                    onCancelTabChange={handleCancelTabChange}
-                  />
-                )}
-                {activeTab === 'invoices' && <Invoices />}
-                {activeTab === 'costs' && <Costs />}
-                {activeTab === 'tax' && <TaxContributions />}
-              </div>
+            <div className="bg-purple-50 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-purple-800">Saldo Fiscale</h3>
+              <p className="mt-2 text-2xl font-semibold text-purple-900">
+                In caricamento...
+              </p>
             </div>
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
+          <h2 className="text-lg leading-6 font-medium text-gray-900">
+            Azioni Rapide
+          </h2>
+        </div>
+        <div className="px-4 py-5 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a
+              href="/dashboard/invoices"
+              className="block p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+            >
+              <div className="text-blue-600 font-medium">Nuova Fattura</div>
+              <div className="text-sm text-blue-500 mt-1">Aggiungi una nuova fattura</div>
+            </a>
+
+            <a
+              href="/dashboard/costs"
+              className="block p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+            >
+              <div className="text-green-600 font-medium">Nuovo Costo</div>
+              <div className="text-sm text-green-500 mt-1">Registra un nuovo costo</div>
+            </a>
+
+            <a
+              href="/dashboard/settings"
+              className="block p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+            >
+              <div className="text-purple-600 font-medium">Impostazioni</div>
+              <div className="text-sm text-purple-500 mt-1">Configura parametri fiscali</div>
+            </a>
+
+            <a
+              href="/dashboard/taxes"
+              className="block p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+            >
+              <div className="text-orange-600 font-medium">Calcolo Tasse</div>
+              <div className="text-sm text-orange-500 mt-1">Visualizza situazione fiscale</div>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

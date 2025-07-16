@@ -3,14 +3,7 @@
  * Centralized export point for invoice-related components
  */
 
-export {
-  default as InvoiceHeader,
-  type InvoiceHeaderProps,
-} from "./InvoiceHeader";
-export { default as InvoiceList, type InvoiceListProps } from "./InvoiceList";
-export {
-  default as NewInvoiceForm,
-  type NewInvoiceFormProps,
-  vatOptions,
-  type VatOption,
-} from "./NewInvoiceForm";
+export { InvoiceHeader } from "./InvoiceHeader";
+export { InvoiceList } from "./InvoiceList";
+export { NewInvoiceForm } from "./NewInvoiceForm";
+export { default as Invoices } from "./Invoices";

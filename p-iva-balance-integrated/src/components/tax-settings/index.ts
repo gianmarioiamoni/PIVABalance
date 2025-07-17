@@ -1,9 +1,11 @@
 /**
- * Tax Settings Components Exports
- * Centralized export point for tax settings components
+ * Tax Settings Components
+ * Exports for components related to tax settings functionality
  */
 
 export { InpsRateSelector } from "./InpsRateSelector";
+export { InpsRateOption } from "./InpsRateOption";
+export { InpsRateList } from "./InpsRateList";
 export { NavigationHandler } from "./NavigationHandler";
 export { PensionContributionsSection } from "./PensionContributionsSection";
 export { default as ProfessionalFundSelector } from "./ProfessionalFundSelector";

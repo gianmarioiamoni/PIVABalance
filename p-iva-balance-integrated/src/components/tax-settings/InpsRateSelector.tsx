@@ -1,119 +1,103 @@
-import React, { useEffect, useState } from 'react';
-import { InpsParameters, InpsRate, inpsService } from '@/services/inpsService';
+import React, { useCallback } from 'react';
+import { InpsRate } from '@/services/inpsService';
+import { useInpsParameters } from '@/hooks/tax-settings';
+import { FormLoadingState, ErrorDisplay } from '@/components/ui';
+import { InpsRateList } from './InpsRateList';
 
+/**
+ * Props for InpsRateSelector component
+ * Following Interface Segregation Principle
+ */
 interface InpsRateSelectorProps {
   value?: string;
   onChange: (type: string, rate: number, minContribution: number) => void;
+  className?: string;
 }
 
-export const InpsRateSelector: React.FC<InpsRateSelectorProps> = ({ value, onChange }) => {
-  const [parameters, setParameters] = useState<InpsParameters | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadParameters = async () => {
-      try {
-        const params = await inpsService.getCurrentParameters();
-        setParameters(params);
-        if (!value) {
-          // Se non c'è un valore selezionato, usa il default
-          const defaultRate = inpsService.getDefaultRate();
-          onChange(
-            defaultRate.type,
-            defaultRate.rate,
-            params.minContributions[defaultRate.type] || 0
-          );
-        }
-        setError(null);
-      } catch (err) {
-        setError('Errore nel caricamento dei parametri INPS');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadParameters();
+/**
+ * INPS Rate Selector Component
+ * 
+ * Refactored to follow SOLID principles:
+ * - Single Responsibility: Orchestrates INPS rate selection UI composition
+ * - Open/Closed: Extensible through props and composition
+ * - Dependency Inversion: Depends on abstractions (hooks, components)
+ * 
+ * Features:
+ * - WCAG accessibility compliance with semantic radio groups
+ * - Keyboard navigation (arrow keys, home/end)
+ * - Screen reader support with proper ARIA attributes
+ * - Loading and error states with consistent UI
+ * - Automatic default selection
+ * - Reusable components for consistent styling
+ * 
+ * @param value - Currently selected rate type
+ * @param onChange - Callback when rate selection changes
+ * @param className - Additional CSS classes
+ */
+export const InpsRateSelector: React.FC<InpsRateSelectorProps> = ({
+  value,
+  onChange,
+  className = ""
+}) => {
+  // Handle default selection when no value is provided
+  const handleDefaultSelection = useCallback((type: string, rate: number, minContribution: number) => {
+    if (!value) {
+      onChange(type, rate, minContribution);
+    }
   }, [value, onChange]);
 
+  // INPS parameters hook with loading and error states
+  const { parameters, loading, error } = useInpsParameters(handleDefaultSelection);
+
+  // Handle rate selection
+  const handleRateSelect = useCallback((rate: InpsRate) => {
+    if (parameters) {
+      onChange(
+        rate.type,
+        rate.rate,
+        parameters.minContributions[rate.type] || 0
+      );
+    }
+  }, [parameters, onChange]);
+
+  /**
+   * Loading state rendering
+   * Using reusable FormLoadingState component
+   */
   if (loading) {
     return (
-      <div className="animate-pulse">
-        <div className="h-10 bg-gray-200 rounded"></div>
-      </div>
+      <FormLoadingState
+        message="Caricamento parametri INPS..."
+        minHeight="min-h-[100px]"
+        className={className}
+      />
     );
   }
 
+  /**
+   * Error state rendering
+   * Using reusable ErrorDisplay component
+   */
   if (error || !parameters) {
     return (
-      <div className="text-red-600 text-sm">
-        {error || 'Errore nel caricamento dei parametri INPS'}
-      </div>
+      <ErrorDisplay
+        message={error || 'Errore nel caricamento dei parametri INPS'}
+        className={className}
+      />
     );
   }
 
-  const handleRateChange = (rate: InpsRate) => {
-    onChange(
-      rate.type,
-      rate.rate,
-      parameters.minContributions[rate.type] || 0
-    );
-  };
-
+  /**
+   * Main component rendering
+   * Using extracted InpsRateList component for accessibility and modularity
+   */
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4">
-        {parameters.rates.map((rate) => (
-          <div
-            key={rate.type}
-            className={`relative flex items-center p-4 cursor-pointer rounded-lg border ${
-              value === rate.type
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-blue-200 hover:bg-blue-50'
-            }`}
-            onClick={() => handleRateChange(rate)}
-          >
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-medium text-gray-900">
-                {rate.description}
-              </div>
-              <div className="mt-1 flex items-center">
-                <span className="text-sm text-gray-500">
-                  Aliquota: {rate.rate}%
-                </span>
-                <span className="mx-2 text-gray-300">|</span>
-                <span className="text-sm text-gray-500">
-                  Contributo minimo: €{parameters.minContributions[rate.type].toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
-              </div>
-            </div>
-            <div className="ml-4">
-              <div
-                className={`h-5 w-5 rounded-full border ${
-                  value === rate.type
-                    ? 'border-blue-500 bg-blue-500'
-                    : 'border-gray-300'
-                }`}
-              >
-                {value === rate.type && (
-                  <svg
-                    className="h-5 w-5 text-white"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className={className}>
+      <InpsRateList
+        parameters={parameters}
+        selectedValue={value}
+        onRateSelect={handleRateSelect}
+      />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SWRConfig } from 'swr';
 import { ReactNode } from 'react';
 
 const queryClient = new QueryClient({
@@ -15,7 +16,17 @@ const queryClient = new QueryClient({
 export function QueryProvider({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <SWRConfig
+        value={{
+          revalidateOnFocus: false,
+          revalidateOnReconnect: true,
+          errorRetryCount: 3,
+          errorRetryInterval: 1000,
+          dedupingInterval: 2000,
+        }}
+      >
+        {children}
+      </SWRConfig>
     </QueryClientProvider>
   );
 }

@@ -3,15 +3,15 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { useTaxSettings } from '@/hooks/useTaxSettings';
 import { useFormSubmission, useNavigationGuard } from '@/hooks/tax-settings';
+
+// Import from specific subdirectories
+import { StatusMessages } from '../shared/StatusMessages';
+import { TaxSettingsHeader } from '../shared/TaxSettingsHeader';
+import ProfitabilityRateTable from '../shared/ProfitabilityRateTable';
+import { TaxableIncomeSection } from '../sections/TaxableIncomeSection';
+import { PensionContributionsSection } from '../sections/PensionContributionsSection';
+import { NavigationHandler } from './NavigationHandler';
 import { FormLoadingState, FormSubmitSection } from '@/components/ui';
-import {
-    StatusMessages,
-    NavigationHandler,
-    TaxableIncomeSection,
-    PensionContributionsSection,
-    ProfitabilityRateTable,
-    TaxSettingsHeader
-} from '@/components/tax-settings';
 
 /**
  * Props for TaxSettings component

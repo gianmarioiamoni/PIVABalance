@@ -3,12 +3,12 @@
 import React from 'react';
 import { useTaxCalculations, useYearSelection } from '@/hooks/tax-settings';
 import { ErrorDisplay } from '@/components/ui';
-import {
-    TaxCalculationsHeader,
-    TaxCalculationsGrid,
-    TaxSummarySection,
-    TaxEmptyState
-} from '@/components/tax-settings';
+
+// Import from same directory (relative paths)
+import { TaxCalculationsHeader } from './TaxCalculationsHeader';
+import { TaxCalculationsGrid } from './TaxCalculationsGrid';
+import { TaxSummarySection } from './TaxSummarySection';
+import { TaxEmptyState } from './TaxEmptyState';
 
 /**
  * Props for TaxContributions component

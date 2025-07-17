@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import useSWR from "swr";
 import { UserSettings, settingsService } from "@/services/settingsService";
 import {
   ProfessionalFund,
   professionalFundService,
 } from "@/services/professionalFundService";
-import { ProfitabilityRate } from "@/components/tax-settings/ProfitabilityRateTable";
+import { ProfitabilityRate } from "@/components/tax-settings/shared/ProfitabilityRateTable";
 
 export function useTaxSettings() {
   const [settings, setSettings] = useState<UserSettings>({
@@ -21,16 +22,35 @@ export function useTaxSettings() {
   const [originalSettings, setOriginalSettings] = useState<UserSettings | null>(
     null
   );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [showRateTable, setShowRateTable] = useState(false);
   const [selectedProfessionalFund, setSelectedProfessionalFund] =
     useState<ProfessionalFund | null>(null);
 
+  // Use SWR for initial settings loading with optimized caching
+  const {
+    data: loadedSettings,
+    error: loadError,
+    isLoading: loading,
+  } = useSWR<UserSettings>(
+    "user-settings",
+    () => settingsService.getUserSettings(),
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60000, // 1 minute cache
+      errorRetryCount: 3,
+    }
+  );
+
+  // Initialize settings when data is loaded
   useEffect(() => {
-    loadSettings();
-  }, []);
+    if (loadedSettings && !originalSettings) {
+      setSettings(loadedSettings);
+      setOriginalSettings(loadedSettings);
+    }
+  }, [loadedSettings, originalSettings]);
+
+  const error = loadError ? "Errore nel caricamento delle impostazioni" : null;
 
   const hasChanges = () => {
     if (!originalSettings) return false;
@@ -47,35 +67,17 @@ export function useTaxSettings() {
     return true;
   };
 
-  const loadSettings = async () => {
-    try {
-      const userSettings = await settingsService.getUserSettings();
-      setSettings(userSettings);
-      setOriginalSettings(userSettings);
-      setError(null);
-    } catch (err) {
-      setError("Errore nel caricamento delle impostazioni");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     try {
       const updatedSettings = await settingsService.updateSettings(settings);
       setSettings(updatedSettings);
       setSuccess(true);
-      setError(null);
       setOriginalSettings(updatedSettings);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setError("Errore nel salvataggio delle impostazioni");
-      console.error(err);
-    } finally {
-      setLoading(false);
+      console.error("Error updating settings:", err);
+      throw err; // Let the component handle the error
     }
   };
 

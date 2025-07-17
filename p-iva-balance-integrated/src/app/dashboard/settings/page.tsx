@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import TaxSettings from '@/components/tax-settings/TaxSettings';
+import TaxSettings from '@/components/tax-settings/main/TaxSettings';
 
 export default function SettingsPage() {
     const taxSettingsRef = useRef<{ hasChanges: () => boolean } | null>(null);

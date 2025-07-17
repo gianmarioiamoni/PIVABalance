@@ -7,8 +7,8 @@ import { Tooltip } from '@/components/ui/Tooltip';
 import { pensionSystemInfo } from '@/components/tooltips/TooltipsText';
 import { UserSettings } from '@/services/settingsService';
 import { PENSION_SYSTEMS, PensionSystemType } from '@/data/pensionFunds';
-import ProfessionalFundSelector from './ProfessionalFundSelector';
-import { InpsRateSelector } from './InpsRateSelector';
+import ProfessionalFundSelector from '../professional-fund/ProfessionalFundSelector';
+import { InpsRateSelector } from '../inps/InpsRateSelector';
 
 interface PensionContributionsSectionProps {
   settings: UserSettings;

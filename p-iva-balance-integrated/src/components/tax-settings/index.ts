@@ -9,6 +9,7 @@ export { InpsRateList } from "./InpsRateList";
 export { NavigationHandler } from "./NavigationHandler";
 export { PensionContributionsSection } from "./PensionContributionsSection";
 export { default as ProfessionalFundSelector } from "./ProfessionalFundSelector";
+export { ProfessionalFundParameters } from "./ProfessionalFundParameters";
 export { default as ProfitabilityRateTable } from "./ProfitabilityRateTable";
 export { StatusMessages } from "./StatusMessages";
 export { TaxableIncomeSection } from "./TaxableIncomeSection";

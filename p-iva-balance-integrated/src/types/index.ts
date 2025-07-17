@@ -86,6 +86,8 @@ export interface IInvoice extends BaseDocument {
   vat?: VatInfo;
 }
 
+export * from "./Invoice";
+
 /**
  * Cost Management Types
  */
@@ -350,3 +352,6 @@ export interface ProfessionalFundParameter {
   fixedAnnualContributions: number;
   year: number;
 }
+
+// Tax calculation types
+export * from "./tax";

@@ -4,6 +4,7 @@
  * Barrel exports for all reusable UI components
  */
 
+export { CalculationCard } from "./CalculationCard";
 export { ConfirmDialog } from "./ConfirmDialog";
 export { ErrorDisplay } from "./ErrorDisplay";
 export { FieldLabel } from "./FieldLabel";

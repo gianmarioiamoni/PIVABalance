@@ -45,11 +45,23 @@ export const countNonDeductibleCosts = (costs: Cost[]): number => {
 };
 
 /**
- * Generate available years starting from current year
+ * Generate available years starting from current year (descending)
  */
 export const generateAvailableYears = (numberOfYears: number = 5): number[] => {
   const currentYear = new Date().getFullYear();
   return Array.from({ length: numberOfYears }, (_, i) => currentYear - i);
+};
+
+/**
+ * Generate available years starting from a specific year (ascending, then reversed)
+ */
+export const generateAvailableYearsFromYear = (startYear: number): number[] => {
+  const currentYear = new Date().getFullYear();
+  const numberOfYears = currentYear - startYear + 1;
+  return Array.from(
+    { length: numberOfYears },
+    (_, i) => startYear + i
+  ).reverse(); // Most recent first
 };
 
 /**

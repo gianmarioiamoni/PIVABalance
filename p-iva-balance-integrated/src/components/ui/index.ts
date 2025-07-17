@@ -5,6 +5,7 @@
  */
 
 export { ConfirmDialog } from "./ConfirmDialog";
+export { ErrorDisplay } from "./ErrorDisplay";
 export { LoadingSpinner } from "./LoadingSpinner";
 export { Tooltip } from "./Tooltip";
 

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { useAuth } from '@/hooks/auth/useAuth';
-import { useInvoices, useNewInvoice } from '@/hooks/invoices';
-import { ConfirmDialog, LoadingSpinner } from '@/components/ui';
-import { InvoiceHeader, InvoiceList, NewInvoiceForm } from '@/components/invoices';
+import { useInvoices, useNewInvoice, useInvoiceActions } from '@/hooks/invoices';
+import { ConfirmDialog, LoadingSpinner, ErrorDisplay } from '@/components/ui';
+import { InvoiceHeader, InvoiceList, NewInvoiceForm, TaxRegimeInfo } from '@/components/invoices';
+import { generateAvailableYearsFromYear } from '@/utils/costSummaryCalculations';
 
 /**
  * Main Invoices Component
@@ -17,15 +17,29 @@ export interface InvoicesProps {
 
 export const Invoices = ({ taxRegime }: InvoicesProps) => {
   const { user } = useAuth();
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [deleteInvoiceId, setDeleteInvoiceId] = useState<string | null>(null);
 
   // Generate available years starting from 2020
-  const currentYear = new Date().getFullYear();
-  const availableYears = Array.from(
-    { length: currentYear - 2019 },
-    (_, i) => 2020 + i
-  ).reverse(); // Most recent first
+  const availableYears = generateAvailableYearsFromYear(2020);
+
+  // Invoice actions hook
+  const {
+    selectedYear,
+    deleteInvoiceId,
+    showNewInvoiceForm,
+    handleYearChange,
+    handleNewInvoiceToggle,
+    setShowNewInvoiceForm,
+    handleDeleteClick,
+    handleDeleteConfirm,
+    handleDeleteCancel
+  } = useInvoiceActions({
+    onFormReset: () => {
+      // Will be connected to resetForm from useNewInvoice
+    },
+    onDeleteSuccess: () => {
+      refreshInvoices();
+    }
+  });
 
   // Hooks for invoice management
   const {
@@ -42,8 +56,6 @@ export const Invoices = ({ taxRegime }: InvoicesProps) => {
   });
 
   const {
-    showNewInvoiceForm,
-    setShowNewInvoiceForm,
     newInvoice,
     setNewInvoice,
     handleCreateInvoice,
@@ -60,42 +72,6 @@ export const Invoices = ({ taxRegime }: InvoicesProps) => {
       refreshInvoices();
     }
   });
-
-  /**
-   * Handle year change
-   */
-  const handleYearChange = (year: number) => {
-    setSelectedYear(year);
-    // Reset form if open
-    if (showNewInvoiceForm) {
-      resetForm();
-    }
-  };
-
-  /**
-   * Handle new invoice form toggle
-   */
-  const handleNewInvoiceToggle = () => {
-    if (showNewInvoiceForm) {
-      resetForm();
-    } else {
-      setShowNewInvoiceForm(true);
-    }
-  };
-
-  /**
-   * Handle delete confirmation
-   */
-  const handleDeleteConfirm = async () => {
-    if (deleteInvoiceId) {
-      try {
-        await handleDeleteInvoice(deleteInvoiceId);
-        setDeleteInvoiceId(null);
-      } catch (error) {
-        console.error('Failed to delete invoice:', error);
-      }
-    }
-  };
 
   // Show loading spinner while fetching user data
   if (!user) {
@@ -115,14 +91,10 @@ export const Invoices = ({ taxRegime }: InvoicesProps) => {
         />
 
         {/* Error Messages */}
-        {(invoicesError || createError) && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
-            <h4 className="font-medium">Si è verificato un errore</h4>
-            <p className="text-sm mt-1">
-              {invoicesError || createError}
-            </p>
-          </div>
-        )}
+        <ErrorDisplay
+          message={invoicesError || createError}
+          className="mb-6"
+        />
 
         {/* New Invoice Form */}
         {showNewInvoiceForm && (
@@ -141,28 +113,16 @@ export const Invoices = ({ taxRegime }: InvoicesProps) => {
         <InvoiceList
           invoices={invoices}
           onUpdatePaymentDate={handleUpdatePaymentDate}
-          onDeleteClick={setDeleteInvoiceId}
+          onDeleteClick={handleDeleteClick}
           isLoading={invoicesLoading}
         />
 
         {/* Tax Regime Info */}
-        {taxRegime === 'forfettario' && invoices.length === 0 && !invoicesLoading && (
-          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-md p-4">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">
-                  Regime Forfettario
-                </h3>
-                <div className="mt-2 text-sm text-blue-700">
-                  <p>
-                    Con il regime forfettario non è necessario applicare l&apos;IVA alle fatture.
-                    Le fatture saranno automaticamente gestite secondo le normative del regime forfettario.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <TaxRegimeInfo
+          taxRegime={taxRegime || ''}
+          invoiceCount={invoices.length}
+          isLoading={invoicesLoading}
+        />
       </div>
 
       {/* Delete Confirmation Dialog */}
@@ -173,8 +133,8 @@ export const Invoices = ({ taxRegime }: InvoicesProps) => {
         confirmLabel="Elimina"
         cancelLabel="Annulla"
         type="danger"
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeleteInvoiceId(null)}
+        onConfirm={() => handleDeleteConfirm(handleDeleteInvoice)}
+        onCancel={handleDeleteCancel}
       />
     </div>
   );

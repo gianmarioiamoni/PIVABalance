@@ -14,3 +14,6 @@ export {
   type UseNewInvoiceReturn,
   vatOptions,
 } from "./useNewInvoice";
+export {
+  useInvoiceActions,
+} from "./useInvoiceActions";

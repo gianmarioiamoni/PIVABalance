@@ -15,12 +15,12 @@ import { CostUpdateRequest, CostResponse, ApiResponse, RawCost } from "@/types";
  * Pure function - follows functional programming principles
  */
 const formatCostResponse = (cost: RawCost): CostResponse => ({
-  id: cost._id.toString(),
+  id: (cost._id as string).toString(),
   description: cost.description,
   date: cost.date.toISOString(),
   amount: cost.amount,
-  createdAt: cost.createdAt.toISOString(),
-  updatedAt: cost.updatedAt.toISOString(),
+  createdAt: cost.createdAt?.toISOString() || new Date().toISOString(),
+  updatedAt: cost.updatedAt?.toISOString() || new Date().toISOString(),
 });
 
 /**

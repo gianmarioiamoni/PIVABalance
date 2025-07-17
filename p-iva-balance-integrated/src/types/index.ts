@@ -308,8 +308,8 @@ export interface RawCost extends RawMongoDocument {
   description: string;
   date: Date;
   amount: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface RawProfessionalFund extends RawMongoDocument {

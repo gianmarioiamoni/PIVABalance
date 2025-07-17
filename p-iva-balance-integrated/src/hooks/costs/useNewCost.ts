@@ -28,9 +28,21 @@ export const useNewCost = ({ selectedYear, onSuccess }: UseNewCostProps) => {
       setError(null);
     },
     onError: (err: unknown) => {
-      setError(
-        err.response?.data?.message || "Errore nella creazione del costo"
-      );
+      const errorMessage =
+        err &&
+        typeof err === "object" &&
+        "response" in err &&
+        err.response &&
+        typeof err.response === "object" &&
+        "data" in err.response &&
+        err.response.data &&
+        typeof err.response.data === "object" &&
+        "message" in err.response.data &&
+        typeof err.response.data.message === "string"
+          ? err.response.data.message
+          : "Errore nella creazione del costo";
+
+      setError(errorMessage);
       console.error("Error creating cost:", err);
     },
   });

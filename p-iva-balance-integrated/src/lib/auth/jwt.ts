@@ -3,7 +3,11 @@ import { NextRequest } from "next/server";
 
 const JWT_SECRET =
   process.env.JWT_SECRET || "your-super-secure-jwt-secret-key-here";
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
+
+// Validate JWT_SECRET is properly configured
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+  throw new Error("JWT_SECRET must be defined and at least 32 characters long");
+}
 
 export interface JwtPayload {
   userId: string;
@@ -22,11 +26,13 @@ export const generateToken = (userId: string, email: string): string => {
     email,
   };
 
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
+  const options: jwt.SignOptions = {
+    expiresIn: "7d", // Use string literal instead of variable
     issuer: "p-iva-balance",
     audience: "p-iva-balance-users",
-  });
+  };
+
+  return jwt.sign(payload, JWT_SECRET, options);
 };
 
 /**

@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 export interface IrpefRate {
   _id: string;
@@ -12,25 +12,28 @@ export interface IrpefRate {
 class IrpefRateService {
   async getCurrentRates(): Promise<IrpefRate[]> {
     try {
-      const response = await api.get('/api/irpef-rates');
-      return response.data;
+      const response = await api.get<IrpefRate[]>("/api/irpef-rates");
+      return response;
     } catch (error) {
-      console.error('Error fetching IRPEF rates:', error);
+      console.error("Error fetching IRPEF rates:", error);
       throw error;
     }
   }
 
   async getRatesByYear(year: number): Promise<IrpefRate[]> {
     try {
-      const response = await api.get(`/api/irpef-rates/${year}`);
-      return response.data;
+      const response = await api.get<IrpefRate[]>(`/api/irpef-rates/${year}`);
+      return response;
     } catch (error) {
-      console.error('Error fetching IRPEF rates:', error);
+      console.error("Error fetching IRPEF rates:", error);
       throw error;
     }
   }
 
-  calculateTax(income: number, rates: IrpefRate[]): { 
+  calculateTax(
+    income: number,
+    rates: IrpefRate[]
+  ): {
     totalTax: number;
     brackets: Array<{
       rate: number;
@@ -46,7 +49,8 @@ class IrpefRateService {
 
     for (let i = 0; i < sortedRates.length; i++) {
       const rate = sortedRates[i];
-      const nextRate = sortedRates[i + 1];
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const _nextRate = sortedRates[i + 1];
       const upperLimit = rate.upperBound ?? Infinity;
       const bracketSize = Math.min(
         upperLimit - rate.lowerBound,
@@ -59,7 +63,7 @@ class IrpefRateService {
         brackets.push({
           rate: rate.rate,
           taxableAmount: bracketSize,
-          tax: bracketTax
+          tax: bracketTax,
         });
         remainingIncome -= bracketSize;
       }
@@ -69,7 +73,7 @@ class IrpefRateService {
 
     return {
       totalTax,
-      brackets
+      brackets,
     };
   }
 }

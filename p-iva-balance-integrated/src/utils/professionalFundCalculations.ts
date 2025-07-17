@@ -1,4 +1,4 @@
-import { IProfessionalFund, ProfessionalFundParameters } from "@/types";
+import { IProfessionalFund, ProfessionalFundParameter } from "@/types";
 
 /**
  * Pure functions for professional fund calculations
@@ -10,7 +10,7 @@ import { IProfessionalFund, ProfessionalFundParameters } from "@/types";
  */
 export const getCurrentYearParameters = (
   fund: IProfessionalFund
-): ProfessionalFundParameters | undefined => {
+): ProfessionalFundParameter | undefined => {
   const currentYear = new Date().getFullYear();
 
   // Try to find parameters for current year
@@ -31,7 +31,7 @@ export const getCurrentYearParameters = (
 export const getParametersForYear = (
   fund: IProfessionalFund,
   year: number
-): ProfessionalFundParameters | undefined => {
+): ProfessionalFundParameter | undefined => {
   return fund.parameters.find((p) => p.year === year);
 };
 
@@ -183,6 +183,7 @@ export const validateFundParameters = (
 export const cleanFundForJSON = (
   fund: IProfessionalFund
 ): Omit<IProfessionalFund, "__v"> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { __v, ...cleanFund } = fund as IProfessionalFund & { __v?: unknown };
   return cleanFund;
 };

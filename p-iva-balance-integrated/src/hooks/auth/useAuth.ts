@@ -50,6 +50,19 @@ export function useAuth() {
   }, [queryClient, refetch]);
 
   /**
+   * Wrapper for refetch to match AuthContextType signature
+   */
+  const refetchWrapper = useCallback(async () => {
+    try {
+      const result = await refetch();
+      return { data: result.data ?? null };
+    } catch (error) {
+      console.error("Refetch failed:", error);
+      return undefined;
+    }
+  }, [refetch]);
+
+  /**
    * Logout user and clear all auth data
    */
   const logout = useCallback(async () => {
@@ -126,7 +139,7 @@ export function useAuth() {
     signUp,
     logout,
     checkAuth,
-    refetch,
+    refetch: refetchWrapper,
     setToken: updateToken,
   };
 }

@@ -3,23 +3,26 @@
  * Handles fetching, updating, and deleting invoices with React Query
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { IInvoice } from "@/types";
 
 // Mock API functions - these will be replaced with actual API calls
 const mockInvoiceService = {
-  async getInvoices(year: number, regime?: string): Promise<IInvoice[]> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getInvoices(_year: number, _regime?: string): Promise<IInvoice[]> {
     // This will be replaced with actual API call
     return [];
   },
 
-  async updatePaymentDate(invoiceId: string, date: Date): Promise<IInvoice> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async updatePaymentDate(_invoiceId: string, _date: Date): Promise<IInvoice> {
     // This will be replaced with actual API call
     throw new Error("Not implemented");
   },
 
-  async deleteInvoice(invoiceId: string): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async deleteInvoice(_invoiceId: string): Promise<void> {
     // This will be replaced with actual API call
     throw new Error("Not implemented");
   },
@@ -56,19 +59,24 @@ export const useInvoices = ({
     data: invoices = [],
     isLoading,
     refetch,
+    error: queryError,
   } = useQuery({
     queryKey,
     queryFn: () => mockInvoiceService.getInvoices(selectedYear, taxRegime),
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    onError: (err: unknown) => {
+  });
+
+  // Handle query errors
+  useEffect(() => {
+    if (queryError) {
       const errorMessage =
-        err instanceof Error
-          ? err.message
+        queryError instanceof Error
+          ? queryError.message
           : "Errore nel caricamento delle fatture";
       setError(errorMessage);
-    },
-  });
+    }
+  }, [queryError]);
 
   // Update payment date mutation
   const updatePaymentMutation = useMutation({
@@ -134,7 +142,10 @@ export const useInvoices = ({
       await refetch();
       setError(null);
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Errore nel ricaricamento delle fatture";
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Errore nel ricaricamento delle fatture";
       setError(errorMessage);
     }
   }, [refetch]);

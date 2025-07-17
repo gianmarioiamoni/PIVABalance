@@ -69,7 +69,7 @@ export const CostForm: React.FC<CostFormProps> = ({
   const handleFieldBlur = (name: string) => {
     setTouched(prev => ({ ...prev, [name]: true }));
     const fieldValue = formData[name as keyof CreateCostData];
-    const error = validateField(name, fieldValue);
+    const error = validateField(name, fieldValue ?? "");
     if (error) {
       setFieldErrors(prev => ({ ...prev, [name]: error }));
     }
@@ -79,7 +79,7 @@ export const CostForm: React.FC<CostFormProps> = ({
     const errors: { [key: string]: string } = {};
 
     Object.keys(formData).forEach(key => {
-      const error = validateField(key, formData[key as keyof CreateCostData]);
+      const error = validateField(key, formData[key as keyof CreateCostData] ?? "");
       if (error) {
         errors[key] = error;
       }

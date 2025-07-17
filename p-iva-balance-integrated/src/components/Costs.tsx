@@ -20,8 +20,8 @@ export const Costs: React.FC = () => {
         loading: costsLoading,
         error: costsError,
         refreshCosts,
-        updateCost,
-        deleteCost
+        handleUpdateCost,
+        handleDeleteCost
     } = useCosts(selectedYear);
 
     // Generate available years starting from current year
@@ -178,8 +178,8 @@ export const Costs: React.FC = () => {
             {/* Costs List */}
             <CostList
                 costs={costs}
-                onUpdate={updateCost}
-                onDelete={deleteCost}
+                onUpdate={handleUpdateCost}
+                onDelete={handleDeleteCost}
                 loading={loading}
                 error={error}
             />

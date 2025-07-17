@@ -26,7 +26,15 @@ export function useSignIn() {
     },
     onError: (error: unknown) => {
       console.error('Sign in error:', error);
-      setError(error.response?.data?.message || 'An error occurred during sign in');
+      const errorMessage = 
+        (error && typeof error === 'object' && 'response' in error && 
+         error.response && typeof error.response === 'object' && 'data' in error.response &&
+         error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data &&
+         typeof error.response.data.message === 'string')
+        ? error.response.data.message
+        : 'An error occurred during sign in';
+      
+      setError(errorMessage);
     },
   });
 

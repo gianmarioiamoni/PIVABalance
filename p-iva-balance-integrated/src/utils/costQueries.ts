@@ -1,8 +1,10 @@
 import { Cost } from "@/models/Cost";
 import { ICost } from "@/types";
 import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   filterCostsByYear,
   calculateTotalCosts,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   sortCostsByDate,
 } from "./costCalculations";
 

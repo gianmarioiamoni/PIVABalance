@@ -4,7 +4,7 @@ import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon, InformationCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
-type DialogType = 'warning' | 'info' | 'success' | 'danger';
+export type DialogType = 'warning' | 'info' | 'success' | 'danger';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -47,7 +47,7 @@ export const ConfirmDialog = ({
   loading = false,
   className = '',
 }: ConfirmDialogProps) => {
-  
+
   const handleConfirm = async () => {
     try {
       await onConfirm();
@@ -100,9 +100,9 @@ export const ConfirmDialog = ({
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
-      <Dialog 
-        as="div" 
-        className={`relative z-50 ${className}`} 
+      <Dialog
+        as="div"
+        className={`relative z-50 ${className}`}
         onClose={onCancel}
       >
         <Transition.Child
@@ -145,9 +145,8 @@ export const ConfirmDialog = ({
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                   <button
                     type="button"
-                    className={`inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto transition-colors ${buttonColor} ${
-                      loading ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
+                    className={`inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto transition-colors ${buttonColor} ${loading ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     onClick={handleConfirm}
                     disabled={loading}
                   >

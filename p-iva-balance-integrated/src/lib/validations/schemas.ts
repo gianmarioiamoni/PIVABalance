@@ -191,8 +191,8 @@ export const yearQuerySchema = z.object({
 });
 
 export const paginationSchema = z.object({
-  page: z.string().regex(/^\d+$/).transform(Number).default("1"),
-  limit: z.string().regex(/^\d+$/).transform(Number).default("10"),
+  page: z.string().regex(/^\d+$/).transform(Number).default(1),
+  limit: z.string().regex(/^\d+$/).transform(Number).default(10),
   sortBy: z.string().optional(),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
@@ -222,19 +222,10 @@ export const professionalFundSchema = z.object({
 export const userSettingsValidationSchema = z
   .object({
     userId: mongoIdSchema,
-    taxRegime: z.enum(["forfettario", "ordinario"], {
-      errorMap: () => ({
-        message: "Regime fiscale deve essere 'forfettario' o 'ordinario'",
-      }),
-    }),
+    taxRegime: z.enum(["forfettario", "ordinario"]),
     substituteRate: z.number().min(0).max(100).optional(),
     profitabilityRate: z.number().min(0).max(100).optional(),
-    pensionSystem: z.enum(["INPS", "PROFESSIONAL_FUND"], {
-      errorMap: () => ({
-        message:
-          "Sistema previdenziale deve essere 'INPS' o 'PROFESSIONAL_FUND'",
-      }),
-    }),
+    pensionSystem: z.enum(["INPS", "PROFESSIONAL_FUND"]),
     professionalFundId: z.string().optional(),
     inpsRateType: z
       .enum([

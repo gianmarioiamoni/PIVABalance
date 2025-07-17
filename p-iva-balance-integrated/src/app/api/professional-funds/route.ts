@@ -23,7 +23,7 @@ import {
 const formatProfessionalFundResponse = (
   fund: RawProfessionalFund
 ): ProfessionalFundResponse => ({
-  id: fund._id.toString(),
+  id: (fund._id as string).toString(),
   name: fund.name,
   code: fund.code,
   description: fund.description,
@@ -77,7 +77,7 @@ export async function GET(
 
     // Filter by year if specified
     if (validatedQuery.year) {
-      query["parameters.year"] = parseInt(validatedQuery.year);
+      (query as Record<string, unknown>)["parameters.year"] = parseInt(validatedQuery.year);
     }
 
     // Find professional funds
@@ -94,7 +94,7 @@ export async function GET(
     }
 
     // Format response data
-    const formattedFunds = paginatedFunds.map(formatProfessionalFundResponse);
+    const formattedFunds = paginatedFunds.map(fund => formatProfessionalFundResponse(fund as unknown as RawProfessionalFund));
 
     return NextResponse.json(
       {
@@ -167,7 +167,7 @@ export async function POST(
     );
 
     // Check if fund with same code already exists
-    const existingFund = await ProfessionalFund.findByCode(validatedData.code);
+    const existingFund = await ProfessionalFund.findOne({ code: validatedData.code });
     if (existingFund) {
       return NextResponse.json(
         {
@@ -191,7 +191,7 @@ export async function POST(
     await fund.save();
 
     // Return formatted response
-    const formattedFund = formatProfessionalFundResponse(fund);
+    const formattedFund = formatProfessionalFundResponse(fund as unknown as RawProfessionalFund);
 
     return NextResponse.json(
       {

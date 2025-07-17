@@ -67,7 +67,7 @@ export async function GET(
     }
 
     // Return formatted response
-    const formattedCost = formatCostResponse(cost);
+    const formattedCost = formatCostResponse(cost as unknown as RawCost);
 
     return NextResponse.json(
       {
@@ -165,7 +165,7 @@ export async function PUT(
     }
 
     // Return formatted response
-    const formattedCost = formatCostResponse(cost);
+    const formattedCost = formatCostResponse(cost as unknown as RawCost);
 
     return NextResponse.json(
       {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
     BanknotesIcon,
     ReceiptPercentIcon,
@@ -155,7 +155,7 @@ const TaxContributions: React.FC<TaxContributionsProps> = React.memo(({
 
     // Hooks for data fetching
     const { state: { settings, loading: settingsLoading } } = useTaxSettings();
-    const { invoices, loading: invoicesLoading, error: invoicesError } = useInvoices(selectedYear, settings?.taxRegime);
+    const { invoices, isLoading: invoicesLoading, error: invoicesError } = useInvoices({ selectedYear, taxRegime: settings?.taxRegime });
     const { costs, loading: costsLoading, error: costsError } = useCosts(selectedYear);
 
     /**
@@ -272,7 +272,8 @@ const TaxContributions: React.FC<TaxContributionsProps> = React.memo(({
             // Simulate brief loading for UX feedback
             await new Promise(resolve => setTimeout(resolve, 500));
             // Calculations are already updated via the useMemo dependency array
-        } catch (error) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (_error) {
             setCalculationError('Errore durante l\'aggiornamento dei calcoli');
         } finally {
             setIsCalculating(false);

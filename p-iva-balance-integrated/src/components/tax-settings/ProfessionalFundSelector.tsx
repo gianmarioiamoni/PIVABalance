@@ -69,10 +69,6 @@ const ProfessionalFundSelector: React.FC<ProfessionalFundSelectorProps> = React.
   const componentId = React.useId();
   const selectId = `professional-fund-select-${componentId}`;
   const errorId = error ? `${selectId}-error` : undefined;
-  const parametersId = currentParameters ? `${selectId}-parameters` : undefined;
-  const combinedAriaDescribedBy = [ariaDescribedBy, errorId, parametersId]
-    .filter(Boolean)
-    .join(' ') || undefined;
 
   /**
    * Find selected fund using memoized computation
@@ -91,6 +87,12 @@ const ProfessionalFundSelector: React.FC<ProfessionalFundSelectorProps> = React.
     if (!selectedFund) return null;
     return getCurrentParameters(selectedFund);
   }, [selectedFund, getCurrentParameters]);
+
+  // Calculate accessibility IDs after currentParameters is available
+  const parametersId = currentParameters ? `${selectId}-parameters` : undefined;
+  const combinedAriaDescribedBy = [ariaDescribedBy, errorId, parametersId]
+    .filter(Boolean)
+    .join(' ') || undefined;
 
   /**
    * Handle fund selection with proper callbacks

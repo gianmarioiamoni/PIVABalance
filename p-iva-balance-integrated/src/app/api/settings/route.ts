@@ -7,12 +7,12 @@ import {
   isValidationError,
   userSettingsUpdateSchema,
 } from "@/lib/validations/schemas";
-import { RawUserSettings } from "@/types";
+import { IUserSettings } from "@/types";
 
 /**
  * Helper function to clean settings data for response
  */
-function cleanSettingsData(settings: RawUserSettings) {
+function cleanSettingsData(settings: IUserSettings | (IUserSettings & { toJSON?(): object; _id?: unknown; __v?: unknown })) {
   const settingsData = settings.toJSON?.() || settings;
   const cleanedData = { ...settingsData };
 
@@ -163,8 +163,8 @@ export async function PUT(request: NextRequest) {
 
       // If regime is ordinario, remove forfettario-specific fields
       if (newSettingsData.taxRegime === "ordinario") {
-        delete newSettingsData.substituteRate;
-        delete newSettingsData.profitabilityRate;
+        delete (newSettingsData as Record<string, unknown>).substituteRate;
+        delete (newSettingsData as Record<string, unknown>).profitabilityRate;
       }
 
       settings = new UserSettings(newSettingsData);

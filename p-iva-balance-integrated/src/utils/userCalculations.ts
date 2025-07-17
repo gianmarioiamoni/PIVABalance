@@ -28,6 +28,7 @@ export const compareUserPassword = async (
       throw new Error("User has no password set");
     }
     return await bcrypt.compare(candidatePassword, userHashedPassword);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     throw new Error("Password comparison failed");
   }
@@ -41,6 +42,7 @@ export const hashPassword = async (password: string): Promise<string> => {
     const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12");
     const salt = await bcrypt.genSalt(saltRounds);
     return await bcrypt.hash(password, salt);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     throw new Error("Password hashing failed");
   }
@@ -148,8 +150,15 @@ export const hasPassword = (user: IUser): boolean => {
 export const cleanUserForJSON = (
   user: IUser
 ): Omit<IUser, "password" | "__v"> => {
-  const { password, __v, ...cleanUser } = user as IUser & { password?: string; __v?: unknown };
-  return cleanUser;
+  const userObj = user.toJSON?.() || user;
+  const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    password: _password,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    __v: _v,
+    ...cleanUser
+  } = userObj as typeof userObj & { password?: string; __v?: unknown };
+  return cleanUser as Omit<IUser, "password" | "__v">;
 };
 
 /**

@@ -79,8 +79,11 @@ export function useTaxSettings() {
     }
   };
 
-  const handleChange = async (field: keyof UserSettings, value: string | number | boolean) => {
-    if (field === "professionalFundId" && value) {
+  const handleChange = async (
+    field: keyof UserSettings,
+    value: string | number | boolean | undefined
+  ) => {
+    if (field === "professionalFundId" && value && typeof value === "string") {
       try {
         const fund = await professionalFundService.getFundByCode(value);
         const params = professionalFundService.getCurrentParameters(fund);

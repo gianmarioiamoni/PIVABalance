@@ -17,9 +17,21 @@ export function useSignUp() {
       router.push("/dashboard");
     },
     onError: (error: unknown) => {
-      setError(
-        error.response?.data?.message || "An error occurred during sign up"
-      );
+      const errorMessage =
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        error.response &&
+        typeof error.response === "object" &&
+        "data" in error.response &&
+        error.response.data &&
+        typeof error.response.data === "object" &&
+        "message" in error.response.data &&
+        typeof error.response.data.message === "string"
+          ? error.response.data.message
+          : "An error occurred during sign up";
+
+      setError(errorMessage);
     },
   });
 

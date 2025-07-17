@@ -22,7 +22,7 @@ import {
 const formatProfessionalFundResponse = (
   fund: RawProfessionalFund
 ): ProfessionalFundResponse => ({
-  id: fund._id.toString(),
+  id: (fund._id as string).toString(),
   name: fund.name,
   code: fund.code,
   description: fund.description,
@@ -71,7 +71,7 @@ export async function GET(
     }
 
     // Return formatted response
-    const formattedFund = formatProfessionalFundResponse(fund);
+    const formattedFund = formatProfessionalFundResponse(fund as unknown as RawProfessionalFund);
 
     return NextResponse.json(
       {
@@ -145,9 +145,8 @@ export async function PUT(
 
     // Check if updating code and if it conflicts with existing fund
     if (validatedData.code) {
-      const existingFund = await ProfessionalFund.findByCode(
-        validatedData.code
-      );
+      const existingFund = await ProfessionalFund.findOne({ code: 
+        validatedData.code });
       if (existingFund && existingFund._id.toString() !== validatedParams.id) {
         return NextResponse.json(
           {
@@ -199,7 +198,7 @@ export async function PUT(
     }
 
     // Return formatted response
-    const formattedFund = formatProfessionalFundResponse(fund);
+    const formattedFund = formatProfessionalFundResponse(fund as unknown as RawProfessionalFund);
 
     return NextResponse.json(
       {

@@ -51,7 +51,7 @@ export const NewInvoiceForm = ({
      */
     const calculateVatDetails = () => {
         const amount = newInvoice.amount || 0;
-        const vatRate = newInvoice.vat?.rate || 0;
+        const vatRate = newInvoice.vat?.vatRate || 0;
         const vatAmount = (amount * vatRate) / 100;
         const total = amount + vatAmount;
 
@@ -152,8 +152,8 @@ export const NewInvoiceForm = ({
                             value={newInvoice.number || ''}
                             onChange={(e) => handleFieldChange('number', e.target.value)}
                             className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.number
-                                    ? 'border-red-300 focus:border-red-500'
-                                    : 'border-gray-300 focus:border-indigo-500'
+                                ? 'border-red-300 focus:border-red-500'
+                                : 'border-gray-300 focus:border-indigo-500'
                                 }`}
                             placeholder="Es. 2024-001"
                         />
@@ -174,8 +174,8 @@ export const NewInvoiceForm = ({
                             value={newInvoice.issueDate ? new Date(newInvoice.issueDate).toISOString().split('T')[0] : ''}
                             onChange={(e) => handleFieldChange('issueDate', new Date(e.target.value))}
                             className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.issueDate
-                                    ? 'border-red-300 focus:border-red-500'
-                                    : 'border-gray-300 focus:border-indigo-500'
+                                ? 'border-red-300 focus:border-red-500'
+                                : 'border-gray-300 focus:border-indigo-500'
                                 }`}
                         />
                         {validationErrors.issueDate && (
@@ -195,8 +195,8 @@ export const NewInvoiceForm = ({
                             value={newInvoice.title || ''}
                             onChange={(e) => handleFieldChange('title', e.target.value)}
                             className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.title
-                                    ? 'border-red-300 focus:border-red-500'
-                                    : 'border-gray-300 focus:border-indigo-500'
+                                ? 'border-red-300 focus:border-red-500'
+                                : 'border-gray-300 focus:border-indigo-500'
                                 }`}
                             placeholder="Descrizione del servizio"
                         />
@@ -217,8 +217,8 @@ export const NewInvoiceForm = ({
                             value={newInvoice.clientName || ''}
                             onChange={(e) => handleFieldChange('clientName', e.target.value)}
                             className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.clientName
-                                    ? 'border-red-300 focus:border-red-500'
-                                    : 'border-gray-300 focus:border-indigo-500'
+                                ? 'border-red-300 focus:border-red-500'
+                                : 'border-gray-300 focus:border-indigo-500'
                                 }`}
                             placeholder="Nome del cliente"
                         />
@@ -241,8 +241,8 @@ export const NewInvoiceForm = ({
                             value={newInvoice.amount || ''}
                             onChange={(e) => handleFieldChange('amount', Number(e.target.value))}
                             className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.amount
-                                    ? 'border-red-300 focus:border-red-500'
-                                    : 'border-gray-300 focus:border-indigo-500'
+                                ? 'border-red-300 focus:border-red-500'
+                                : 'border-gray-300 focus:border-indigo-500'
                                 }`}
                             placeholder="0.00"
                         />
@@ -260,9 +260,14 @@ export const NewInvoiceForm = ({
                             id="payment-date"
                             type="date"
                             value={newInvoice.paymentDate ? new Date(newInvoice.paymentDate).toISOString().split('T')[0] : ''}
-                            onChange={(e) =>
-                                handleFieldChange('paymentDate', e.target.value ? new Date(e.target.value) : undefined)
-                            }
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (value) {
+                                    handleFieldChange('paymentDate', new Date(value));
+                                } else {
+                                    setNewInvoice({ ...newInvoice, paymentDate: undefined });
+                                }
+                            }}
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                         <p className="mt-1 text-xs text-gray-500">
@@ -284,7 +289,7 @@ export const NewInvoiceForm = ({
                                 </label>
                                 <select
                                     id="vat-type"
-                                    value={newInvoice.vat?.type ?? 'standard'}
+                                    value={newInvoice.vat?.vatType ?? 'standard'}
                                     onChange={(e) => {
                                         const selectedType = e.target.value as VatOption['type'];
                                         handleVatChange(selectedType);
@@ -300,7 +305,7 @@ export const NewInvoiceForm = ({
                             </div>
 
                             {/* Custom VAT Rate */}
-                            {newInvoice.vat?.type === 'custom' && (
+                            {newInvoice.vat?.vatType === 'custom' && (
                                 <div>
                                     <label htmlFor="custom-vat-rate" className="block text-sm font-medium text-gray-700">
                                         Aliquota Personalizzata (%)
@@ -311,11 +316,11 @@ export const NewInvoiceForm = ({
                                         min="0"
                                         max="100"
                                         step="0.1"
-                                        value={newInvoice.vat?.rate ?? ''}
+                                        value={newInvoice.vat?.vatRate ?? ''}
                                         onChange={(e) =>
                                             setNewInvoice({
                                                 ...newInvoice,
-                                                vat: { ...newInvoice.vat!, rate: Number(e.target.value) }
+                                                vat: { ...newInvoice.vat!, vatRate: Number(e.target.value) }
                                             })
                                         }
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -338,7 +343,7 @@ export const NewInvoiceForm = ({
                                         <span className="font-medium">€{newInvoice.amount.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">IVA ({newInvoice.vat?.rate || 0}%):</span>
+                                        <span className="text-gray-600">IVA ({newInvoice.vat?.vatRate || 0}%):</span>
                                         <span className="font-medium">€{vatAmount.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between border-t border-gray-300 pt-1 mt-2">

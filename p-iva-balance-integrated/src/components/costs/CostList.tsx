@@ -11,7 +11,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 interface CostListProps {
   costs: Cost[];
-  onUpdate: (id: string, cost: Omit<Cost, '_id' | 'createdAt' | 'updatedAt'>) => void;
+  onUpdate: (id: string, cost: Omit<Cost, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onDelete: (id: string) => void;
   loading?: boolean;
   error?: string | null;
@@ -32,9 +32,9 @@ export const CostList: React.FC<CostListProps> = ({
     setEditingCost(cost);
   };
 
-  const handleUpdate = (updatedCost: Omit<Cost, '_id' | 'createdAt' | 'updatedAt'>) => {
+  const handleUpdate = (updatedCost: Omit<Cost, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (editingCost) {
-      onUpdate(editingCost._id, updatedCost);
+      onUpdate(editingCost.id, updatedCost);
       setEditingCost(null);
     }
   };
@@ -45,7 +45,7 @@ export const CostList: React.FC<CostListProps> = ({
 
   const handleDeleteConfirm = () => {
     if (costToDelete) {
-      onDelete(costToDelete._id);
+      onDelete(costToDelete.id);
       setCostToDelete(null);
     }
   };
@@ -108,7 +108,7 @@ export const CostList: React.FC<CostListProps> = ({
             <tbody className="bg-white divide-y divide-gray-200">
               {costs.map((cost) => (
                 <tr 
-                  key={cost._id} 
+                  key={cost.id} 
                   className="hover:bg-gray-50 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -164,7 +164,7 @@ export const CostList: React.FC<CostListProps> = ({
       <div className="md:hidden space-y-3">
         {costs.map((cost) => (
           <div 
-            key={cost._id} 
+            key={cost.id} 
             className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
           >
             <div className="p-4">
@@ -175,11 +175,11 @@ export const CostList: React.FC<CostListProps> = ({
                       {cost.description}
                     </p>
                     <button
-                      onClick={() => toggleRowExpansion(cost._id)}
+                      onClick={() => toggleRowExpansion(cost.id)}
                       className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
-                      title={expandedRow === cost._id ? 'Comprimi' : 'Espandi'}
+                      title={expandedRow === cost.id ? 'Comprimi' : 'Espandi'}
                     >
-                      {expandedRow === cost._id ? (
+                      {expandedRow === cost.id ? (
                         <EyeSlashIcon className="h-5 w-5" />
                       ) : (
                         <EyeIcon className="h-5 w-5" />
@@ -200,7 +200,7 @@ export const CostList: React.FC<CostListProps> = ({
                     </span>
                   </div>
 
-                  {expandedRow === cost._id && (
+                  {expandedRow === cost.id && (
                     <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
                       <div className="text-sm text-gray-600">
                         <span className="font-medium">Data:</span> {format(new Date(cost.date), 'dd MMM yyyy', { locale: it })}
@@ -241,20 +241,7 @@ export const CostList: React.FC<CostListProps> = ({
         onCancel={() => setCostToDelete(null)}
         onConfirm={handleDeleteConfirm}
         title="Conferma eliminazione costo"
-        message={
-          <div className="space-y-2">
-            <p>Sei sicuro di voler eliminare il seguente costo?</p>
-            {costToDelete && (
-              <div className="bg-gray-50 p-3 rounded-md text-sm">
-                <p><span className="font-medium">Descrizione:</span> {costToDelete.description}</p>
-                <p><span className="font-medium">Importo:</span> {formatCurrency(costToDelete.amount)}</p>
-                <p><span className="font-medium">Data:</span> {format(new Date(costToDelete.date), 'dd MMM yyyy', { locale: it })}</p>
-              </div>
-            )}
-            <p className="text-red-600 text-sm font-medium">Questa azione non può essere annullata.</p>
-          </div>
-        }
-        loading={loading}
+        message={`Sei sicuro di voler eliminare il costo "${costToDelete?.description}" di ${costToDelete ? formatCurrency(costToDelete.amount) : ""} del ${costToDelete ? format(new Date(costToDelete.date), "dd MMM yyyy", { locale: it }) : ""}? Questa azione non può essere annullata.`}        loading={loading}
       />
     </div>
   );

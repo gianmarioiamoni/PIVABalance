@@ -10,7 +10,6 @@ import {
     PensionContributionsSection,
     ProfitabilityRateTable
 } from '@/components/tax-settings';
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 /**
  * Props for TaxSettings component
@@ -192,7 +191,6 @@ const TaxSettings = forwardRef<TaxSettingsRef, TaxSettingsProps>(({
                 <StatusMessages
                     error={error || undefined}
                     success={success}
-                    className="mb-6"
                 />
 
                 {/* Navigation Handler */}

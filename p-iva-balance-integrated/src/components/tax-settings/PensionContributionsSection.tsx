@@ -1,19 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
-import { useTaxSettings } from '@/hooks/useTaxSettings';
 
 import { Tooltip } from '@/components/ui/Tooltip';
 import { pensionSystemInfo } from '@/components/tooltips/TooltipsText';
-import { UserSettings } from '@/types';
+import { UserSettings } from '@/services/settingsService';
 import { PENSION_SYSTEMS, PensionSystemType } from '@/data/pensionFunds';
 import ProfessionalFundSelector from './ProfessionalFundSelector';
 import { InpsRateSelector } from './InpsRateSelector';
 
 interface PensionContributionsSectionProps {
   settings: UserSettings;
-  handleChange: (field: keyof UserSettings, value: unknown) => void;
+  handleChange: (field: keyof UserSettings, value: string | number | boolean | undefined) => Promise<void>;
 }
 
 export const PensionContributionsSection: React.FC<PensionContributionsSectionProps> = React.memo(({

@@ -162,7 +162,7 @@ export const InvoiceList = ({
 
                                         {/* VAT (hidden on smaller screens) */}
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hidden lg:table-cell">
-                                            {invoice.vat ? `${invoice.vat.rate}%` : (
+                                            {invoice.vat ? `${invoice.vat.vatRate}%` : (
                                                 <span className="text-gray-400">-</span>
                                             )}
                                         </td>

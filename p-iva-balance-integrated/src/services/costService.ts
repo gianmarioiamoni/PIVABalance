@@ -20,7 +20,7 @@ export interface CreateCostData {
   description: string;
   date: string;
   amount: number;
-  deductible?: boolean;
+  deductible: boolean;
 }
 
 /**

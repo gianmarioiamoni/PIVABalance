@@ -38,7 +38,7 @@ export const Invoices = ({ taxRegime }: InvoicesProps) => {
   } = useInvoices({
     selectedYear,
     taxRegime,
-    userId: user?._id
+    userId: user?.id
   });
 
   const {
@@ -54,7 +54,7 @@ export const Invoices = ({ taxRegime }: InvoicesProps) => {
   } = useNewInvoice({
     selectedYear,
     taxRegime,
-    userId: user?._id || '',
+    userId: user?.id || '',
     onSuccess: () => {
       setShowNewInvoiceForm(false);
       refreshInvoices();

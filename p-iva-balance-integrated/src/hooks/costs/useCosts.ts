@@ -23,7 +23,7 @@ export const useCosts = (selectedYear: number) => {
       data,
     }: {
       id: string;
-      data: Omit<Cost, "_id" | "createdAt" | "updatedAt">;
+      data: Omit<Cost, "id" | "createdAt" | "updatedAt">;
     }) => costService.updateCost(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["costs", selectedYear] });
@@ -49,7 +49,7 @@ export const useCosts = (selectedYear: number) => {
 
   const handleUpdateCost = async (
     id: string,
-    data: Omit<Cost, "_id" | "createdAt" | "updatedAt">
+    data: Omit<Cost, "id" | "createdAt" | "updatedAt">
   ) => {
     updateCostMutation.mutate({ id, data });
   };

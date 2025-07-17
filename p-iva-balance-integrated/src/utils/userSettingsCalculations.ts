@@ -256,6 +256,10 @@ export const getSettingsCompletionPercentage = (
 export const cleanSettingsForJSON = (
   settings: IUserSettings
 ): Omit<IUserSettings, "__v"> => {
-  const { __v, ...cleanSettings } = settings as IUserSettings & { __v?: unknown };
-  return cleanSettings;
+  const settingsObj = settings.toJSON?.() || settings;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { __v: _v, ...cleanSettings } = settingsObj as typeof settingsObj & {
+    __v?: unknown;
+  };
+  return cleanSettings as Omit<IUserSettings, "__v">;
 };

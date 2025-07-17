@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/database/mongodb";
 import { Cost } from "@/models";
+import { Document as MongoDocument } from "mongoose";
 import { getUserFromRequest } from "@/lib/auth/jwt";
 import {
   validateSchema,
@@ -8,7 +9,7 @@ import {
   costCreateSchema,
   costQuerySchema,
 } from "@/lib/validations/schemas";
-import { CostCreateRequest, CostResponse, ApiResponse, ICost } from "@/types";
+import { findCostsByUserAndYear, findCostsByUserId } from "@/utils/costQueries";import { CostCreateRequest, CostResponse, ApiResponse, ICost } from "@/types";
 import { Document } from "mongoose";
 
 /**
@@ -16,12 +17,12 @@ import { Document } from "mongoose";
  * Pure function - follows functional programming principles
  */
 const formatCostResponse = (cost: Document & ICost): CostResponse => ({
-  id: cost._id.toString(),
+  id: cost._id?.toString() || "unknown",
   description: cost.description,
   date: cost.date.toISOString(),
   amount: cost.amount,
-  createdAt: cost.createdAt.toISOString(),
-  updatedAt: cost.updatedAt.toISOString(),
+  createdAt: cost.createdAt?.toISOString() || new Date().toISOString(),
+  updatedAt: cost.updatedAt?.toISOString() || new Date().toISOString(),
 });
 
 /**
@@ -60,12 +61,12 @@ export async function GET(
     // Build query based on parameters
     let costs;
     if (validatedQuery.year) {
-      costs = await Cost.findByUserAndYear(
+      costs = await findCostsByUserAndYear(
         userData.userId,
         parseInt(validatedQuery.year)
       );
     } else {
-      costs = await Cost.findByUserId(userData.userId);
+      costs = await findCostsByUserId(userData.userId);
     }
 
     // Apply pagination if specified
@@ -79,7 +80,7 @@ export async function GET(
     }
 
     // Format response data
-    const formattedCosts = paginatedCosts.map(formatCostResponse);
+    const formattedCosts = paginatedCosts.map(cost => formatCostResponse(cost as MongoDocument & ICost));
 
     return NextResponse.json(
       {

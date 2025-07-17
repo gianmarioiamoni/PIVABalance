@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 interface NavigationHandlerProps {
@@ -18,16 +17,17 @@ interface NavigationHandlerProps {
 export const NavigationHandler: React.FC<NavigationHandlerProps> = ({
   hasChanges,
   showConfirmDialog,
-  pendingNavigation,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  pendingNavigation: _pendingNavigation,
   onConfirmNavigation,
   onCancelNavigation,
   setShowConfirmDialog,
   setPendingNavigation,
   activeTab,
   attemptedTab,
-  onTabChange,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onTabChange: _onTabChange,
 }) => {
-  const router = useRouter();
 
   useEffect(() => {
     if (attemptedTab && attemptedTab !== activeTab) {
@@ -44,7 +44,8 @@ export const NavigationHandler: React.FC<NavigationHandlerProps> = ({
       }
     };
 
-    const handleRouteInterception = (e: PopStateEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleRouteInterception = (_e: PopStateEvent) => {
       if (hasChanges()) {
         window.history.pushState(null, '', window.location.href);
         setShowConfirmDialog(true);

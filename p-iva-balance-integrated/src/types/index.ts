@@ -330,10 +330,15 @@ export interface RawProfessionalFund extends RawMongoDocument {
 
 export interface RawUserSettings extends RawMongoDocument {
   userId: string;
-  regime: string;
-  professionalFund?: string;
-  inpsManagement?: string;
-  taxableIncome?: number;
+  taxRegime: TaxRegime;
+  substituteRate?: number;
+  profitabilityRate?: number;
+  pensionSystem: PensionSystem;
+  professionalFundId?: string;
+  inpsRateType?: InpsRateType;
+  manualContributionRate?: number;
+  manualMinimumContribution?: number;
+  manualFixedAnnualContributions?: number;
   createdAt: Date;
   updatedAt: Date;
 }

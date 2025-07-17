@@ -1,9 +1,9 @@
 /**
  * Enhanced API Client for Next.js API Routes
- * 
+ *
  * Replaces the old axios-based client that connected to separate Express backend.
  * Now uses Next.js API Routes with proper JWT authentication and ApiResponse format.
- * 
+ *
  * Features:
  * - TypeScript strict typing (zero 'any')
  * - JWT token management
@@ -13,7 +13,7 @@
  * - SOLID principles adherence
  */
 
-import { ApiResponse } from '@/types';
+import { ApiResponse } from "@/types";
 
 /**
  * API Client Configuration
@@ -28,7 +28,7 @@ interface ApiClientConfig {
  * Default configuration for API client
  */
 const defaultConfig: ApiClientConfig = {
-  baseURL: '/api', // Next.js API Routes
+  baseURL: "/api", // Next.js API Routes
   timeout: 10000, // 10 seconds
   retries: 2,
 };
@@ -38,13 +38,9 @@ const defaultConfig: ApiClientConfig = {
  * Provides structured error handling
  */
 export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public data?: unknown
-  ) {
+  constructor(message: string, public status: number, public data?: unknown) {
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
   }
 }
 
@@ -52,7 +48,7 @@ export class ApiError extends Error {
  * Request options interface
  */
 interface RequestOptions {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   headers?: Record<string, string>;
   body?: unknown;
   signal?: AbortSignal;
@@ -76,8 +72,8 @@ class ApiClient {
    * Only runs on client side
    */
   private initializeAuth(): void {
-    if (typeof window !== 'undefined') {
-      this.authToken = localStorage.getItem('token');
+    if (typeof window !== "undefined") {
+      this.authToken = localStorage.getItem("token");
     }
   }
 
@@ -87,11 +83,11 @@ class ApiClient {
    */
   setAuthToken(token: string | null): void {
     this.authToken = token;
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       if (token) {
-        localStorage.setItem('token', token);
+        localStorage.setItem("token", token);
       } else {
-        localStorage.removeItem('token');
+        localStorage.removeItem("token");
       }
     }
   }
@@ -107,7 +103,7 @@ class ApiClient {
    * Build complete URL
    */
   private buildUrl(endpoint: string): string {
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
     return `${this.config.baseURL}${cleanEndpoint}`;
   }
 
@@ -115,15 +111,17 @@ class ApiClient {
    * Build request headers
    * Includes authentication and content type headers
    */
-  private buildHeaders(customHeaders: Record<string, string> = {}): Record<string, string> {
+  private buildHeaders(
+    customHeaders: Record<string, string> = {}
+  ): Record<string, string> {
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...customHeaders,
     };
 
     // Add authentication header if token is available
     if (this.authToken) {
-      headers['Authorization'] = `Bearer ${this.authToken}`;
+      headers["Authorization"] = `Bearer ${this.authToken}`;
     }
 
     return headers;
@@ -135,24 +133,30 @@ class ApiClient {
    */
   private async processResponse<T>(response: Response): Promise<T> {
     let data: unknown;
-    
+
     try {
       data = await response.json();
     } catch (error) {
-      throw new ApiError(
-        'Invalid JSON response from server',
-        response.status,
-        { originalError: error }
-      );
+      throw new ApiError("Invalid JSON response from server", response.status, {
+        originalError: error,
+      });
     }
 
     // Check if response follows ApiResponse format
-    if (typeof data === 'object' && data !== null && 'success' in data) {
+    if (typeof data === "object" && data !== null && "success" in data) {
       const apiResponse = data as ApiResponse<T>;
-      
+
       if (!apiResponse.success) {
         throw new ApiError(
-          apiResponse.message || 'API request failed',
+          apiResponse.message || "API request failed",
+          response.status,
+          apiResponse
+        );
+      }
+
+      if (apiResponse.data === undefined) {
+        throw new ApiError(
+          "API response data is missing",
           response.status,
           apiResponse
         );
@@ -192,28 +196,30 @@ class ApiClient {
     };
 
     // Add body for non-GET requests
-    if (options.body && options.method !== 'GET') {
+    if (options.body && options.method !== "GET") {
       fetchOptions.body = JSON.stringify(options.body);
     }
 
     try {
       const response = await fetch(url, fetchOptions);
-      
+
       // Handle authentication errors
       if (response.status === 401) {
         this.setAuthToken(null);
         // Redirect to login if we're on the client side
-        if (typeof window !== 'undefined') {
-          window.location.href = '/auth/signin';
+        if (typeof window !== "undefined") {
+          window.location.href = "/auth/signin";
         }
-        throw new ApiError('Authentication required', 401);
+        throw new ApiError("Authentication required", 401);
       }
 
       return await this.processResponse<T>(response);
     } catch (error) {
       // Retry logic for network errors
       if (retryCount < this.config.retries && error instanceof TypeError) {
-        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 * (retryCount + 1))
+        );
         return this.makeRequest<T>(endpoint, options, retryCount + 1);
       }
 
@@ -224,7 +230,7 @@ class ApiClient {
 
       // Handle network and other errors
       throw new ApiError(
-        error instanceof Error ? error.message : 'Network error',
+        error instanceof Error ? error.message : "Network error",
         0,
         { originalError: error }
       );
@@ -237,7 +243,7 @@ class ApiClient {
    */
 
   async get<T>(endpoint: string, signal?: AbortSignal): Promise<T> {
-    return this.makeRequest<T>(endpoint, { method: 'GET', signal });
+    return this.makeRequest<T>(endpoint, { method: "GET", signal });
   }
 
   async post<T>(
@@ -246,7 +252,7 @@ class ApiClient {
     signal?: AbortSignal
   ): Promise<T> {
     return this.makeRequest<T>(endpoint, {
-      method: 'POST',
+      method: "POST",
       body: data,
       signal,
     });
@@ -258,7 +264,7 @@ class ApiClient {
     signal?: AbortSignal
   ): Promise<T> {
     return this.makeRequest<T>(endpoint, {
-      method: 'PUT',
+      method: "PUT",
       body: data,
       signal,
     });
@@ -270,14 +276,14 @@ class ApiClient {
     signal?: AbortSignal
   ): Promise<T> {
     return this.makeRequest<T>(endpoint, {
-      method: 'PATCH',
+      method: "PATCH",
       body: data,
       signal,
     });
   }
 
   async delete<T>(endpoint: string, signal?: AbortSignal): Promise<T> {
-    return this.makeRequest<T>(endpoint, { method: 'DELETE', signal });
+    return this.makeRequest<T>(endpoint, { method: "DELETE", signal });
   }
 }
 

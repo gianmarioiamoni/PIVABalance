@@ -104,6 +104,7 @@ export const getCostStatistics = (costs: ICost[]) => {
  * Clean cost object for JSON output (removes internal fields)
  */
 export const cleanCostForJSON = (cost: ICost): Omit<ICost, "__v"> => {
-  const { __v, ...cleanCost } = cost as ICost & { __v?: unknown };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { __v: _v, ...cleanCost } = cost as ICost & { __v?: unknown };
   return cleanCost;
 };

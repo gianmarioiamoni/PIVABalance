@@ -10,7 +10,8 @@ import { VatOption, vatOptions } from "@/components/invoices/NewInvoiceForm";
 
 // Mock API function - this will be replaced with actual API call
 const mockInvoiceService = {
-  async createInvoice(invoice: Partial<IInvoice>): Promise<IInvoice> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async createInvoice(_invoice: Partial<IInvoice>): Promise<IInvoice> {
     // This will be replaced with actual API call
     throw new Error("Not implemented");
   },
@@ -50,7 +51,9 @@ export const useNewInvoice = ({
       fiscalYear: selectedYear,
       issueDate: new Date(),
       vat:
-        taxRegime === "ordinario" ? { type: "standard", rate: 22 } : undefined,
+        taxRegime === "ordinario"
+          ? { vatType: "standard", vatRate: 22 }
+          : undefined,
     }),
     [selectedYear, taxRegime]
   );
@@ -69,7 +72,10 @@ export const useNewInvoice = ({
       onSuccess?.();
     },
     onError: (err: unknown) => {
-      const errorMessage = err instanceof Error ? err.message : "Errore nella creazione della fattura";
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Errore nella creazione della fattura";
       setError(errorMessage);
     },
   });
@@ -89,8 +95,8 @@ export const useNewInvoice = ({
       setNewInvoice((prev) => ({
         ...prev,
         vat: {
-          type: selectedOption.type,
-          rate: selectedOption.rate,
+          vatType: selectedOption.type,
+          vatRate: selectedOption.rate,
         },
       }));
     }
@@ -152,7 +158,8 @@ export const useNewInvoice = ({
 
       try {
         await createMutation.mutateAsync(invoiceData);
-      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_error) {
         // Error is handled in onError callback
       }
     },

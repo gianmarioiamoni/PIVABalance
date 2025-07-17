@@ -357,4 +357,50 @@ export interface ProfessionalFundParameter {
 export * from "./tax";
 
 // Navigation types
-export * from './navigation';
+export * from "./navigation";
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Activity {
+  id: string;
+  type: "invoice" | "cost" | "settings";
+  description: string;
+  amount?: number;
+  date: Date;
+}
+
+// Notification system types
+export type NotificationType = "success" | "error" | "warning" | "info";
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  duration?: number; // Auto-dismiss duration in ms (0 = no auto-dismiss)
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  createdAt: Date;
+}
+
+export interface NotificationContextType {
+  notifications: Notification[];
+  addNotification: (
+    notification: Omit<Notification, "id" | "createdAt">
+  ) => string;
+  removeNotification: (id: string) => void;
+  clearAll: () => void;
+  // Convenience methods
+  showSuccess: (title: string, message: string, duration?: number) => string;
+  showError: (title: string, message: string, duration?: number) => string;
+  showWarning: (title: string, message: string, duration?: number) => string;
+  showInfo: (title: string, message: string, duration?: number) => string;
+}

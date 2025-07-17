@@ -5,10 +5,13 @@ import { X, Save, Calculator } from 'lucide-react';
 import { IInvoice } from '@/types';
 import { LoadingSpinner } from '@/components/ui';
 import { sanitizeInput } from '@/utils/security';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { useMessages } from '@/hooks/useMessages';
 
 /**
  * New Invoice Form Component
  * Form for creating new invoices with VAT calculation and validation
+ * Enhanced with centralized error handling and notifications
  */
 
 export interface VatOption {
@@ -46,19 +49,73 @@ export const NewInvoiceForm = ({
 }: NewInvoiceFormProps) => {
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
+    // Centralized error handling and messages
+    const { handleValidationErrors, handleError } = useErrorHandler();
+    const { showCreateSuccess } = useMessages();
+
+    /**
+     * Enhanced form submission with centralized error handling
+     */
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Clear previous validation errors
+        setValidationErrors({});
+
+        // Client-side validation
+        const errors: Record<string, string> = {};
+
+        if (!newInvoice.number?.trim()) {
+            errors.number = 'Numero fattura è obbligatorio';
+        }
+
+        if (!newInvoice.clientName?.trim()) {
+            errors.clientName = 'Cliente è obbligatorio';
+        }
+
+        if (!newInvoice.amount || newInvoice.amount <= 0) {
+            errors.amount = 'Importo deve essere maggiore di zero';
+        }
+
+        if (!newInvoice.issueDate) {
+            errors.issueDate = 'Data è obbligatoria';
+        }
+
+        // Handle validation errors with centralized system
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            handleValidationErrors(errors);
+            return;
+        }
+
+        try {
+            // Call the original handler
+            await handleCreateInvoice(e);
+
+            // Show success message using centralized system
+            showCreateSuccess(`Fattura ${newInvoice.number}`);
+
+        } catch (error) {
+            // Handle error with centralized system
+            handleError(error as Error, 'Creazione fattura');
+        }
+    };
+
     /**
      * Calculate VAT amount and total
      */
-    const calculateVatDetails = () => {
-        const amount = newInvoice.amount || 0;
+    const calculateVAT = () => {
+        if (!newInvoice.amount) return { vatAmount: 0, total: 0 };
+
+        const baseAmount = Number(newInvoice.amount) || 0;
         const vatRate = newInvoice.vat?.vatRate || 0;
-        const vatAmount = (amount * vatRate) / 100;
-        const total = amount + vatAmount;
+        const vatAmount = (baseAmount * vatRate) / 100;
+        const total = baseAmount + vatAmount;
 
         return { vatAmount, total };
     };
 
-    const { vatAmount, total } = calculateVatDetails();
+    const { vatAmount, total } = calculateVAT();
 
     /**
      * Handle form field changes with validation
@@ -79,47 +136,6 @@ export const NewInvoiceForm = ({
             ...newInvoice,
             [field]: sanitizedValue
         });
-    };
-
-    /**
-     * Validate form before submission
-     */
-    const validateForm = (): boolean => {
-        const errors: Record<string, string> = {};
-
-        if (!newInvoice.number?.trim()) {
-            errors.number = 'Numero fattura è obbligatorio';
-        }
-
-        if (!newInvoice.title?.trim()) {
-            errors.title = 'Titolo è obbligatorio';
-        }
-
-        if (!newInvoice.clientName?.trim()) {
-            errors.clientName = 'Nome cliente è obbligatorio';
-        }
-
-        if (!newInvoice.amount || newInvoice.amount <= 0) {
-            errors.amount = 'Importo deve essere maggiore di 0';
-        }
-
-        if (!newInvoice.issueDate) {
-            errors.issueDate = 'Data emissione è obbligatoria';
-        }
-
-        setValidationErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
-
-    /**
-     * Handle form submission with validation
-     */
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (validateForm()) {
-            handleCreateInvoice(e);
-        }
     };
 
     return (

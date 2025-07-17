@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 
 interface QuickAction {
@@ -12,10 +14,11 @@ interface QuickActionsProps {
 }
 
 /**
- * QuickActions Component
+ * QuickActions Component (Client Component)
  * 
- * Displays a list of quick action buttons
- * Follows SRP by handling only quick actions display and interaction
+ * Displays a list of quick action buttons with click handlers.
+ * Requires client-side execution due to onClick event handlers.
+ * Follows SRP by handling only quick actions display and interaction.
  */
 export const QuickActions: React.FC<QuickActionsProps> = ({ actions }) => {
     return (

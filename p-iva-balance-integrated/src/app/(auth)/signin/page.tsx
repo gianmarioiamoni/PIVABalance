@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
@@ -9,11 +9,14 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import { sanitizeInput, escapeHtml, isValidEmail } from '@/utils/security';
 import { LoadingSpinner } from '@/components/ui';
 
+// Disable prerendering for this page to avoid SSR issues
+export const dynamic = 'force-dynamic';
+
 /**
- * SignIn Page Component
- * Enhanced with better UX, validation, and security
+ * SignIn Content Component
+ * Contains the actual signin form logic including useSearchParams
  */
-export default function SignInPage() {
+function SignInContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { setToken } = useAuth();
@@ -97,8 +100,6 @@ export default function SignInPage() {
             }));
         }
     };
-
-
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -231,5 +232,22 @@ export default function SignInPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+/**
+ * SignIn Page Component
+ * Enhanced with better UX, validation, and security
+ * Wrapped with Suspense to handle SSR compatibility
+ */
+export default function SignInPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+                <LoadingSpinner />
+            </div>
+        }>
+            <SignInContent />
+        </Suspense>
     );
 } 

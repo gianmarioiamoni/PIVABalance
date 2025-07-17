@@ -1,20 +1,29 @@
 'use client';
 
-import { useRef } from 'react';
+import { Suspense } from 'react';
 import TaxSettings from '@/components/tax-settings/main/TaxSettings';
+import { LoadingSpinner } from '@/components/ui';
 
+// Disable prerendering for this page to avoid SSR issues with React Query
+export const dynamic = 'force-dynamic';
+
+/**
+ * Settings Page (Client Component with Suspense)
+ * 
+ * Wrapped with Suspense to handle SSR compatibility issues
+ * with useSearchParams in nested components.
+ */
 export default function SettingsPage() {
-    const taxSettingsRef = useRef<{ hasChanges: () => boolean } | null>(null);
-
     return (
-        <div>
-            <TaxSettings
-                ref={taxSettingsRef}
-                activeTab="settings"
-                attemptedTab={undefined}
-                onTabChange={() => { }}
-                onCancelTabChange={() => { }}
-            />
-        </div>
+        <Suspense fallback={<LoadingSpinner />}>
+            <div>
+                <TaxSettings
+                    activeTab="settings"
+                    attemptedTab={undefined}
+                    onTabChange={() => { }}
+                    onCancelTabChange={() => { }}
+                />
+            </div>
+        </Suspense>
     );
 } 

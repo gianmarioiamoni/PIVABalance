@@ -1,10 +1,10 @@
-'use client';
-
 import { PlusIcon } from 'lucide-react';
 
 /**
- * Invoice Header Component
- * Contains year selector and create invoice button
+ * Invoice Header Component (Server Component)
+ * 
+ * Presentational component for invoice header with year selector and actions.
+ * Converted to server component as it only renders props without client-side state.
  */
 
 export interface InvoiceHeaderProps {
@@ -28,43 +28,36 @@ export const InvoiceHeader = ({
                 <h2 className="text-2xl font-bold text-gray-900">Fatture</h2>
                 {totalInvoices > 0 && (
                     <p className="mt-1 text-sm text-gray-600">
-                        {totalInvoices} fatture per l&apos;anno {selectedYear}
+                        {totalInvoices} {totalInvoices === 1 ? 'fattura' : 'fatture'} per il {selectedYear}
                     </p>
                 )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
                 {/* Year Selector */}
-                <div className="min-w-0">
-                    <label htmlFor="year-select" className="sr-only">
-                        Seleziona anno
-                    </label>
-                    <select
-                        id="year-select"
-                        value={selectedYear}
-                        onChange={(e) => onYearChange(Number(e.target.value))}
-                        className="block w-full rounded-md border-0 py-2 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 bg-white shadow-sm"
-                    >
-                        {availableYears.map((year) => (
-                            <option key={year} value={year}>
-                                {year}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                <select
+                    value={selectedYear}
+                    onChange={(e) => onYearChange(parseInt(e.target.value))}
+                    className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    aria-label="Seleziona anno"
+                >
+                    {availableYears.map((year) => (
+                        <option key={year} value={year}>
+                            {year}
+                        </option>
+                    ))}
+                </select>
 
-                {/* Create Invoice Button */}
+                {/* New Invoice Button */}
                 <button
                     onClick={onNewInvoiceClick}
-                    className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    aria-label="Crea nuova fattura"
                 >
-                    <PlusIcon className="h-4 w-4" aria-hidden="true" />
-                    <span className="hidden sm:inline">Crea Fattura</span>
-                    <span className="sr-only">Crea nuova fattura</span>
+                    <PlusIcon className="h-4 w-4 mr-2" />
+                    Nuova Fattura
                 </button>
             </div>
         </div>
     );
-};
-
-export default InvoiceHeader; 
+}; 

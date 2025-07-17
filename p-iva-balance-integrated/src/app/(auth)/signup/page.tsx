@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
@@ -9,11 +9,14 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import { sanitizeInput, escapeHtml, isValidEmail, validatePassword } from '@/utils/security';
 import { LoadingSpinner } from '@/components/ui';
 
+// Disable prerendering for this page to avoid SSR issues
+export const dynamic = 'force-dynamic';
+
 /**
- * SignUp Page Component
- * Enhanced with real-time validation and password strength indicator
+ * SignUp Content Component
+ * Contains the actual signup form logic
  */
-export default function SignUpPage() {
+function SignUpContent() {
     const router = useRouter();
     const { setToken } = useAuth();
     const [formData, setFormData] = useState<SignUpCredentials>({
@@ -179,8 +182,8 @@ export default function SignUpPage() {
                                     value={formData.name}
                                     onChange={handleChange}
                                     className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:text-sm transition-colors ${validationErrors.name
-                                            ? 'border-red-300 focus:border-red-500'
-                                            : 'border-gray-300 focus:border-emerald-500'
+                                        ? 'border-red-300 focus:border-red-500'
+                                        : 'border-gray-300 focus:border-emerald-500'
                                         }`}
                                     placeholder="Mario Rossi"
                                 />
@@ -205,8 +208,8 @@ export default function SignUpPage() {
                                     value={formData.email}
                                     onChange={handleChange}
                                     className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:text-sm transition-colors ${validationErrors.email
-                                            ? 'border-red-300 focus:border-red-500'
-                                            : 'border-gray-300 focus:border-emerald-500'
+                                        ? 'border-red-300 focus:border-red-500'
+                                        : 'border-gray-300 focus:border-emerald-500'
                                         }`}
                                     placeholder="mario@esempio.com"
                                 />
@@ -233,8 +236,8 @@ export default function SignUpPage() {
                                     onFocus={() => setPasswordFocused(true)}
                                     onBlur={() => setPasswordFocused(false)}
                                     className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:text-sm transition-colors ${validationErrors.password
-                                            ? 'border-red-300 focus:border-red-500'
-                                            : 'border-gray-300 focus:border-emerald-500'
+                                        ? 'border-red-300 focus:border-red-500'
+                                        : 'border-gray-300 focus:border-emerald-500'
                                         }`}
                                     placeholder="Minimo 8 caratteri"
                                 />
@@ -256,7 +259,7 @@ export default function SignUpPage() {
                                         <div className="flex justify-between items-center mb-1">
                                             <span className="text-xs text-gray-600">Sicurezza password:</span>
                                             <span className={`text-xs font-medium ${passwordStrength < 50 ? 'text-red-600' :
-                                                    passwordStrength < 75 ? 'text-yellow-600' : 'text-green-600'
+                                                passwordStrength < 75 ? 'text-yellow-600' : 'text-green-600'
                                                 }`}>
                                                 {getPasswordStrengthText()}
                                             </span>
@@ -291,8 +294,8 @@ export default function SignUpPage() {
                                     value={confirmPassword}
                                     onChange={handleChange}
                                     className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:text-sm transition-colors ${validationErrors.confirmPassword
-                                            ? 'border-red-300 focus:border-red-500'
-                                            : 'border-gray-300 focus:border-emerald-500'
+                                        ? 'border-red-300 focus:border-red-500'
+                                        : 'border-gray-300 focus:border-emerald-500'
                                         }`}
                                     placeholder="Ripeti la password"
                                 />
@@ -337,5 +340,22 @@ export default function SignUpPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+/**
+ * SignUp Page Component
+ * Enhanced with real-time validation and password strength indicator
+ * Wrapped with Suspense to handle SSR compatibility
+ */
+export default function SignUpPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
+                <LoadingSpinner />
+            </div>
+        }>
+            <SignUpContent />
+        </Suspense>
     );
 } 

@@ -1,5 +1,8 @@
 import Link from 'next/link';
 
+// Disable prerendering for this page to avoid SSR issues with React Query
+export const dynamic = 'force-dynamic';
+
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
@@ -22,14 +25,14 @@ export default function DashboardPage() {
                 In caricamento...
               </p>
             </div>
-            
+
             <div className="bg-green-50 rounded-lg p-4">
               <h3 className="text-sm font-medium text-green-800">Costi Anno Corrente</h3>
               <p className="mt-2 text-2xl font-semibold text-green-900">
                 In caricamento...
               </p>
             </div>
-            
+
             <div className="bg-purple-50 rounded-lg p-4">
               <h3 className="text-sm font-medium text-purple-800">Saldo Fiscale</h3>
               <p className="mt-2 text-2xl font-semibold text-purple-900">
@@ -56,7 +59,7 @@ export default function DashboardPage() {
               <div className="text-blue-600 font-medium">Nuova Fattura</div>
               <div className="text-sm text-blue-500 mt-1">Aggiungi una nuova fattura</div>
             </Link>
-            
+
             <Link
               href="/dashboard/costs"
               className="block p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
@@ -64,7 +67,7 @@ export default function DashboardPage() {
               <div className="text-green-600 font-medium">Nuovo Costo</div>
               <div className="text-sm text-green-500 mt-1">Registra un nuovo costo</div>
             </Link>
-            
+
             <Link
               href="/dashboard/settings"
               className="block p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
@@ -72,7 +75,7 @@ export default function DashboardPage() {
               <div className="text-purple-600 font-medium">Impostazioni</div>
               <div className="text-sm text-purple-500 mt-1">Configura parametri fiscali</div>
             </Link>
-            
+
             <Link
               href="/dashboard/taxes"
               className="block p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"

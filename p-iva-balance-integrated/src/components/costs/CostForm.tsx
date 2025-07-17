@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { CreateCostData } from '@/services/costService';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { useCostFormState } from '@/hooks/costs';
+import { FormErrorMessage } from './FormErrorMessage';
 
 interface CostFormProps {
   cost?: CreateCostData;
@@ -19,98 +21,19 @@ export const CostForm: React.FC<CostFormProps> = ({
   loading = false,
   error
 }) => {
-  const [formData, setFormData] = useState<CreateCostData>({
-    description: cost?.description || '',
-    date: cost?.date ? cost.date.split('T')[0] : new Date().toISOString().split('T')[0],
-    amount: cost?.amount || 0,
-    deductible: cost?.deductible ?? true
+  const {
+    formData,
+    fieldErrors,
+    touched,
+    updateField,
+    handleFieldBlur,
+    handleSubmit,
+    handleCancel
+  } = useCostFormState({
+    initialCost: cost,
+    onSubmit,
+    onCancel
   });
-
-  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
-  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
-
-  useEffect(() => {
-    if (cost) {
-      setFormData({
-        description: cost.description,
-        date: cost.date.split('T')[0],
-        amount: cost.amount,
-        deductible: cost.deductible
-      });
-    }
-  }, [cost]);
-
-  const validateField = (name: string, value: string | number | boolean): string | null => {
-    switch (name) {
-      case 'description':
-        return !value?.toString().trim() ? 'La descrizione è obbligatoria' : null;
-      case 'date':
-        return !value ? 'La data è obbligatoria' : null;
-      case 'amount':
-        const numValue = Number(value);
-        if (isNaN(numValue) || numValue <= 0) {
-          return 'Inserire un importo valido maggiore di 0';
-        }
-        return null;
-      default:
-        return null;
-    }
-  };
-
-  const handleFieldChange = (name: string, value: string | number | boolean) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-
-    // Clear field error when user starts typing
-    if (fieldErrors[name]) {
-      setFieldErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleFieldBlur = (name: string) => {
-    setTouched(prev => ({ ...prev, [name]: true }));
-    const fieldValue = formData[name as keyof CreateCostData];
-    const error = validateField(name, fieldValue ?? "");
-    if (error) {
-      setFieldErrors(prev => ({ ...prev, [name]: error }));
-    }
-  };
-
-  const validateForm = (): boolean => {
-    const errors: { [key: string]: string } = {};
-
-    Object.keys(formData).forEach(key => {
-      const error = validateField(key, formData[key as keyof CreateCostData] ?? "");
-      if (error) {
-        errors[key] = error;
-      }
-    });
-
-    setFieldErrors(errors);
-    setTouched({
-      description: true,
-      date: true,
-      amount: true,
-      deductible: true
-    });
-
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
-      onSubmit(formData);
-    }
-  };
-
-  const renderFieldError = (fieldName: string) => {
-    return touched[fieldName] && fieldErrors[fieldName] ? (
-      <div className="mt-1 flex items-center text-sm text-red-600">
-        <ExclamationCircleIcon className="h-4 w-4 mr-1 flex-shrink-0" />
-        <span>{fieldErrors[fieldName]}</span>
-      </div>
-    ) : null;
-  };
 
   return (
     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
@@ -120,7 +43,7 @@ export const CostForm: React.FC<CostFormProps> = ({
         </h3>
         <button
           type="button"
-          onClick={onCancel}
+          onClick={handleCancel}
           className="text-gray-400 hover:text-gray-500"
         >
           <span className="sr-only">Chiudi</span>
@@ -146,15 +69,18 @@ export const CostForm: React.FC<CostFormProps> = ({
             type="text"
             required
             value={formData.description}
-            onChange={(e) => handleFieldChange('description', e.target.value)}
+            onChange={(e) => updateField('description', e.target.value)}
             onBlur={() => handleFieldBlur('description')}
             className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm ${touched.description && fieldErrors.description
-                ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+              ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+              : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
               }`}
             placeholder="Inserisci la descrizione del costo"
           />
-          {renderFieldError('description')}
+          <FormErrorMessage
+            message={fieldErrors.description || ''}
+            show={!!touched.description && !!fieldErrors.description}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -166,14 +92,17 @@ export const CostForm: React.FC<CostFormProps> = ({
               type="date"
               required
               value={formData.date}
-              onChange={(e) => handleFieldChange('date', e.target.value)}
+              onChange={(e) => updateField('date', e.target.value)}
               onBlur={() => handleFieldBlur('date')}
               className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm ${touched.date && fieldErrors.date
-                  ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                  : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
                 }`}
             />
-            {renderFieldError('date')}
+            <FormErrorMessage 
+              message={fieldErrors.date || ''} 
+              show={!!touched.date && !!fieldErrors.date} 
+            />
           </div>
 
           <div>
@@ -186,7 +115,7 @@ export const CostForm: React.FC<CostFormProps> = ({
               step="0.01"
               min="0"
               value={formData.amount}
-              onChange={(e) => handleFieldChange('amount', Number(e.target.value))}
+              onChange={(e) => updateField('amount', Number(e.target.value))}
               onBlur={() => handleFieldBlur('amount')}
               className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm ${touched.amount && fieldErrors.amount
                   ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
@@ -194,7 +123,10 @@ export const CostForm: React.FC<CostFormProps> = ({
                 }`}
               placeholder="0.00"
             />
-            {renderFieldError('amount')}
+            <FormErrorMessage 
+              message={fieldErrors.amount || ''} 
+              show={!!touched.amount && !!fieldErrors.amount} 
+            />
           </div>
         </div>
 
@@ -203,7 +135,7 @@ export const CostForm: React.FC<CostFormProps> = ({
             <input
               type="checkbox"
               checked={formData.deductible}
-              onChange={(e) => handleFieldChange('deductible', e.target.checked)}
+              onChange={(e) => updateField('deductible', e.target.checked)}
               className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
             />
             <span className="ml-2 text-sm text-gray-700">
@@ -215,7 +147,7 @@ export const CostForm: React.FC<CostFormProps> = ({
         <div className="flex justify-end space-x-3 pt-4">
           <button
             type="button"
-            onClick={onCancel}
+            onClick={handleCancel}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Annulla

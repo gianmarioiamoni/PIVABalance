@@ -1,0 +1,41 @@
+import React from 'react';
+
+interface QuickAction {
+    label: string;
+    onClick: () => void;
+    bgColor: string;
+    hoverColor: string;
+}
+
+interface QuickActionsProps {
+    actions: QuickAction[];
+}
+
+/**
+ * QuickActions Component
+ * 
+ * Displays a list of quick action buttons
+ * Follows SRP by handling only quick actions display and interaction
+ */
+export const QuickActions: React.FC<QuickActionsProps> = ({ actions }) => {
+    return (
+        <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-medium text-gray-900">
+                    Azioni Rapide
+                </h2>
+            </div>
+            <div className="p-6 space-y-4">
+                {actions.map((action, index) => (
+                    <button
+                        key={index}
+                        onClick={action.onClick}
+                        className={`w-full ${action.bgColor} ${action.hoverColor} text-white px-4 py-3 rounded-md font-medium transition-colors`}
+                    >
+                        {action.label}
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+}; 

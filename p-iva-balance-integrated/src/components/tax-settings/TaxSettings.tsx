@@ -1,14 +1,16 @@
 'use client';
 
-import React, { forwardRef, useImperativeHandle, useState, useCallback } from 'react';
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import React, { forwardRef, useImperativeHandle } from 'react';
 import { useTaxSettings } from '@/hooks/useTaxSettings';
+import { useFormSubmission, useNavigationGuard } from '@/hooks/tax-settings';
+import { FormLoadingState, FormSubmitSection } from '@/components/ui';
 import {
     StatusMessages,
     NavigationHandler,
     TaxableIncomeSection,
     PensionContributionsSection,
-    ProfitabilityRateTable
+    ProfitabilityRateTable,
+    TaxSettingsHeader
 } from '@/components/tax-settings';
 
 /**
@@ -33,21 +35,19 @@ interface TaxSettingsRef {
 /**
  * Main Tax Settings Component
  * 
- * Enhanced integration component that orchestrates all tax-settings subcomponents:
+ * Refactored to follow SOLID principles:
+ * - Single Responsibility: Orchestrates tax settings UI composition
+ * - Open/Closed: Extensible through props and composition
+ * - Dependency Inversion: Depends on abstractions (hooks, components)
+ * 
+ * Features:
  * - WCAG accessibility compliance
  * - TypeScript strict typing (zero 'any')
  * - Modern UX with loading states and error handling
  * - Responsive design (mobile-first)
  * - React Query for efficient data management
- * - SOLID principles adherence
- * - Form validation and change tracking
- * 
- * Features:
  * - Navigation guard for unsaved changes
  * - Real-time form validation
- * - Optimistic UI updates
- * - Accessible error messaging
- * - Mobile-responsive layout
  * 
  * @example
  * ```tsx
@@ -69,11 +69,6 @@ const TaxSettings = forwardRef<TaxSettingsRef, TaxSettingsProps>(({
     onCancelTabChange,
     className = '',
 }, ref) => {
-    // Local state for UI interactions
-    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-    const [pendingNavigation, setPendingNavigation] = useState<string | undefined>(undefined);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     /**
      * Generate unique IDs for accessibility - must be called before any early returns
      */
@@ -93,6 +88,23 @@ const TaxSettings = forwardRef<TaxSettingsRef, TaxSettingsProps>(({
         }
     } = useTaxSettings();
 
+    // Navigation guard hook for handling unsaved changes
+    const {
+        navigationState: { showConfirmDialog, pendingNavigation },
+        navigationActions: {
+            setShowConfirmDialog,
+            setPendingNavigation,
+            handleConfirmNavigation,
+            handleCancelNavigation,
+        }
+    } = useNavigationGuard(onTabChange, onCancelTabChange);
+
+    // Form submission hook for handling loading states
+    const { isSubmitting, handleSubmit: handleFormSubmit } = useFormSubmission(
+        handleSubmit,
+        isValid
+    );
+
     /**
      * Expose hasChanges method to parent components
      * Allows parent to check for unsaved changes before navigation
@@ -102,66 +114,15 @@ const TaxSettings = forwardRef<TaxSettingsRef, TaxSettingsProps>(({
     }), [hasChanges]);
 
     /**
-     * Handle navigation confirmation
-     * Processes pending navigation after user confirmation
-     */
-    const handleConfirmNavigation = useCallback(async () => {
-        setShowConfirmDialog(false);
-        if (pendingNavigation) {
-            if (pendingNavigation.startsWith('tab:')) {
-                const newTab = pendingNavigation.replace('tab:', '');
-                onTabChange(newTab);
-            }
-            setPendingNavigation(undefined);
-        }
-    }, [pendingNavigation, onTabChange]);
-
-    /**
-     * Handle navigation cancellation
-     * Cancels pending navigation and maintains current state
-     */
-    const handleCancelNavigation = useCallback(() => {
-        setShowConfirmDialog(false);
-        setPendingNavigation(undefined);
-        onCancelTabChange();
-    }, [onCancelTabChange]);
-
-    /**
-     * Enhanced form submission with loading states and error handling
-     */
-    const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!isValid() || isSubmitting) {
-            return;
-        }
-
-        setIsSubmitting(true);
-        try {
-            await handleSubmit(e);
-        } catch (error) {
-            console.error('Form submission error:', error);
-            // Error is handled by the hook
-        } finally {
-            setIsSubmitting(false);
-        }
-    }, [handleSubmit, isValid, isSubmitting]);
-
-    /**
      * Loading state rendering
      * Accessible loading indicator with proper ARIA attributes
      */
     if (loading) {
         return (
-            <div
-                className={`flex flex-col items-center justify-center p-8 min-h-[400px] ${className}`}
-                role="status"
-                aria-live="polite"
-                aria-label="Caricamento impostazioni fiscali"
-            >
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4" aria-hidden="true" />
-                <span className="text-gray-600 text-sm">Caricamento impostazioni fiscali...</span>
-            </div>
+            <FormLoadingState
+                message="Caricamento impostazioni fiscali..."
+                className={className}
+            />
         );
     }
 
@@ -176,14 +137,7 @@ const TaxSettings = forwardRef<TaxSettingsRef, TaxSettingsProps>(({
             data-testid="tax-settings"
         >
             {/* Header Section */}
-            <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                    Impostazioni Fiscali
-                </h2>
-                <p className="text-gray-600 text-sm">
-                    Configura i parametri per il calcolo delle imposte e dei contributi previdenziali
-                </p>
-            </div>
+            <TaxSettingsHeader />
 
             {/* Content Section */}
             <div className="p-6">
@@ -239,66 +193,12 @@ const TaxSettings = forwardRef<TaxSettingsRef, TaxSettingsProps>(({
                     </section>
 
                     {/* Submit Section */}
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pt-6 border-t border-gray-200">
-                        {/* Validation Messages */}
-                        {!isValid() && (
-                            <div
-                                className="flex items-start p-3 bg-yellow-50 border border-yellow-200 rounded-lg"
-                                role="alert"
-                                aria-live="polite"
-                            >
-                                <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600 mr-2 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                                <div className="text-sm text-yellow-800">
-                                    <p className="font-medium mb-1">Configurazione incompleta</p>
-                                    <p>Completa tutti i campi obbligatori per salvare le impostazioni.</p>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-3 sm:ml-auto">
-                            {hasChanges() && (
-                                <span className="text-sm text-gray-500 sm:mr-4 sm:self-center">
-                                    Modifiche non salvate
-                                </span>
-                            )}
-
-                            <button
-                                type="submit"
-                                disabled={loading || isSubmitting || !hasChanges() || !isValid()}
-                                className={`
-                  inline-flex items-center justify-center px-6 py-2.5 
-                  border border-transparent text-sm font-medium rounded-lg
-                  transition-all duration-200 ease-in-out
-                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  ${isSubmitting || loading
-                                        ? 'bg-blue-400 text-white'
-                                        : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
-                                    }
-                  /* Mobile optimizations */
-                  min-h-[44px] /* Touch-friendly height */
-                  sm:min-h-[40px]
-                `}
-                                aria-describedby={hasChanges() ? undefined : 'no-changes-help'}
-                            >
-                                {isSubmitting || loading ? (
-                                    <>
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" aria-hidden="true" />
-                                        Salvataggio...
-                                    </>
-                                ) : (
-                                    'Salva Modifiche'
-                                )}
-                            </button>
-
-                            {!hasChanges() && (
-                                <div id="no-changes-help" className="sr-only">
-                                    Nessuna modifica da salvare
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                    <FormSubmitSection
+                        isSubmitting={isSubmitting}
+                        isLoading={loading}
+                        hasChanges={hasChanges()}
+                        isValid={isValid()}
+                    />
                 </form>
 
                 {/* Profitability Rate Table Modal */}

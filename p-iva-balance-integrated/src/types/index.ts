@@ -355,3 +355,6 @@ export interface ProfessionalFundParameter {
 
 // Tax calculation types
 export * from "./tax";
+
+// Navigation types
+export * from './navigation';

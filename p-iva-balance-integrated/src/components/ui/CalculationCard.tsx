@@ -4,13 +4,15 @@ import { Icon } from '@/components/ui/Icon';
 /**
  * Props for CalculationCard component
  */
-interface CalculationCardProps {
+interface CalculationCardProps extends React.HTMLAttributes<HTMLDivElement> {
     title: string;
-    amount: number;
+    value: number;
     description?: string;
     tooltip?: string;
     className?: string;
     variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger';
+    icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+    isLoading?: boolean;
 }
 
 /**
@@ -18,11 +20,14 @@ interface CalculationCardProps {
  */
 export const CalculationCard: React.FC<CalculationCardProps> = ({
     title,
-    amount,
+    value,
     description,
     tooltip,
     className = '',
-    variant = 'default'
+    variant = 'default',
+    icon,
+    isLoading = false,
+    ...htmlProps
 }) => {
     const variantClasses = {
         default: 'bg-white border-gray-200',
@@ -33,9 +38,15 @@ export const CalculationCard: React.FC<CalculationCardProps> = ({
     };
 
     return (
-        <div className={`border rounded-lg p-4 ${variantClasses[variant]} ${className}`}>
+        <div
+            className={`border rounded-lg p-4 ${variantClasses[variant]} ${className}`}
+            {...htmlProps}
+        >
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium text-gray-900 flex items-center">
+                    {icon && React.createElement(icon, {
+                        className: "h-5 w-5 mr-2 text-gray-400"
+                    })}
                     {title}
                     {tooltip && (
                         <div className="relative ml-2 group">
@@ -51,12 +62,18 @@ export const CalculationCard: React.FC<CalculationCardProps> = ({
                 </h3>
             </div>
             <div className="mt-2">
-                <div className="text-2xl font-semibold text-gray-900">
-                    {new Intl.NumberFormat('it-IT', {
-                        style: 'currency',
-                        currency: 'EUR'
-                    }).format(amount)}
-                </div>
+                {isLoading ? (
+                    <div className="text-2xl font-semibold text-gray-400">
+                        Caricamento...
+                    </div>
+                ) : (
+                    <div className="text-2xl font-semibold text-gray-900">
+                        {new Intl.NumberFormat('it-IT', {
+                            style: 'currency',
+                            currency: 'EUR'
+                        }).format(value)}
+                    </div>
+                )}
                 {description && (
                     <p className="text-sm text-gray-500 mt-1">{description}</p>
                 )}

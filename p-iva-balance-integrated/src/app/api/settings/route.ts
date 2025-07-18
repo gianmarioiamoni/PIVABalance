@@ -7,12 +7,16 @@ import {
   isValidationError,
   userSettingsUpdateSchema,
 } from "@/lib/validations/schemas";
-import { IUserSettings } from "@/types";
+import { IUserSettings, RawUserSettings } from "@/types";
 
 /**
  * Helper function to clean settings data for response
  */
-function cleanSettingsData(settings: IUserSettings | (IUserSettings & { toJSON?(): object; _id?: unknown; __v?: unknown })) {
+function cleanSettingsData(
+  settings:
+    | IUserSettings
+    | (IUserSettings & { toJSON?(): object; _id?: unknown; __v?: unknown })
+): RawUserSettings {
   const settingsData = settings.toJSON?.() || settings;
   const cleanedData = { ...settingsData };
 
@@ -30,7 +34,7 @@ function cleanSettingsData(settings: IUserSettings | (IUserSettings & { toJSON?(
     }
   });
 
-  return cleanedData;
+  return cleanedData as RawUserSettings;
 }
 
 /**

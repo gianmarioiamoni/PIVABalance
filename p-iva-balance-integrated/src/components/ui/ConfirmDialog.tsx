@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
+import { Icon } from '@/components/ui';
 
 export type DialogType = 'warning' | 'info' | 'success' | 'danger';
 
@@ -95,7 +96,7 @@ export const ConfirmDialog = ({
     }
   };
 
-  const { icon: Icon, bgColor, iconColor, buttonColor } = getIconConfig(type);
+  const { icon: iconName, bgColor, iconColor, buttonColor } = getIconConfig(type);
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
@@ -130,7 +131,7 @@ export const ConfirmDialog = ({
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div className="sm:flex sm:items-start">
                   <div className={`mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full ${bgColor} sm:mx-0 sm:h-10 sm:w-10`}>
-                    <Icon className={`h-6 w-6 ${iconColor}`} aria-hidden="true" />
+                    <Icon name={iconName} className={`h-6 w-6 ${iconColor}`} aria-hidden={true} />
                   </div>
                   <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                     <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">

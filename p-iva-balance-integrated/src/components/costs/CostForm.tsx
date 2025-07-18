@@ -102,8 +102,7 @@ export const CostForm: React.FC<CostFormProps> = ({
                 }`}
             />
             <FormErrorMessage
-              message={fieldErrors.date || ''}
-              show={!!touched.date && !!fieldErrors.date}
+              message={touched.date && fieldErrors.date ? fieldErrors.date : ''}
             />
           </div>
 
@@ -126,8 +125,7 @@ export const CostForm: React.FC<CostFormProps> = ({
               placeholder="0.00"
             />
             <FormErrorMessage
-              message={fieldErrors.amount || ''}
-              show={!!touched.amount && !!fieldErrors.amount}
+              message={touched.amount && fieldErrors.amount ? fieldErrors.amount : ''}
             />
           </div>
         </div>

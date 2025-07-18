@@ -7,6 +7,7 @@ import { Icon } from '@/components/ui';
  */
 interface TaxCalculationsHeaderProps {
     selectedYear: number;
+    availableYears: number[];
     onYearChange: (year: number) => void;
     onRefresh: () => void;
     isLoading?: boolean;
@@ -17,6 +18,7 @@ interface TaxCalculationsHeaderProps {
  */
 export const TaxCalculationsHeader: React.FC<TaxCalculationsHeaderProps> = ({
     selectedYear,
+    availableYears,
     onYearChange,
     onRefresh,
     isLoading = false
@@ -30,14 +32,11 @@ export const TaxCalculationsHeader: React.FC<TaxCalculationsHeaderProps> = ({
                     onChange={(e) => onYearChange(Number(e.target.value))}
                     className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                    {Array.from({ length: 5 }, (_, i) => {
-                        const year = new Date().getFullYear() - i;
-                        return (
-                            <option key={year} value={year}>
-                                {year}
-                            </option>
-                        );
-                    })}
+                    {availableYears.map((year) => (
+                        <option key={year} value={year}>
+                            {year}
+                        </option>
+                    ))}
                 </select>
             </div>
 

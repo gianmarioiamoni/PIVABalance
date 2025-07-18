@@ -48,7 +48,7 @@ const TaxContributions: React.FC<TaxContributionsProps> = React.memo(({
     const {
         selectedYear,
         availableYears,
-        handleSelectChange
+        handleYearChange
     } = useYearSelection(defaultYear);
 
     // Tax calculations hook with all business logic
@@ -79,7 +79,7 @@ const TaxContributions: React.FC<TaxContributionsProps> = React.memo(({
                 selectedYear={selectedYear}
                 availableYears={availableYears}
                 isLoading={isLoading}
-                onYearChange={handleSelectChange}
+                onYearChange={handleYearChange}
                 onRefresh={handleRefreshCalculations}
             />
 
@@ -111,7 +111,7 @@ const TaxContributions: React.FC<TaxContributionsProps> = React.memo(({
 
             {/* Empty State */}
             {!isLoading && calculationResult.totalIncome === 0 && !hasError && (
-                <TaxEmptyState selectedYear={selectedYear} />
+                <TaxEmptyState year={selectedYear} />
             )}
         </div>
     );

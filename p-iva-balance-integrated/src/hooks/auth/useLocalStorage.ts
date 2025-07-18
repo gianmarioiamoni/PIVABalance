@@ -22,7 +22,14 @@ export function useLocalStorage<T>(
       if (typeof window !== "undefined") {
         const item = window.localStorage.getItem(key);
         if (item !== null) {
-          setStoredValue(JSON.parse(item));
+          // Try to parse as JSON, but if it fails, use the raw string
+          // This handles both JSON objects and raw strings like JWT tokens
+          try {
+            setStoredValue(JSON.parse(item));
+          } catch (jsonError) {
+            // If JSON.parse fails, it's likely a raw string (like JWT token)
+            setStoredValue(item as T);
+          }
         } else if (initialValue !== undefined) {
           setStoredValue(initialValue);
         }
@@ -47,7 +54,9 @@ export function useLocalStorage<T>(
           if (value === null) {
             window.localStorage.removeItem(key);
           } else {
-            window.localStorage.setItem(key, JSON.stringify(value));
+            // Store strings directly, JSON.stringify for objects
+            const valueToStore = typeof value === 'string' ? value : JSON.stringify(value);
+            window.localStorage.setItem(key, valueToStore);
           }
         }
       } catch (error) {

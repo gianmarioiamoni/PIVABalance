@@ -71,9 +71,10 @@ const userSchema = new Schema<IUser>(
 
 /**
  * Index for performance optimization
+ * Note: email and googleId already have unique indexes from their field definitions
  */
-userSchema.index({ email: 1 });
-userSchema.index({ googleId: 1 });
+// userSchema.index({ email: 1 }); // Removed: duplicate of unique: true
+// userSchema.index({ googleId: 1 }); // Removed: duplicate of unique: true
 
 /**
  * Pre-save middleware to hash password

@@ -126,8 +126,9 @@ const userSettingsSchema = new Schema<IUserSettings>(
 
 /**
  * Indexes for performance
+ * Note: userId already has unique index from field definition
  */
-userSettingsSchema.index({ userId: 1 });
+// userSettingsSchema.index({ userId: 1 }); // Removed: duplicate of unique: true
 
 /**
  * Pre-save validation middleware

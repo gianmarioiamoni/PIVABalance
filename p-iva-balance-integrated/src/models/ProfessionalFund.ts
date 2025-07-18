@@ -140,8 +140,9 @@ const professionalFundSchema = new Schema<IProfessionalFund>(
 
 /**
  * Indexes for performance optimization
+ * Note: code already has unique index from field definition
  */
-professionalFundSchema.index({ code: 1 }, { unique: true });
+// professionalFundSchema.index({ code: 1 }, { unique: true }); // Removed: duplicate of unique: true
 professionalFundSchema.index({ isActive: 1 });
 professionalFundSchema.index({ "parameters.year": 1 });
 

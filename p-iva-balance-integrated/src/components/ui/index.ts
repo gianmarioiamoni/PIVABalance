@@ -19,6 +19,9 @@ export {
   InformationCircleIcon,
   XCircleIcon,
   XMarkIcon,
+  ArrowPathIcon,
+  HomeIcon,
+  ShieldExclamationIcon,
 } from "./Icon";
 export { LoadingOverlay } from "./LoadingOverlay";
 export { LoadingSpinner } from "./LoadingSpinner";

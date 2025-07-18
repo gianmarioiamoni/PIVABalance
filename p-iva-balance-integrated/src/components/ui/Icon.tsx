@@ -84,4 +84,16 @@ export const XCircleIcon: React.FC<Omit<IconProps, 'name'>> = (props) => (
 
 export const XMarkIcon: React.FC<Omit<IconProps, 'name'>> = (props) => (
     <Icon name="XMarkIcon" {...props} />
+);
+
+export const ArrowPathIcon: React.FC<Omit<IconProps, 'name'>> = (props) => (
+    <Icon name="ArrowPathIcon" {...props} />
+);
+
+export const HomeIcon: React.FC<Omit<IconProps, 'name'>> = (props) => (
+    <Icon name="HomeIcon" {...props} />
+);
+
+export const ShieldExclamationIcon: React.FC<Omit<IconProps, 'name'>> = (props) => (
+    <Icon name="ShieldExclamationIcon" {...props} />
 ); 

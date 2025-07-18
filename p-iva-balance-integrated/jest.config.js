@@ -1,8 +1,8 @@
 const nextJest = require('next/jest')
 
 const createJestConfig = nextJest({
-    // Provide the path to your Next.js app to load next.config.js and .env files
-    dir: './',
+  // Provide the path to your Next.js app to load next.config.js and .env files
+  dir: './',
 })
 
 // Add any custom config to be passed to Jest
@@ -12,7 +12,7 @@ const customJestConfig = {
     // Handle module aliases (this will be automatically configured for you based on your tsconfig.json paths)
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  testEnvironment: 'jest-environment-node', // Changed to node for API testing
+  testEnvironment: 'jsdom', // Use jsdom for React component tests
   testMatch: [
     '**/__tests__/**/*.(ts|tsx|js)',
     '**/*.(test|spec).(ts|tsx|js)'
@@ -26,7 +26,7 @@ const customJestConfig = {
   ],
   coverageReporters: ['text', 'lcov', 'html'],
   transformIgnorePatterns: [
-    'node_modules/(?!(bson|mongodb|mongodb-memory-server)/)'
+    'node_modules/(?!(.*\\.mjs$|bson|mongodb|mongodb-memory-server)/)'
   ],
   testTimeout: 30000,
   preset: undefined // Remove preset to avoid conflicts

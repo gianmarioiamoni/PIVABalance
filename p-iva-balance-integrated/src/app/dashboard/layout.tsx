@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTaxSettings } from '@/hooks/useTaxSettings';
+import { PageErrorBoundary, SectionErrorBoundary } from '@/components/error-boundaries';
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ');
@@ -128,12 +129,14 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            </div>
-        }>
-            <DashboardContent>{children}</DashboardContent>
-        </Suspense>
+        <PageErrorBoundary pageName="dashboard" showHomeLink={false}>
+            <Suspense fallback={
+                <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                </div>
+            }>
+                <DashboardContent>{children}</DashboardContent>
+            </Suspense>
+        </PageErrorBoundary>
     );
 } 

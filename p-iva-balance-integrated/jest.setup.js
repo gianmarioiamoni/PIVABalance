@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom'
+require('@testing-library/jest-dom')
 
 // Mock Next.js Request and Response for API testing
 global.Request = class MockRequest {

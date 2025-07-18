@@ -1,52 +1,47 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
-import { authService, type SignUpCredentials } from '@/services/authService';
-import { useAuth } from '@/hooks/auth/useAuth';
-import { sanitizeInput, escapeHtml, isValidEmail, validatePassword } from '@/utils/security';
+import { authService, type SignUpData } from '@/services/authService';
+import { sanitizeInput, escapeHtml, isValidEmail, isValidPassword } from '@/utils/security';
 import { LoadingSpinner } from '@/components/ui';
+import { AuthErrorBoundary } from '@/components/error-boundaries';
 
 // Disable prerendering for this page to avoid SSR issues
 export const dynamic = 'force-dynamic';
 
 /**
  * SignUp Content Component
- * Contains the actual signup form logic
+ * Contains the actual signup form logic including useSearchParams
  */
 function SignUpContent() {
     const router = useRouter();
-    const { setToken } = useAuth();
-    const [formData, setFormData] = useState<SignUpCredentials>({
+    const searchParams = useSearchParams();
+    const [formData, setFormData] = useState<SignUpData>({
         name: '',
         email: '',
         password: '',
+        confirmPassword: ''
     });
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
     const [showPassword, setShowPassword] = useState(false);
-    const [passwordFocused, setPasswordFocused] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    // Handle redirect parameter
+    const redirect = searchParams.get('redirect') || '/dashboard';
 
     const {
         mutate: signUp,
         isPending: isLoading,
         error
     } = useMutation({
-        mutationFn: (credentials: SignUpCredentials) => authService.signUp(credentials),
-        onSuccess: async (data) => {
-            try {
-                const userData = await setToken(data.token);
-                if (userData) {
-                    // Redirect to signin with success message
-                    router.push('/signin?message=' + encodeURIComponent('Account creato con successo! Benvenuto!'));
-                } else {
-                    throw new Error('Failed to authenticate user');
-                }
-            } catch (error) {
-                console.error('Authentication error:', error);
-            }
+        mutationFn: (userData: SignUpData) => authService.signUp(userData),
+        onSuccess: () => {
+            // Redirect to signin with success message
+            const message = encodeURIComponent('Account creato con successo! Ora puoi effettuare il login.');
+            router.push(`/signin?message=${message}&redirect=${encodeURIComponent(redirect)}`);
         },
         onError: (error: unknown) => {
             console.error('Sign up error:', error);
@@ -62,10 +57,10 @@ function SignUpContent() {
         // Client-side validation
         const newErrors: Record<string, string> = {};
 
-        if (!formData.name.trim()) {
+        if (!formData.name) {
             newErrors.name = 'Nome è obbligatorio';
-        } else if (formData.name.trim().length < 2) {
-            newErrors.name = 'Nome deve avere almeno 2 caratteri';
+        } else if (formData.name.length < 2) {
+            newErrors.name = 'Nome troppo corto';
         }
 
         if (!formData.email) {
@@ -74,13 +69,19 @@ function SignUpContent() {
             newErrors.email = 'Formato email non valido';
         }
 
-        const passwordValidation = validatePassword(formData.password);
-        if (!passwordValidation.isValid) {
-            newErrors.password = passwordValidation.errors[0];
+        if (!formData.password) {
+            newErrors.password = 'Password è obbligatoria';
+        } else {
+            const passwordValidation = isValidPassword(formData.password);
+            if (!passwordValidation.isValid) {
+                newErrors.password = passwordValidation.errors[0];
+            }
         }
 
-        if (formData.password !== confirmPassword) {
-            newErrors.confirmPassword = 'Le password non coincidono';
+        if (!formData.confirmPassword) {
+            newErrors.confirmPassword = 'Conferma password è obbligatoria';
+        } else if (formData.password !== formData.confirmPassword) {
+            newErrors.confirmPassword = 'Le password non corrispondono';
         }
 
         if (Object.keys(newErrors).length > 0) {
@@ -93,15 +94,10 @@ function SignUpContent() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-
-        if (name === 'confirmPassword') {
-            setConfirmPassword(sanitizeInput(value));
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: sanitizeInput(value)
-            }));
-        }
+        setFormData(prev => ({
+            ...prev,
+            [name]: sanitizeInput(value)
+        }));
 
         // Clear validation error for this field
         if (validationErrors[name]) {
@@ -112,36 +108,12 @@ function SignUpContent() {
         }
     };
 
-    // Password strength calculation
-    const passwordValidation = validatePassword(formData.password);
-    const passwordStrength = formData.password.length === 0 ? 0 :
-        passwordValidation.isValid ? 100 :
-            Math.min(75, (formData.password.length / 8) * 50 +
-                (passwordValidation.errors.length < 3 ? 25 : 0));
-
-    const getPasswordStrengthColor = () => {
-        if (passwordStrength < 25) return 'bg-red-500';
-        if (passwordStrength < 50) return 'bg-yellow-500';
-        if (passwordStrength < 75) return 'bg-blue-500';
-        return 'bg-green-500';
-    };
-
-    const getPasswordStrengthText = () => {
-        if (passwordStrength < 25) return 'Debole';
-        if (passwordStrength < 50) return 'Sufficiente';
-        if (passwordStrength < 75) return 'Buona';
-        return 'Forte';
-    };
-
-    // Handle server-side error messages
-    const errorMessage = error instanceof Error ? error.message : "Errore durante la registrazione";
-
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 {/* Logo/Brand */}
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-emerald-600 mb-2">P.IVA Balance</h1>
+                    <h1 className="text-2xl font-bold text-indigo-600 mb-2">P.IVA Balance</h1>
                     <h2 className="text-3xl font-extrabold text-gray-900">
                         Crea il tuo account
                     </h2>
@@ -149,9 +121,9 @@ function SignUpContent() {
                         Oppure{' '}
                         <Link
                             href="/signin"
-                            className="font-medium text-emerald-600 hover:text-emerald-500 transition-colors"
+                            className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
                         >
-                            accedi al tuo account
+                            accedi con il tuo account esistente
                         </Link>
                     </p>
                 </div>
@@ -160,12 +132,11 @@ function SignUpContent() {
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow-xl rounded-lg sm:px-10">
                     <form className="space-y-6" onSubmit={handleSubmit}>
-                        {/* Server Error */}
-                        {errorMessage && (
+                        {error ? (
                             <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-md" role="alert">
-                                <span className="block sm:inline">{escapeHtml(errorMessage)}</span>
+                                <span className="block sm:inline">{escapeHtml(error instanceof Error ? error.message : "Errore durante la registrazione")}</span>
                             </div>
-                        )}
+                        ) : null}
 
                         {/* Name Field */}
                         <div>
@@ -181,15 +152,15 @@ function SignUpContent() {
                                     required
                                     value={formData.name}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:text-sm transition-colors ${validationErrors.name
+                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.name
                                         ? 'border-red-300 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-emerald-500'
+                                        : 'border-gray-300 focus:border-indigo-500'
                                         }`}
                                     placeholder="Mario Rossi"
                                 />
-                                {validationErrors.name && (
+                                {validationErrors.name ? (
                                     <p className="mt-1 text-sm text-red-600">{validationErrors.name}</p>
-                                )}
+                                ) : null}
                             </div>
                         </div>
 
@@ -207,15 +178,15 @@ function SignUpContent() {
                                     required
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:text-sm transition-colors ${validationErrors.email
+                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.email
                                         ? 'border-red-300 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-emerald-500'
+                                        : 'border-gray-300 focus:border-indigo-500'
                                         }`}
-                                    placeholder="mario@esempio.com"
+                                    placeholder="esempio@email.com"
                                 />
-                                {validationErrors.email && (
+                                {validationErrors.email ? (
                                     <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
-                                )}
+                                ) : null}
                             </div>
                         </div>
 
@@ -233,15 +204,12 @@ function SignUpContent() {
                                     required
                                     value={formData.password}
                                     onChange={handleChange}
-                                    onFocus={() => setPasswordFocused(true)}
-                                    onBlur={() => setPasswordFocused(false)}
-                                    className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:text-sm transition-colors ${validationErrors.password
+                                    className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.password
                                         ? 'border-red-300 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-emerald-500'
+                                        : 'border-gray-300 focus:border-indigo-500'
                                         }`}
-                                    placeholder="Minimo 8 caratteri"
+                                    placeholder="Crea una password sicura"
                                 />
-                                {/* Password visibility toggle */}
                                 <button
                                     type="button"
                                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -252,31 +220,13 @@ function SignUpContent() {
                                         {showPassword ? '👁️‍🗨️' : '👁️'}
                                     </span>
                                 </button>
-
-                                {/* Password strength indicator */}
-                                {(passwordFocused || formData.password) && (
-                                    <div className="mt-2">
-                                        <div className="flex justify-between items-center mb-1">
-                                            <span className="text-xs text-gray-600">Sicurezza password:</span>
-                                            <span className={`text-xs font-medium ${passwordStrength < 50 ? 'text-red-600' :
-                                                passwordStrength < 75 ? 'text-yellow-600' : 'text-green-600'
-                                                }`}>
-                                                {getPasswordStrengthText()}
-                                            </span>
-                                        </div>
-                                        <div className="w-full bg-gray-200 rounded-full h-1.5">
-                                            <div
-                                                className={`h-1.5 rounded-full transition-all duration-300 ${getPasswordStrengthColor()}`}
-                                                style={{ width: `${passwordStrength}%` }}
-                                            ></div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {validationErrors.password && (
+                                {validationErrors.password ? (
                                     <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
-                                )}
+                                ) : null}
                             </div>
+                            <p className="mt-1 text-xs text-gray-500">
+                                Minimo 8 caratteri, almeno una lettera maiuscola, una minuscola e un numero
+                            </p>
                         </div>
 
                         {/* Confirm Password Field */}
@@ -284,24 +234,34 @@ function SignUpContent() {
                             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
                                 Conferma password
                             </label>
-                            <div className="mt-1">
+                            <div className="mt-1 relative">
                                 <input
                                     id="confirmPassword"
                                     name="confirmPassword"
-                                    type={showPassword ? 'text' : 'password'}
+                                    type={showConfirmPassword ? 'text' : 'password'}
                                     autoComplete="new-password"
                                     required
-                                    value={confirmPassword}
+                                    value={formData.confirmPassword}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:text-sm transition-colors ${validationErrors.confirmPassword
+                                    className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.confirmPassword
                                         ? 'border-red-300 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-emerald-500'
+                                        : 'border-gray-300 focus:border-indigo-500'
                                         }`}
                                     placeholder="Ripeti la password"
                                 />
-                                {validationErrors.confirmPassword && (
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    tabIndex={-1}
+                                >
+                                    <span className="text-gray-400 hover:text-gray-600 text-sm">
+                                        {showConfirmPassword ? '👁️‍🗨️' : '👁️'}
+                                    </span>
+                                </button>
+                                {validationErrors.confirmPassword ? (
                                     <p className="mt-1 text-sm text-red-600">{validationErrors.confirmPassword}</p>
-                                )}
+                                ) : null}
                             </div>
                         </div>
 
@@ -310,12 +270,12 @@ function SignUpContent() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 {isLoading ? (
                                     <>
                                         <LoadingSpinner size="sm" className="mr-2" />
-                                        Creazione account...
+                                        Registrazione in corso...
                                     </>
                                 ) : (
                                     'Crea account'
@@ -323,15 +283,21 @@ function SignUpContent() {
                             </button>
                         </div>
 
-                        {/* Terms & Privacy */}
+                        {/* Terms and Privacy */}
                         <div className="text-center">
-                            <p className="text-xs text-gray-600">
+                            <p className="text-xs text-gray-500">
                                 Creando un account accetti i nostri{' '}
-                                <Link href="/terms" className="text-emerald-600 hover:text-emerald-500">
+                                <Link
+                                    href="/terms"
+                                    className="text-indigo-600 hover:text-indigo-500"
+                                >
                                     Termini di Servizio
                                 </Link>{' '}
                                 e{' '}
-                                <Link href="/privacy" className="text-emerald-600 hover:text-emerald-500">
+                                <Link
+                                    href="/privacy"
+                                    className="text-indigo-600 hover:text-indigo-500"
+                                >
                                     Privacy Policy
                                 </Link>
                             </p>
@@ -345,17 +311,20 @@ function SignUpContent() {
 
 /**
  * SignUp Page Component
- * Enhanced with real-time validation and password strength indicator
+ * Enhanced with comprehensive validation, better UX, and security
  * Wrapped with Suspense to handle SSR compatibility
+ * Protected with AuthErrorBoundary for robust error handling
  */
 export default function SignUpPage() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
-                <LoadingSpinner />
-            </div>
-        }>
-            <SignUpContent />
-        </Suspense>
+        <AuthErrorBoundary authType="signup">
+            <Suspense fallback={
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+                    <LoadingSpinner />
+                </div>
+            }>
+                <SignUpContent />
+            </Suspense>
+        </AuthErrorBoundary>
     );
 } 

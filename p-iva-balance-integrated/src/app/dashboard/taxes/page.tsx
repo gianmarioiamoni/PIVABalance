@@ -1,11 +1,21 @@
+'use client';
+
 import TaxContributions from '@/components/tax-settings/tax-calculations/TaxContributions';
+import { SectionErrorBoundary } from '@/components/error-boundaries';
 
 /**
- * Taxes Page (Server Component)
+ * Taxes Page (Client Component with Error Boundary)
  * 
  * Simple page component that renders the TaxContributions component.
- * Converted to server component as it has no client-side logic.
+ * Converted to client component to support error boundaries.
  */
 export default function TaxesPage() {
-    return <TaxContributions />;
+    return (
+        <SectionErrorBoundary 
+            sectionName="il calcolo delle tasse" 
+            description="Errore nel caricamento del modulo calcolo tasse e contributi."
+        >
+            <TaxContributions />
+        </SectionErrorBoundary>
+    );
 } 

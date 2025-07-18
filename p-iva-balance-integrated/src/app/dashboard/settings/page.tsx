@@ -3,6 +3,7 @@
 import { Suspense } from 'react';
 import TaxSettings from '@/components/tax-settings/main/TaxSettings';
 import { LoadingSpinner } from '@/components/ui';
+import { SectionErrorBoundary } from '@/components/error-boundaries';
 
 // Disable prerendering for this page to avoid SSR issues with React Query
 export const dynamic = 'force-dynamic';
@@ -15,15 +16,20 @@ export const dynamic = 'force-dynamic';
  */
 export default function SettingsPage() {
     return (
-        <Suspense fallback={<LoadingSpinner />}>
-            <div>
-                <TaxSettings
-                    activeTab="settings"
-                    attemptedTab={undefined}
-                    onTabChange={() => { }}
-                    onCancelTabChange={() => { }}
-                />
-            </div>
-        </Suspense>
+        <SectionErrorBoundary 
+            sectionName="le impostazioni fiscali" 
+            description="Errore nel caricamento delle impostazioni fiscali."
+        >
+            <Suspense fallback={<LoadingSpinner />}>
+                <div>
+                    <TaxSettings
+                        activeTab="settings"
+                        attemptedTab={undefined}
+                        onTabChange={() => { }}
+                        onCancelTabChange={() => { }}
+                    />
+                </div>
+            </Suspense>
+        </SectionErrorBoundary>
     );
 } 

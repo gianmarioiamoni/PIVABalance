@@ -8,6 +8,7 @@ import { authService, type SignInCredentials } from '@/services/authService';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { sanitizeInput, escapeHtml, isValidEmail } from '@/utils/security';
 import { LoadingSpinner } from '@/components/ui';
+import { AuthErrorBoundary } from '@/components/error-boundaries';
 
 // Disable prerendering for this page to avoid SSR issues
 export const dynamic = 'force-dynamic';
@@ -239,15 +240,18 @@ function SignInContent() {
  * SignIn Page Component
  * Enhanced with better UX, validation, and security
  * Wrapped with Suspense to handle SSR compatibility
+ * Protected with AuthErrorBoundary for robust error handling
  */
 export default function SignInPage() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-                <LoadingSpinner />
-            </div>
-        }>
-            <SignInContent />
-        </Suspense>
+        <AuthErrorBoundary authType="signin">
+            <Suspense fallback={
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+                    <LoadingSpinner />
+                </div>
+            }>
+                <SignInContent />
+            </Suspense>
+        </AuthErrorBoundary>
     );
 } 

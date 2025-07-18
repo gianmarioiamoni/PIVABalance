@@ -12,6 +12,14 @@ export { FormActionButtons } from "./FormActionButtons";
 export { FormLoadingState } from "./FormLoadingState";
 export { FormSubmitSection } from "./FormSubmitSection";
 export { FormValidationAlert } from "./FormValidationAlert";
+export {
+  Icon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+  XCircleIcon,
+  XMarkIcon,
+} from "./Icon";
 export { LoadingOverlay } from "./LoadingOverlay";
 export { LoadingSpinner } from "./LoadingSpinner";
 export { NotificationToast } from "./NotificationToast";

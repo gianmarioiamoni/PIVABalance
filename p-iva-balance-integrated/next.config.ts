@@ -1,8 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Use standalone output to avoid SSR issues
-  output: "standalone",
+  // Standard configuration
   trailingSlash: true,
   webpack: (config, { isServer }) => {
     // Ensure proper handling of client-only modules

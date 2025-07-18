@@ -1,12 +1,12 @@
 import React from 'react';
+import { Notification } from '@/types';
 import {
     CheckCircleIcon,
     ExclamationTriangleIcon,
     InformationCircleIcon,
     XCircleIcon,
     XMarkIcon
-} from '@heroicons/react/24/outline';
-import { Notification } from '@/types';
+} from './Icon';
 
 interface NotificationToastProps {
     notification: Notification;

@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Standard configuration
+  // Use standalone output for production deployments if specified
+  output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
   trailingSlash: true,
   webpack: (config, { isServer }) => {
     // Ensure proper handling of client-only modules

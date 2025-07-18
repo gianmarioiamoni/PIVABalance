@@ -5,12 +5,16 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:standalone": "NEXT_OUTPUT=standalone next build",
+    "build:export": "next build && next export",
     "start": "next start",
+    "start:standalone": "node .next/standalone/server.js",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --coverage --watchAll=false"
+    "test:ci": "jest --ci --coverage --watchAll=false",
+    "deploy:test": "npm run build:standalone && npm run start:standalone"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

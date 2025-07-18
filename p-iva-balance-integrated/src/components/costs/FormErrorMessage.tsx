@@ -1,25 +1,24 @@
 import React from 'react';
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { Icon } from '@/components/ui';
 
 interface FormErrorMessageProps {
     message: string;
-    show: boolean;
+    className?: string;
 }
 
 /**
- * FormErrorMessage Component
- * 
- * Reusable component for displaying form field error messages
- * Follows SRP by handling only error message display
+ * Reusable form error message component
+ * Optimized with dynamic icon loading
  */
-export const FormErrorMessage: React.FC<FormErrorMessageProps> = ({ message, show }) => {
-    if (!show || !message) {
-        return null;
-    }
+export const FormErrorMessage: React.FC<FormErrorMessageProps> = ({
+    message,
+    className = ''
+}) => {
+    if (!message) return null;
 
     return (
-        <div className="mt-1 flex items-center text-sm text-red-600">
-            <ExclamationCircleIcon className="h-4 w-4 mr-1 flex-shrink-0" />
+        <div className={`flex items-center text-red-600 text-sm mt-1 ${className}`}>
+            <Icon name="ExclamationCircleIcon" className="h-4 w-4 mr-1 flex-shrink-0" />
             <span>{message}</span>
         </div>
     );

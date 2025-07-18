@@ -78,6 +78,20 @@ export const validatePassword = (
 };
 
 /**
+ * Simple password validation wrapper
+ * @param password - Password to validate
+ * @returns Validation result with errors
+ */
+export const isValidPassword = (
+  password: string
+): {
+  isValid: boolean;
+  errors: string[];
+} => {
+  return validatePassword(password);
+};
+
+/**
  * Generate secure random string for tokens/IDs
  * @param length - Length of generated string
  * @returns Random string

@@ -12,7 +12,7 @@ export { AuthErrorBoundary } from "./AuthErrorBoundary";
 
 // Re-export types for convenience
 export type {
-  ErrorInfo,
+  ErrorBoundaryInfo,
   ErrorBoundaryState,
   ErrorBoundaryProps,
 } from "./ErrorBoundary";

@@ -1,5 +1,5 @@
+import { Icon } from '@/components/ui/Icon';
 import React from 'react';
-import { ChevronDownIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { LoadingOverlay } from './LoadingOverlay';
 
 /**
@@ -118,13 +118,13 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                 </select>
 
                 {/* Custom dropdown icon */}
-                <ChevronDownIcon
+                <Icon
+                    name="ChevronDownIcon"
                     className={`
             absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 
             text-gray-400 pointer-events-none transition-transform duration-200
             ${disabled || loading ? 'opacity-50' : ''}
           `}
-                    aria-hidden="true"
                 />
 
                 {/* Loading overlay */}
@@ -138,7 +138,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                     role="alert"
                     aria-live="polite"
                 >
-                    <ExclamationCircleIcon className="h-4 w-4 mr-1 flex-shrink-0" aria-hidden="true" />
+                    <Icon name="ExclamationCircleIcon" className="h-4 w-4 mr-1 flex-shrink-0" />
                     <span>{error}</span>
                 </div>
             )}

@@ -1,63 +1,42 @@
 import React from 'react';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';
-import { Tooltip } from './Tooltip';
+import { Icon } from '@/components/ui/Icon';
 
 /**
  * Props for FieldLabel component
  */
 interface FieldLabelProps {
-    htmlFor: string;
     children: React.ReactNode;
-    tooltip?: React.ReactNode;
     required?: boolean;
+    tooltip?: string;
     className?: string;
 }
 
 /**
- * Reusable Field Label Component with Tooltip
- * 
- * Follows Single Responsibility Principle - only handles label display with optional tooltip.
- * Provides consistent styling and accessibility across form fields.
- * 
- * Features:
- * - Optional tooltip with information icon
- * - Required field indicator
- * - Consistent styling and hover states
- * - Proper accessibility attributes
- * - Responsive design
- * 
- * @param htmlFor - ID of the associated form field
- * @param children - Label text content
- * @param tooltip - Optional tooltip content (string or React element)
- * @param required - Whether the field is required
- * @param className - Additional CSS classes
+ * Reusable field label component with optimized icon
  */
 export const FieldLabel: React.FC<FieldLabelProps> = ({
-    htmlFor,
     children,
-    tooltip,
     required = false,
-    className = ""
+    tooltip,
+    className = ''
 }) => {
     return (
-        <label
-            htmlFor={htmlFor}
-            className={`block text-sm font-medium text-gray-700 ${className}`}
-        >
-            {children}
-            {required && (
-                <span className="text-red-500 ml-1" aria-label="Campo obbligatorio">
-                    *
-                </span>
-            )}
-            {tooltip && (
-                <Tooltip content={tooltip}>
-                    <InformationCircleIcon
-                        className="ml-1 inline h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors cursor-help"
-                        aria-label="Informazioni aggiuntive"
-                    />
-                </Tooltip>
-            )}
+        <label className={`block text-sm font-medium text-gray-700 mb-1 ${className}`}>
+            <span className="flex items-center">
+                {children}
+                {required && <span className="text-red-500 ml-1">*</span>}
+                {tooltip && (
+                    <div className="relative ml-2 group">
+                        <Icon 
+                            name="InformationCircleIcon" 
+                            className="h-4 w-4 text-gray-400 cursor-help" 
+                        />
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                            {tooltip}
+                        </div>
+                    </div>
+                )}
+            </span>
         </label>
     );
 }; 

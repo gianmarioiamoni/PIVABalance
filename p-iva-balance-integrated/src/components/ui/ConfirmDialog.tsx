@@ -1,8 +1,7 @@
 'use client';
 
-import { Fragment } from 'react';
+import React from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { ExclamationTriangleIcon, InformationCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 export type DialogType = 'warning' | 'info' | 'success' | 'danger';
 
@@ -60,35 +59,35 @@ export const ConfirmDialog = ({
     switch (dialogType) {
       case 'danger':
         return {
-          icon: ExclamationTriangleIcon,
+          icon: 'ExclamationTriangleIcon',
           bgColor: 'bg-red-100',
           iconColor: 'text-red-600',
           buttonColor: 'bg-red-600 hover:bg-red-500 focus:ring-red-500'
         };
       case 'warning':
         return {
-          icon: ExclamationTriangleIcon,
+          icon: 'ExclamationTriangleIcon',
           bgColor: 'bg-yellow-100',
           iconColor: 'text-yellow-600',
           buttonColor: 'bg-yellow-600 hover:bg-yellow-500 focus:ring-yellow-500'
         };
       case 'info':
         return {
-          icon: InformationCircleIcon,
+          icon: 'InformationCircleIcon',
           bgColor: 'bg-blue-100',
           iconColor: 'text-blue-600',
           buttonColor: 'bg-blue-600 hover:bg-blue-500 focus:ring-blue-500'
         };
       case 'success':
         return {
-          icon: CheckCircleIcon,
+          icon: 'CheckCircleIcon',
           bgColor: 'bg-green-100',
           iconColor: 'text-green-600',
           buttonColor: 'bg-green-600 hover:bg-green-500 focus:ring-green-500'
         };
       default:
         return {
-          icon: ExclamationTriangleIcon,
+          icon: 'ExclamationTriangleIcon',
           bgColor: 'bg-red-100',
           iconColor: 'text-red-600',
           buttonColor: 'bg-red-600 hover:bg-red-500 focus:ring-red-500'

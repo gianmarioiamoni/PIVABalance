@@ -4,13 +4,18 @@ import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
-import { authService, type SignUpData } from '@/services/authService';
+import { authService, type SignUpCredentials } from '@/services/authService';
 import { sanitizeInput, escapeHtml, isValidEmail, isValidPassword } from '@/utils/security';
 import { LoadingSpinner } from '@/components/ui';
 import { AuthErrorBoundary } from '@/components/error-boundaries';
 
 // Disable prerendering for this page to avoid SSR issues
 export const dynamic = 'force-dynamic';
+
+// Local type for signup form including confirm password
+interface SignUpFormData extends SignUpCredentials {
+    confirmPassword: string;
+}
 
 /**
  * SignUp Content Component
@@ -19,7 +24,7 @@ export const dynamic = 'force-dynamic';
 function SignUpContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [formData, setFormData] = useState<SignUpData>({
+    const [formData, setFormData] = useState<SignUpFormData>({
         name: '',
         email: '',
         password: '',
@@ -37,7 +42,7 @@ function SignUpContent() {
         isPending: isLoading,
         error
     } = useMutation({
-        mutationFn: (userData: SignUpData) => authService.signUp(userData),
+        mutationFn: (userData: SignUpCredentials) => authService.signUp(userData),
         onSuccess: () => {
             // Redirect to signin with success message
             const message = encodeURIComponent('Account creato con successo! Ora puoi effettuare il login.');

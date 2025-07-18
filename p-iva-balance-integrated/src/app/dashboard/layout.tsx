@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTaxSettings } from '@/hooks/useTaxSettings';
-import { PageErrorBoundary, SectionErrorBoundary } from '@/components/error-boundaries';
+import { PageErrorBoundary } from '@/components/error-boundaries';
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ');

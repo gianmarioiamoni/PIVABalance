@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { useCosts, useCostForm } from '@/hooks/costs';
-import { CostForm } from './costs/CostForm';
+// ✅ Code splitting: Lazy load CostForm (caricato solo quando necessario)
+const CostForm = lazy(() => import('./costs/CostForm').then(module => ({ default: module.CostForm })));
 import { CostList } from './costs/CostList';
 import { SummaryCard } from './costs/SummaryCard';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { PlusIcon, CalendarIcon, CurrencyEuroIcon } from '@heroicons/react/24/outline';
+// ✅ Ottimizzazione: Uso sistema Icon dinamico invece di import diretti
+import { Icon } from '@/components/ui';
 import {
     calculateCostSummary,
     generateAvailableYears
@@ -72,7 +74,7 @@ export const Costs: React.FC = () => {
                             className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                             disabled={loading}
                         >
-                            <PlusIcon className="h-4 w-4 mr-2" />
+                            <Icon name="plus" className="h-4 w-4 mr-2" />
                             Nuovo Costo
                         </button>
                     </div>
@@ -85,7 +87,7 @@ export const Costs: React.FC = () => {
                     title="Totale Costi"
                     amount={costSummary.totalCosts}
                     count={costSummary.totalCount}
-                    icon={CurrencyEuroIcon}
+                    icon={({ className }) => <Icon name="CurrencyEuroIcon" className={className} />}
                     bgColor="bg-blue-50"
                     textColor="text-blue-600"
                 />
@@ -93,7 +95,7 @@ export const Costs: React.FC = () => {
                     title="Costi Deducibili"
                     amount={costSummary.deductibleCosts}
                     count={costSummary.deductibleCount}
-                    icon={CalendarIcon}
+                    icon={({ className }) => <Icon name="CheckCircleIcon" className={className} />}
                     bgColor="bg-green-50"
                     textColor="text-green-600"
                 />
@@ -101,7 +103,7 @@ export const Costs: React.FC = () => {
                     title="Costi Non Deducibili"
                     amount={costSummary.nonDeductibleCosts}
                     count={costSummary.nonDeductibleCount}
-                    icon={CalendarIcon}
+                    icon={({ className }) => <Icon name="XCircleIcon" className={className} />}
                     bgColor="bg-red-50"
                     textColor="text-red-600"
                 />
@@ -116,12 +118,14 @@ export const Costs: React.FC = () => {
 
             {/* New Cost Form */}
             {showNewCostForm && (
-                <CostForm
-                    onSubmit={submitNewCost}
-                    onCancel={closeNewCostForm}
-                    loading={createLoading}
-                    error={createError}
-                />
+                <Suspense fallback={<LoadingSpinner />}>
+                    <CostForm
+                        onSubmit={submitNewCost}
+                        onCancel={closeNewCostForm}
+                        loading={createLoading}
+                        error={createError}
+                    />
+                </Suspense>
             )}
 
             {/* Costs List */}

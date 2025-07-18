@@ -1,26 +1,37 @@
 'use client';
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, ReactNode } from 'react';
 import { ExclamationTriangleIcon, ArrowPathIcon } from '../ui/Icon';
 
 // Types for error boundary
-export interface ErrorInfo {
+export interface ErrorBoundaryInfo {
     componentStack: string;
     errorBoundary?: string;
     errorBoundaryStack?: string;
 }
 
+export interface ErrorReport {
+    message: string;
+    stack?: string;
+    componentStack: string;
+    level: 'page' | 'section' | 'component';
+    timestamp: string;
+    userAgent: string;
+    url: string;
+    errorId: string | null;
+}
+
 export interface ErrorBoundaryState {
     hasError: boolean;
     error: Error | null;
-    errorInfo: ErrorInfo | null;
+    errorInfo: ErrorBoundaryInfo | null;
     errorId: string | null;
 }
 
 export interface ErrorBoundaryProps {
     children: ReactNode;
     fallback?: ReactNode;
-    onError?: (error: Error, errorInfo: ErrorInfo) => void;
+    onError?: (error: Error, errorInfo: ErrorBoundaryInfo) => void;
     isolate?: boolean; // If true, prevents error from bubbling up
     showDetails?: boolean; // Show technical details in development
     resetOnPropsChange?: boolean; // Reset error state when props change
@@ -68,7 +79,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         };
     }
 
-    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    componentDidCatch(error: Error, errorInfo: ErrorBoundaryInfo) {
         // Store error info in state
         this.setState({ errorInfo });
 
@@ -126,7 +137,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     /**
      * Report error to external monitoring service
      */
-    private reportError = (errorReport: any) => {
+    private reportError = (errorReport: ErrorReport) => {
         // In development, just log to console
         if (process.env.NODE_ENV === 'development') {
             console.group('🚨 Error Boundary Report');
@@ -202,12 +213,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                             Si è verificato un errore imprevisto. Il nostro team è stato notificato.
                         </p>
 
-                                    <div className="flex flex-col sm:flex-row gap-2 justify-center">
-              <button
-                type="button"
-                onClick={this.resetErrorBoundary}
-                className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
-              >
+                        <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                            <button
+                                type="button"
+                                onClick={this.resetErrorBoundary}
+                                className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
+                            >
                                 <ArrowPathIcon className="h-4 w-4 mr-2" />
                                 Riprova
                             </button>

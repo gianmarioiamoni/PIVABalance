@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { CreateCostData } from '@/services/costService';
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { useCostFormState } from '@/hooks/costs';
+// ✅ Ottimizzazione: Uso sistema Icon dinamico
+import { Icon } from '@/components/ui';
 import { FormErrorMessage } from './FormErrorMessage';
 
 interface CostFormProps {
@@ -55,7 +56,7 @@ export const CostForm: React.FC<CostFormProps> = ({
 
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded flex items-center">
-          <ExclamationCircleIcon className="h-5 w-5 mr-2 flex-shrink-0" />
+          <Icon name="ExclamationCircleIcon" className="h-5 w-5 mr-2 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -77,10 +78,11 @@ export const CostForm: React.FC<CostFormProps> = ({
               }`}
             placeholder="Inserisci la descrizione del costo"
           />
-          <FormErrorMessage
-            message={fieldErrors.description || ''}
-            show={!!touched.description && !!fieldErrors.description}
-          />
+          {touched.description && fieldErrors.description && (
+            <FormErrorMessage
+              message={fieldErrors.description}
+            />
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -99,9 +101,9 @@ export const CostForm: React.FC<CostFormProps> = ({
                 : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
                 }`}
             />
-            <FormErrorMessage 
-              message={fieldErrors.date || ''} 
-              show={!!touched.date && !!fieldErrors.date} 
+            <FormErrorMessage
+              message={fieldErrors.date || ''}
+              show={!!touched.date && !!fieldErrors.date}
             />
           </div>
 
@@ -118,14 +120,14 @@ export const CostForm: React.FC<CostFormProps> = ({
               onChange={(e) => updateField('amount', Number(e.target.value))}
               onBlur={() => handleFieldBlur('amount')}
               className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm ${touched.amount && fieldErrors.amount
-                  ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                  : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
                 }`}
               placeholder="0.00"
             />
-            <FormErrorMessage 
-              message={fieldErrors.amount || ''} 
-              show={!!touched.amount && !!fieldErrors.amount} 
+            <FormErrorMessage
+              message={fieldErrors.amount || ''}
+              show={!!touched.amount && !!fieldErrors.amount}
             />
           </div>
         </div>

@@ -75,7 +75,7 @@ export function useAuth() {
       await queryClient.invalidateQueries({ queryKey: ["auth"] });
 
       // Redirect to signin page
-      router.push("/auth/signin");
+      router.push("/signin");
     }
   }, [queryClient, setToken, router]);
 

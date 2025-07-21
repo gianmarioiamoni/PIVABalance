@@ -8,6 +8,7 @@ import {
   userSettingsUpdateSchema,
 } from "@/lib/validations/schemas";
 import { IUserSettings, RawUserSettings } from "@/types";
+import { getUserFromRequest } from "@/lib/auth/jwt";
 
 /**
  * Helper function to clean settings data for response
@@ -45,9 +46,9 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    // Get user ID from headers (simplified auth for now)
-    const userId = request.headers.get("x-user-id");
-    if (!userId) {
+    // Get user from JWT token
+    const userData = await getUserFromRequest(request);
+    if (!userData) {
       return NextResponse.json(
         {
           success: false,
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify user exists
-    const user = await User.findById(userId);
+    const user = await User.findById(userData.userId);
     if (!user) {
       return NextResponse.json(
         {
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user settings or return defaults
-    const settings = await UserSettings.findOne({ userId });
+    const settings = await UserSettings.findOne({ userId: userData.userId });
 
     if (!settings) {
       // Return default settings
@@ -118,9 +119,9 @@ export async function PUT(request: NextRequest) {
   try {
     await connectDB();
 
-    // Get user ID from headers (simplified auth for now)
-    const userId = request.headers.get("x-user-id");
-    if (!userId) {
+    // Get user from JWT token
+    const userData = await getUserFromRequest(request);
+    if (!userData) {
       return NextResponse.json(
         {
           success: false,
@@ -131,7 +132,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Verify user exists
-    const user = await User.findById(userId);
+    const user = await User.findById(userData.userId);
     if (!user) {
       return NextResponse.json(
         {
@@ -147,7 +148,7 @@ export async function PUT(request: NextRequest) {
     const validatedData = validateSchema(userSettingsUpdateSchema, body);
 
     // Find existing settings or create new
-    let settings = await UserSettings.findOne({ userId });
+    let settings = await UserSettings.findOne({ userId: userData.userId });
 
     if (settings) {
       // Update existing settings
@@ -156,7 +157,7 @@ export async function PUT(request: NextRequest) {
     } else {
       // Create new settings with defaults + provided data
       const defaultSettings = {
-        userId,
+        userId: userData.userId,
         taxRegime: "forfettario" as const,
         substituteRate: 5,
         profitabilityRate: 78,

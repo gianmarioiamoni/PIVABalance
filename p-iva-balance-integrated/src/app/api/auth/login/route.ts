@@ -8,6 +8,7 @@ import {
   isValidationError,
 } from "@/lib/validations/schemas";
 import { SignInCredentials, ApiResponse, AuthResponse } from "@/types";
+import { compareUserPassword } from "@/utils/userCalculations";
 
 /**
  * POST /api/auth/login
@@ -37,7 +38,10 @@ export async function POST(
     }
 
     // Check password
-    const isPasswordValid = await user.comparePassword(validatedData.password);
+    const isPasswordValid = await compareUserPassword(
+      validatedData.password,
+      user.password
+    );
     if (!isPasswordValid) {
       return NextResponse.json(
         {

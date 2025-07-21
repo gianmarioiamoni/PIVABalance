@@ -157,7 +157,7 @@ function SignUpContent() {
                                     required
                                     value={formData.name}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.name
+                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.name
                                         ? 'border-red-300 focus:border-red-500'
                                         : 'border-gray-300 focus:border-indigo-500'
                                         }`}
@@ -183,7 +183,7 @@ function SignUpContent() {
                                     required
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.email
+                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.email
                                         ? 'border-red-300 focus:border-red-500'
                                         : 'border-gray-300 focus:border-indigo-500'
                                         }`}
@@ -209,7 +209,7 @@ function SignUpContent() {
                                     required
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.password
+                                    className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.password
                                         ? 'border-red-300 focus:border-red-500'
                                         : 'border-gray-300 focus:border-indigo-500'
                                         }`}

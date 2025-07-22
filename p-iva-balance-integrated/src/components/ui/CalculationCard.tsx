@@ -39,43 +39,55 @@ export const CalculationCard: React.FC<CalculationCardProps> = ({
 
     return (
         <div
-            className={`border rounded-lg p-4 ${variantClasses[variant]} ${className}`}
+            className={`border rounded-lg overflow-hidden ${variantClasses[variant]} ${className}`}
             {...htmlProps}
         >
-            <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-gray-900 flex items-center">
+            {/* Header section con icona e titolo centrati */}
+            <div className="p-6 pb-3">
+                <div className="flex items-center justify-center gap-3 mb-2">
                     {icon && React.createElement(icon, {
-                        className: "h-5 w-5 mr-2 text-gray-400"
+                        className: "h-6 w-6 text-gray-500 flex-shrink-0"
                     })}
-                    {title}
+                    <h3 className="text-base font-medium text-gray-900 text-center truncate flex-1">
+                        {title}
+                    </h3>
                     {tooltip && (
-                        <div className="relative ml-2 group">
+                        <div className="relative group flex-shrink-0">
                             <Icon
                                 name="InformationCircleIcon"
-                                className="h-4 w-4 text-gray-400 cursor-help"
+                                className="h-5 w-5 text-gray-400 cursor-help hover:text-gray-600 transition-colors"
                             />
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                                {tooltip}
+                            <div className="absolute bottom-full right-0 mb-2 w-72 px-4 py-3 text-sm text-white bg-gray-900 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+                                <div className="text-left whitespace-normal break-words">
+                                    {tooltip}
+                                </div>
+                                <div className="absolute top-full right-4 -mt-1 border-4 border-transparent border-t-gray-900"></div>
                             </div>
                         </div>
                     )}
-                </h3>
+                </div>
             </div>
-            <div className="mt-2">
+
+            {/* Valore principale centrato */}
+            <div className="px-6 pb-6 text-center">
                 {isLoading ? (
-                    <div className="text-2xl font-semibold text-gray-400">
+                    <div className="text-2xl lg:text-3xl font-bold text-gray-400 min-h-[3rem] flex items-center justify-center">
                         Caricamento...
                     </div>
                 ) : (
-                    <div className="text-2xl font-semibold text-gray-900">
-                        {new Intl.NumberFormat('it-IT', {
-                            style: 'currency',
-                            currency: 'EUR'
-                        }).format(value)}
+                    <div className="text-2xl lg:text-3xl font-bold text-gray-900 min-h-[3rem] flex items-center justify-center">
+                        <span className="truncate">
+                            {new Intl.NumberFormat('it-IT', {
+                                style: 'currency',
+                                currency: 'EUR'
+                            }).format(value)}
+                        </span>
                     </div>
                 )}
                 {description && (
-                    <p className="text-sm text-gray-500 mt-1">{description}</p>
+                    <p className="text-sm text-gray-500 mt-3 leading-relaxed line-clamp-2">
+                        {description}
+                    </p>
                 )}
             </div>
         </div>

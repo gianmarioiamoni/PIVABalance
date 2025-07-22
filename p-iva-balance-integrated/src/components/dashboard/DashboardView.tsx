@@ -2,6 +2,7 @@ import { LoadingSpinner } from '@/components/ui';
 import { StatCard } from './StatCard';
 import { QuickActions } from './QuickActions';
 import { RecentActivities } from './RecentActivities';
+import { TaxContributions } from '@/components/tax-settings/tax-calculations';
 import { User } from '@/services/authService';
 
 /**
@@ -126,10 +127,7 @@ export const DashboardView = ({
                         </h2>
                     </div>
                     <div className="p-6">
-                        {/* TaxContributions component will be added here when migrated */}
-                        <div className="text-center py-12 text-gray-500">
-                            <p>Il componente TaxContributions verrà aggiunto dopo la migrazione.</p>
-                        </div>
+                        <TaxContributions />
                     </div>
                 </div>
 

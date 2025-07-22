@@ -25,6 +25,8 @@ interface UseDashboardReturn {
   stats: DashboardStats;
   activities: Activity[];
   quickActions: QuickAction[];
+  isLoading: boolean;
+  error: string | null;
 }
 
 /**
@@ -97,5 +99,7 @@ export const useDashboard = (): UseDashboardReturn => {
     stats,
     activities,
     quickActions,
+    isLoading: false, // Mock data is immediately available
+    error: null,
   };
 };

@@ -12,8 +12,11 @@ import { DashboardView } from './DashboardView';
  * Follows Single Responsibility Principle - only handles data orchestration.
  */
 export const Dashboard = () => {
-    const { user, isLoading } = useAuthContext();
-    const { stats, activities, quickActions } = useDashboard();
+    const { user, isLoading: authLoading } = useAuthContext();
+    const { stats, activities, quickActions, isLoading: dashboardLoading } = useDashboard();
+
+    // Show loading if either auth or dashboard data is loading
+    const isLoading = authLoading || dashboardLoading;
 
     return (
         <DashboardView

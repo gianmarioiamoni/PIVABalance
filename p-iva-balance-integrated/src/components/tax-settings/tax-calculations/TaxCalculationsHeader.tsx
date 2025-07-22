@@ -30,10 +30,10 @@ export const TaxCalculationsHeader: React.FC<TaxCalculationsHeaderProps> = ({
                 <select
                     value={selectedYear}
                     onChange={(e) => onYearChange(Number(e.target.value))}
-                    className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="border border-gray-300 rounded-md px-3 py-2 text-gray-900 font-medium bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                 >
                     {availableYears.map((year) => (
-                        <option key={year} value={year}>
+                        <option key={year} value={year} className="text-gray-900 font-medium">
                             {year}
                         </option>
                     ))}

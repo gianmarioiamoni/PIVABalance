@@ -42,40 +42,39 @@ export const CalculationCard: React.FC<CalculationCardProps> = ({
             className={`border rounded-lg overflow-hidden ${variantClasses[variant]} ${className}`}
             {...htmlProps}
         >
-            {/* Header section con icona e titolo centrati */}
-            <div className="p-6 pb-3">
-                <div className="flex items-center justify-center gap-3 mb-2">
+            {/* Header section con icona e tooltip */}
+            <div className="p-6 pb-2">
+                <div className="flex items-center justify-between mb-3">
                     {icon && React.createElement(icon, {
-                        className: "h-6 w-6 text-gray-500 flex-shrink-0"
+                        className: "h-6 w-6 text-gray-500"
                     })}
-                    <h3 className="text-base font-medium text-gray-900 text-center truncate flex-1">
-                        {title}
-                    </h3>
                     {tooltip && (
-                        <div className="relative group flex-shrink-0">
+                        <div className="relative group">
                             <Icon
                                 name="InformationCircleIcon"
-                                className="h-5 w-5 text-gray-400 cursor-help hover:text-gray-600 transition-colors"
+                                className="h-4 w-4 text-gray-400 cursor-help hover:text-gray-600 transition-colors"
                             />
-                            <div className="absolute bottom-full right-0 mb-2 w-72 px-4 py-3 text-sm text-white bg-gray-900 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
-                                <div className="text-left whitespace-normal break-words">
-                                    {tooltip}
-                                </div>
-                                <div className="absolute top-full right-4 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 max-w-xs">
+                                {tooltip}
                             </div>
                         </div>
                     )}
                 </div>
+
+                {/* Titolo centrato sotto icona e tooltip */}
+                <h3 className="text-sm font-medium text-gray-900 text-center mb-2">
+                    {title}
+                </h3>
             </div>
 
             {/* Valore principale centrato */}
             <div className="px-6 pb-6 text-center">
                 {isLoading ? (
-                    <div className="text-2xl lg:text-3xl font-bold text-gray-400 min-h-[3rem] flex items-center justify-center">
+                    <div className="text-2xl font-bold text-gray-400 min-h-[2.5rem] flex items-center justify-center">
                         Caricamento...
                     </div>
                 ) : (
-                    <div className="text-2xl lg:text-3xl font-bold text-gray-900 min-h-[3rem] flex items-center justify-center">
+                    <div className="text-2xl font-bold text-gray-900 min-h-[2.5rem] flex items-center justify-center">
                         <span className="truncate">
                             {new Intl.NumberFormat('it-IT', {
                                 style: 'currency',
@@ -85,7 +84,7 @@ export const CalculationCard: React.FC<CalculationCardProps> = ({
                     </div>
                 )}
                 {description && (
-                    <p className="text-sm text-gray-500 mt-3 leading-relaxed line-clamp-2">
+                    <p className="text-xs text-gray-500 mt-2 leading-relaxed line-clamp-2">
                         {description}
                     </p>
                 )}

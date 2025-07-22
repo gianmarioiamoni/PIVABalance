@@ -179,7 +179,7 @@ export const InvoiceList = ({
                                                         }
                                                     }}
                                                     disabled={updatingPayment === invoice._id}
-                                                    className="block w-full min-w-0 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="block w-full min-w-0 rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                                     aria-label={`Data pagamento per fattura ${invoice.number}`}
                                                 />
                                                 {updatingPayment === invoice._id && (

@@ -310,7 +310,7 @@ export const NewInvoiceForm = ({
                                         const selectedType = e.target.value as VatOption['type'];
                                         handleVatChange(selectedType);
                                     }}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 >
                                     {vatOptions.map(option => (
                                         <option key={option.type} value={option.type}>
@@ -339,7 +339,7 @@ export const NewInvoiceForm = ({
                                                 vat: { ...newInvoice.vat!, vatRate: Number(e.target.value) }
                                             })
                                         }
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                         placeholder="0.0"
                                     />
                                 </div>

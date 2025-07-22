@@ -51,7 +51,7 @@ class InpsService {
     try {
       if (!this.currentParameters) {
         const response = await api.get<InpsParameters>(
-          "/api/inps/parameters/current"
+          "/inps/parameters/current"
         );
         this.currentParameters = response;
       }
@@ -64,7 +64,7 @@ class InpsService {
 
   async getParametersByYear(year: number): Promise<InpsParameters> {
     const response = await api.get<InpsParameters>(
-      `/api/inps/parameters/${year}`
+      `/inps/parameters/${year}`
     );
     return response;
   }

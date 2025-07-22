@@ -65,17 +65,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         },
     ];
 
-    // DEBUG: Check pathname and active states
-    console.log('🎯 Dashboard Navigation Debug:', {
-        pathname,
-        normalizedPathname,
-        navigationItems: navigationItems.map(item => ({
-            name: item.name,
-            href: item.href,
-            current: item.current,
-            isActive: normalizedPathname === item.href
-        }))
-    });
+
 
     return (
         <div className="min-h-screen bg-gray-100">

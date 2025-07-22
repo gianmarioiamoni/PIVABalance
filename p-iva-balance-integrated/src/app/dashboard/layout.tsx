@@ -48,15 +48,18 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         return null;
     }
 
+    // Normalize pathname by removing trailing slash for consistent comparison
+    const normalizedPathname = pathname?.replace(/\/$/, '') || '';
+
     const navigationItems = [
-        { name: 'Dashboard', href: '/dashboard', current: pathname === '/dashboard' },
-        { name: 'Impostazioni', href: '/dashboard/settings', current: pathname === '/dashboard/settings' },
-        { name: 'Fatture', href: '/dashboard/invoices', current: pathname === '/dashboard/invoices' },
-        { name: 'Costi', href: '/dashboard/costs', current: pathname === '/dashboard/costs' },
+        { name: 'Dashboard', href: '/dashboard', current: normalizedPathname === '/dashboard' },
+        { name: 'Impostazioni', href: '/dashboard/settings', current: normalizedPathname === '/dashboard/settings' },
+        { name: 'Fatture', href: '/dashboard/invoices', current: normalizedPathname === '/dashboard/invoices' },
+        { name: 'Costi', href: '/dashboard/costs', current: normalizedPathname === '/dashboard/costs' },
         {
             name: 'Tasse e Contributi',
             href: '/dashboard/taxes',
-            current: pathname === '/dashboard/taxes',
+            current: normalizedPathname === '/dashboard/taxes',
             disabled: isOrdinaryRegime,
             tooltip: isOrdinaryRegime ? "Tasse e Contributi disponibili solo per Regime Forfettario" : undefined
         },
@@ -65,11 +68,12 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     // DEBUG: Check pathname and active states
     console.log('🎯 Dashboard Navigation Debug:', {
         pathname,
+        normalizedPathname,
         navigationItems: navigationItems.map(item => ({
             name: item.name,
             href: item.href,
             current: item.current,
-            isActive: pathname === item.href
+            isActive: normalizedPathname === item.href
         }))
     });
 

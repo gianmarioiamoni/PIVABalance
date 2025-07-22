@@ -116,30 +116,32 @@ export const DashboardView = ({
                 />
             </div>
 
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content Grid - Contributi e Tasse + Ultime Attività */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 {/* Tax Contributions Section */}
-                <div className="lg:col-span-2">
-                    <div className="bg-white shadow rounded-lg">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <h2 className="text-lg font-medium text-gray-900">
-                                Contributi e Tasse
-                            </h2>
-                        </div>
-                        <div className="p-6">
-                            {/* TaxContributions component will be added here when migrated */}
-                            <div className="text-center py-12 text-gray-500">
-                                <p>Il componente TaxContributions verrà aggiunto dopo la migrazione.</p>
-                            </div>
+                <div className="bg-white shadow rounded-lg">
+                    <div className="px-6 py-4 border-b border-gray-200">
+                        <h2 className="text-lg font-medium text-gray-900">
+                            Contributi e Tasse
+                        </h2>
+                    </div>
+                    <div className="p-6">
+                        {/* TaxContributions component will be added here when migrated */}
+                        <div className="text-center py-12 text-gray-500">
+                            <p>Il componente TaxContributions verrà aggiunto dopo la migrazione.</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Quick Actions and Activities */}
-                <div className="space-y-6">
-                    <QuickActions actions={quickActions} />
+                {/* Recent Activities */}
+                <div>
                     <RecentActivities activities={activities} />
                 </div>
+            </div>
+
+            {/* Quick Actions - In formato orizzontale sotto */}
+            <div>
+                <QuickActions actions={quickActions} />
             </div>
         </div>
     );

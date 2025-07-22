@@ -28,12 +28,12 @@ export const QuickActions: React.FC<QuickActionsProps> = ({ actions }) => {
                     Azioni Rapide
                 </h2>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {actions.map((action, index) => (
                     <button
                         key={index}
                         onClick={action.onClick}
-                        className={`w-full ${action.bgColor} ${action.hoverColor} text-white px-4 py-3 rounded-md font-medium transition-colors`}
+                        className={`${action.bgColor} ${action.hoverColor} text-white px-4 py-3 rounded-md font-medium transition-colors text-center`}
                     >
                         {action.label}
                     </button>

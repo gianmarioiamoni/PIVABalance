@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { NavItem as NavItemType, NavItemVariant } from '@/types/navigation';
 import { useNavigation } from '@/hooks/layout';
 
@@ -28,16 +29,30 @@ export const NavItem: React.FC<NavItemProps> = ({
     className = '',
     onClick
 }) => {
-    const { getNavItemClass } = useNavigation();
+    const pathname = usePathname();
+    const { getNavItemClass, isActive } = useNavigation();
 
     const navItemClasses = `${getNavItemClass(item.href, item.exactMatch, variant)} ${className}`.trim();
+    const isItemActive = isActive(item.href, item.exactMatch);
+
+    // DEBUG: Temporary console log to debug navbar active state
+    if (typeof window !== 'undefined') {
+        console.log('🔗 NavItem debug:', {
+            label: item.label,
+            href: item.href,
+            exactMatch: item.exactMatch,
+            pathname,
+            isItemActive,
+            hasActiveClass: navItemClasses.includes('text-blue-600')
+        });
+    }
 
     return (
         <Link
             href={item.href}
             className={navItemClasses}
             onClick={onClick}
-            aria-current={getNavItemClass(item.href, item.exactMatch, variant).includes('text-blue-600') ? 'page' : undefined}
+            aria-current={isItemActive ? 'page' : undefined}
         >
             {item.label}
         </Link>

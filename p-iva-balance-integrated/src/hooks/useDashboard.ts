@@ -95,6 +95,14 @@ export const useDashboard = (): UseDashboardReturn => {
     [router]
   );
 
+  // DEBUG: Add temporary logging
+  console.log("🎯 useDashboard state:", {
+    hasStats: !!stats,
+    hasActivities: activities.length > 0,
+    hasQuickActions: quickActions.length > 0,
+    isLoading: false,
+  });
+
   return {
     stats,
     activities,

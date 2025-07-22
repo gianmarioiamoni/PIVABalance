@@ -36,16 +36,14 @@ export const NavItem: React.FC<NavItemProps> = ({
     const isItemActive = isActive(item.href, item.exactMatch);
 
     // DEBUG: Temporary console log to debug navbar active state
-    if (typeof window !== 'undefined') {
-        console.log('🔗 NavItem debug:', {
-            label: item.label,
-            href: item.href,
-            exactMatch: item.exactMatch,
-            pathname,
-            isItemActive,
-            hasActiveClass: navItemClasses.includes('text-blue-600')
-        });
-    }
+    console.log('🔗 NavItem debug:', {
+        label: item.label,
+        href: item.href,
+        exactMatch: item.exactMatch,
+        pathname,
+        isItemActive,
+        hasActiveClass: navItemClasses.includes('text-blue-600')
+    });
 
     return (
         <Link

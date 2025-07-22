@@ -23,6 +23,9 @@ export const NavbarMenu: React.FC<NavbarMenuProps> = ({
     isAuthenticated,
     className = ''
 }) => {
+    // DEBUG: Check if NavbarMenu is rendering
+    console.log('🎯 NavbarMenu render:', { isAuthenticated });
+
     if (!isAuthenticated) {
         return null;
     }

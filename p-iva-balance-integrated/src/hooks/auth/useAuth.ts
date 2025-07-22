@@ -127,20 +127,10 @@ export function useAuth() {
     [updateToken]
   );
 
-  // DEBUG: Add temporary logging to understand loading state
-  const authIsLoading = !isLoaded || isLoading;
-  console.log("🔍 useAuth state:", {
-    isLoaded,
-    isLoading,
-    user: !!user,
-    token: !!token,
-    authIsLoading,
-  });
-
   return {
     // State
     user,
-    isLoading: authIsLoading,
+    isLoading: !isLoaded || isLoading,
     isAuthenticated: !!user && !!token,
     error,
 

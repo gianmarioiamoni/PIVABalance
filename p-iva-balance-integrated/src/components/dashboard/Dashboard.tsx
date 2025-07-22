@@ -18,14 +18,6 @@ export const Dashboard = () => {
     // Show loading if either auth or dashboard data is loading
     const isLoading = authLoading || dashboardLoading;
 
-    // DEBUG: Add temporary logging
-    console.log('🏠 Dashboard component state:', {
-        hasUser: !!user,
-        authLoading,
-        dashboardLoading,
-        finalIsLoading: isLoading,
-    });
-
     return (
         <DashboardView
             user={user}

@@ -35,15 +35,7 @@ export const NavItem: React.FC<NavItemProps> = ({
     const navItemClasses = `${getNavItemClass(item.href, item.exactMatch, variant)} ${className}`.trim();
     const isItemActive = isActive(item.href, item.exactMatch);
 
-    // DEBUG: Temporary console log to debug navbar active state
-    console.log('🔗 NavItem debug:', {
-        label: item.label,
-        href: item.href,
-        exactMatch: item.exactMatch,
-        pathname,
-        isItemActive,
-        hasActiveClass: navItemClasses.includes('text-blue-600')
-    });
+
 
     return (
         <Link

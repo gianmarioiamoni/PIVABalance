@@ -72,7 +72,7 @@ export const CostForm: React.FC<CostFormProps> = ({
             value={formData.description}
             onChange={(e) => updateField('description', e.target.value)}
             onBlur={() => handleFieldBlur('description')}
-            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm ${touched.description && fieldErrors.description
+            className={`block w-full px-3 py-2 border rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm ${touched.description && fieldErrors.description
               ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
               : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
               }`}
@@ -96,7 +96,7 @@ export const CostForm: React.FC<CostFormProps> = ({
               value={formData.date}
               onChange={(e) => updateField('date', e.target.value)}
               onBlur={() => handleFieldBlur('date')}
-              className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm ${touched.date && fieldErrors.date
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm ${touched.date && fieldErrors.date
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
                 }`}
@@ -118,7 +118,7 @@ export const CostForm: React.FC<CostFormProps> = ({
               value={formData.amount}
               onChange={(e) => updateField('amount', Number(e.target.value))}
               onBlur={() => handleFieldBlur('amount')}
-              className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm ${touched.amount && fieldErrors.amount
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm ${touched.amount && fieldErrors.amount
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
                 }`}

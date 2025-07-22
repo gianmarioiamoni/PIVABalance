@@ -11,17 +11,17 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     exactMatch: true,
   },
   {
-    href: "/invoices",
+    href: "/dashboard/invoices",
     label: "Fatture",
     exactMatch: false,
   },
   {
-    href: "/costs",
+    href: "/dashboard/costs",
     label: "Costi",
     exactMatch: false,
   },
   {
-    href: "/tax-settings",
+    href: "/dashboard/settings",
     label: "Impostazioni",
     exactMatch: false,
   },

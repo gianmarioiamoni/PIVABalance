@@ -167,7 +167,7 @@ export const NewInvoiceForm = ({
                             required
                             value={newInvoice.number || ''}
                             onChange={(e) => handleFieldChange('number', e.target.value)}
-                            className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.number
+                            className={`mt-1 block w-full rounded-md shadow-sm text-gray-900 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.number
                                 ? 'border-red-300 focus:border-red-500'
                                 : 'border-gray-300 focus:border-indigo-500'
                                 }`}
@@ -189,7 +189,7 @@ export const NewInvoiceForm = ({
                             required
                             value={newInvoice.issueDate ? new Date(newInvoice.issueDate).toISOString().split('T')[0] : ''}
                             onChange={(e) => handleFieldChange('issueDate', new Date(e.target.value))}
-                            className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.issueDate
+                            className={`mt-1 block w-full rounded-md shadow-sm text-gray-900 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.issueDate
                                 ? 'border-red-300 focus:border-red-500'
                                 : 'border-gray-300 focus:border-indigo-500'
                                 }`}
@@ -210,7 +210,7 @@ export const NewInvoiceForm = ({
                             required
                             value={newInvoice.title || ''}
                             onChange={(e) => handleFieldChange('title', e.target.value)}
-                            className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.title
+                            className={`mt-1 block w-full rounded-md shadow-sm text-gray-900 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.title
                                 ? 'border-red-300 focus:border-red-500'
                                 : 'border-gray-300 focus:border-indigo-500'
                                 }`}
@@ -232,7 +232,7 @@ export const NewInvoiceForm = ({
                             required
                             value={newInvoice.clientName || ''}
                             onChange={(e) => handleFieldChange('clientName', e.target.value)}
-                            className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.clientName
+                            className={`mt-1 block w-full rounded-md shadow-sm text-gray-900 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.clientName
                                 ? 'border-red-300 focus:border-red-500'
                                 : 'border-gray-300 focus:border-indigo-500'
                                 }`}
@@ -256,7 +256,7 @@ export const NewInvoiceForm = ({
                             min="0.01"
                             value={newInvoice.amount || ''}
                             onChange={(e) => handleFieldChange('amount', Number(e.target.value))}
-                            className={`mt-1 block w-full rounded-md shadow-sm focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.amount
+                            className={`mt-1 block w-full rounded-md shadow-sm text-gray-900 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.amount
                                 ? 'border-red-300 focus:border-red-500'
                                 : 'border-gray-300 focus:border-indigo-500'
                                 }`}
@@ -284,7 +284,7 @@ export const NewInvoiceForm = ({
                                     setNewInvoice({ ...newInvoice, paymentDate: undefined });
                                 }
                             }}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                         <p className="mt-1 text-xs text-gray-500">
                             Opzionale - puoi impostarla anche dopo

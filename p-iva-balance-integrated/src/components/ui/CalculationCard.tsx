@@ -39,7 +39,7 @@ export const CalculationCard: React.FC<CalculationCardProps> = ({
 
     return (
         <div
-            className={`border rounded-lg overflow-hidden ${variantClasses[variant]} ${className}`}
+            className={`border rounded-lg ${variantClasses[variant]} ${className}`}
             {...htmlProps}
         >
             {/* Header section con icona e tooltip */}
@@ -54,11 +54,11 @@ export const CalculationCard: React.FC<CalculationCardProps> = ({
                                 name="InformationCircleIcon"
                                 className="h-5 w-5 text-gray-500 cursor-help hover:text-gray-700 transition-colors"
                             />
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 text-sm text-white bg-gray-800 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-20 max-w-sm">
-                                <div className="whitespace-normal break-words text-center">
+                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 text-sm text-white bg-gray-800 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 w-64">
+                                <div className="whitespace-normal break-words">
                                     {tooltip}
                                 </div>
-                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-800"></div>
+                                <div className="absolute top-full right-3 -mt-1 border-4 border-transparent border-t-gray-800"></div>
                             </div>
                         </div>
                     )}

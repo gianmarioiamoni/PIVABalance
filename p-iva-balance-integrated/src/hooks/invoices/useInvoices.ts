@@ -6,27 +6,23 @@
 import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { IInvoice } from "@/types";
+import { invoiceService, Invoice } from "@/services/invoiceService";
 
-// Mock API functions - these will be replaced with actual API calls
-const mockInvoiceService = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getInvoices(_year: number, _regime?: string): Promise<IInvoice[]> {
-    // This will be replaced with actual API call
-    return [];
-  },
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async updatePaymentDate(_invoiceId: string, _date: Date): Promise<IInvoice> {
-    // This will be replaced with actual API call
-    throw new Error("Not implemented");
-  },
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async deleteInvoice(_invoiceId: string): Promise<void> {
-    // This will be replaced with actual API call
-    throw new Error("Not implemented");
-  },
-};
+// Convert Invoice to IInvoice format for compatibility
+const convertInvoiceFormat = (invoice: Invoice): IInvoice => ({
+  id: invoice.id,
+  userId: invoice.userId,
+  number: invoice.number,
+  issueDate: invoice.issueDate,
+  title: invoice.title,
+  clientName: invoice.clientName,
+  amount: invoice.amount,
+  paymentDate: invoice.paymentDate,
+  fiscalYear: invoice.fiscalYear,
+  vat: invoice.vat,
+  createdAt: invoice.createdAt,
+  updatedAt: invoice.updatedAt,
+});
 
 export interface UseInvoicesProps {
   selectedYear: number;
@@ -62,8 +58,10 @@ export const useInvoices = ({
     error: queryError,
   } = useQuery({
     queryKey,
-    queryFn: () => mockInvoiceService.getInvoices(selectedYear, taxRegime),
-    enabled: !!userId,
+    queryFn: async () => {
+      const invoiceData = await invoiceService.getInvoicesByYear(selectedYear);
+      return invoiceData.map(convertInvoiceFormat);
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -81,7 +79,7 @@ export const useInvoices = ({
   // Update payment date mutation
   const updatePaymentMutation = useMutation({
     mutationFn: ({ invoiceId, date }: { invoiceId: string; date: Date }) =>
-      mockInvoiceService.updatePaymentDate(invoiceId, date),
+      invoiceService.updatePaymentDate(invoiceId, date.toISOString()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
       setError(null);
@@ -97,8 +95,7 @@ export const useInvoices = ({
 
   // Delete invoice mutation
   const deleteMutation = useMutation({
-    mutationFn: (invoiceId: string) =>
-      mockInvoiceService.deleteInvoice(invoiceId),
+    mutationFn: (invoiceId: string) => invoiceService.deleteInvoice(invoiceId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
       setError(null);

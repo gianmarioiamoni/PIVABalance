@@ -16,13 +16,13 @@ export const useYearSelection = (defaultYear?: number) => {
 
   /**
    * Generate available years for selection
-   * Starting from 2025 up to current year + 1
+   * Starting from 2020 up to current year (no future years)
    * Memoized to prevent unnecessary recalculations
    */
   const availableYears = useMemo(() => {
     const currentYear = new Date().getFullYear();
-    const startYear = 2025;
-    const endYear = Math.max(currentYear + 1, startYear);
+    const startYear = 2020; // Start from 2020 for historical data
+    const endYear = currentYear; // No future years to match API validation
 
     return Array.from(
       { length: endYear - startYear + 1 },

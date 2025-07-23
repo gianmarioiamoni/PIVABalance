@@ -1,5 +1,6 @@
 import { Invoice } from "@/models/Invoice";
 import { IInvoice } from "@/types";
+import { connectDB } from "@/lib/database/mongodb";
 import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   filterInvoicesByYear,
@@ -85,4 +86,71 @@ export const findOverdueInvoicesByUser = async (
     .lean();
 
   return invoices;
+};
+
+/**
+ * Get invoices by year for API endpoint
+ */
+export const getInvoicesByYear = async (
+  userId: string,
+  year: number
+): Promise<IInvoice[]> => {
+  return await findInvoicesByUserAndYear(userId, year);
+};
+
+/**
+ * Get invoice by ID for API endpoint
+ */
+export const getInvoiceById = async (
+  invoiceId: string,
+  userId: string
+): Promise<IInvoice | null> => {
+  const invoice = await Invoice.findOne({ _id: invoiceId, userId }).lean();
+  return invoice;
+};
+
+/**
+ * Create new invoice for API endpoint
+ */
+export const createInvoice = async (
+  userId: string,
+  invoiceData: Omit<IInvoice, "id" | "userId" | "createdAt" | "updatedAt">
+): Promise<IInvoice> => {
+  const invoice = new Invoice({
+    ...invoiceData,
+    userId,
+  });
+
+  const savedInvoice = await invoice.save();
+  return savedInvoice.toObject();
+};
+
+/**
+ * Update invoice for API endpoint
+ */
+export const updateInvoice = async (
+  invoiceId: string,
+  userId: string,
+  updateData: Partial<
+    Omit<IInvoice, "id" | "userId" | "createdAt" | "updatedAt">
+  >
+): Promise<IInvoice | null> => {
+  const invoice = await Invoice.findOneAndUpdate(
+    { _id: invoiceId, userId },
+    updateData,
+    { new: true }
+  ).lean();
+
+  return invoice;
+};
+
+/**
+ * Delete invoice for API endpoint
+ */
+export const deleteInvoice = async (
+  invoiceId: string,
+  userId: string
+): Promise<boolean> => {
+  const result = await Invoice.deleteOne({ _id: invoiceId, userId });
+  return result.deletedCount > 0;
 };

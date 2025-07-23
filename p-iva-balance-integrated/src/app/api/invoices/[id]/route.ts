@@ -4,9 +4,9 @@ import {
   updateInvoice,
   deleteInvoice,
 } from "@/utils/invoiceQueries";
-import { validateSchema } from "@/lib/validations/schemas";
-import { authenticateRequest } from "@/lib/auth/jwt";
-import { invoiceSchema } from "@/lib/validations/schemas";
+import { validateSchema, invoiceSchema } from "@/lib/validations/schemas";
+import { getUserFromRequest } from "@/lib/auth/jwt";
+import { connectDB } from "@/lib/database/mongodb";
 import { z } from "zod";
 
 /**
@@ -29,14 +29,22 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    await connectDB();
+
     // Authenticate request
-    const { userId } = await authenticateRequest(request);
+    const userData = await getUserFromRequest(request);
+    if (!userData) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     // Validate invoice ID
     const { id } = validateSchema(invoiceIdSchema, params);
 
     // Get invoice
-    const invoice = await getInvoiceById(id, userId);
+    const invoice = await getInvoiceById(id, userData.userId);
 
     if (!invoice) {
       return NextResponse.json(
@@ -79,8 +87,16 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    await connectDB();
+
     // Authenticate request
-    const { userId } = await authenticateRequest(request);
+    const userData = await getUserFromRequest(request);
+    if (!userData) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     // Validate invoice ID
     const { id } = validateSchema(invoiceIdSchema, params);
@@ -92,7 +108,7 @@ export async function PUT(
     const validatedData = validateSchema(updateInvoiceSchema, body);
 
     // Update invoice
-    const invoice = await updateInvoice(id, userId, validatedData);
+    const invoice = await updateInvoice(id, userData.userId, validatedData);
 
     if (!invoice) {
       return NextResponse.json(
@@ -135,14 +151,22 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    await connectDB();
+
     // Authenticate request
-    const { userId } = await authenticateRequest(request);
+    const userData = await getUserFromRequest(request);
+    if (!userData) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     // Validate invoice ID
     const { id } = validateSchema(invoiceIdSchema, params);
 
     // Delete invoice
-    const success = await deleteInvoice(id, userId);
+    const success = await deleteInvoice(id, userData.userId);
 
     if (!success) {
       return NextResponse.json(

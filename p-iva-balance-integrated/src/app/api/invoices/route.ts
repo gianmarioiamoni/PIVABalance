@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getInvoicesByYear, createInvoice } from "@/utils/invoiceQueries";
-import { validateSchema } from "@/lib/validations/schemas";
-import { authenticateRequest } from "@/lib/auth/jwt";
-import { invoiceSchema } from "@/lib/validations/schemas";
+import { validateSchema, invoiceSchema } from "@/lib/validations/schemas";
+import { getUserFromRequest } from "@/lib/auth/jwt";
+import { connectDB } from "@/lib/database/mongodb";
 import { z } from "zod";
 
 /**
@@ -29,8 +29,16 @@ const invoiceQuerySchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
+    await connectDB();
+
     // Authenticate request
-    const { userId } = await authenticateRequest(request);
+    const userData = await getUserFromRequest(request);
+    if (!userData) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     // Parse query parameters
     const url = new URL(request.url);
@@ -41,12 +49,12 @@ export async function GET(request: NextRequest) {
 
     // Get invoices
     if (year) {
-      const invoices = await getInvoicesByYear(userId, parseInt(year));
+      const invoices = await getInvoicesByYear(userData.userId, parseInt(year));
       return NextResponse.json({ success: true, data: invoices });
     } else {
       // Get all invoices for user (you might want to implement pagination here)
       const currentYear = new Date().getFullYear();
-      const invoices = await getInvoicesByYear(userId, currentYear);
+      const invoices = await getInvoicesByYear(userData.userId, currentYear);
       return NextResponse.json({ success: true, data: invoices });
     }
   } catch (error) {
@@ -79,8 +87,16 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    await connectDB();
+
     // Authenticate request
-    const { userId } = await authenticateRequest(request);
+    const userData = await getUserFromRequest(request);
+    if (!userData) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     // Parse request body
     const body = await request.json();
@@ -89,7 +105,7 @@ export async function POST(request: NextRequest) {
     const validatedData = validateSchema(invoiceSchema, body);
 
     // Create invoice
-    const invoice = await createInvoice(userId, validatedData);
+    const invoice = await createInvoice(userData.userId, validatedData);
 
     return NextResponse.json({ success: true, data: invoice }, { status: 201 });
   } catch (error) {

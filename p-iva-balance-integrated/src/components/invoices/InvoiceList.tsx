@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Trash2, Calendar, Euro, User, FileText, Hash } from 'lucide-react';
-import { IInvoice } from '@/types';
+import { PlainInvoice } from '@/hooks/invoices/useInvoices';
 import { LoadingSpinner } from '@/components/ui';
 
 /**
@@ -11,7 +11,7 @@ import { LoadingSpinner } from '@/components/ui';
  */
 
 export interface InvoiceListProps {
-    invoices: IInvoice[];
+    invoices: PlainInvoice[];
     onUpdatePaymentDate: (invoiceId: string, date: Date) => Promise<void>;
     onDeleteClick: (invoiceId: string) => void;
     isLoading?: boolean;
@@ -130,7 +130,7 @@ export const InvoiceList = ({
                             </thead>
                             <tbody className="divide-y divide-gray-200 bg-white">
                                 {invoices.map((invoice) => (
-                                    <tr key={invoice._id} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={invoice.id} className="hover:bg-gray-50 transition-colors">
                                         {/* Invoice Number */}
                                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                                             {invoice.number}
@@ -174,15 +174,15 @@ export const InvoiceList = ({
                                                     type="date"
                                                     value={invoice.paymentDate ? new Date(invoice.paymentDate).toISOString().split('T')[0] : ''}
                                                     onChange={(e) => {
-                                                        if (invoice._id && e.target.value) {
-                                                            handlePaymentDateChange(invoice._id, e.target.value);
+                                                        if (invoice.id && e.target.value) {
+                                                            handlePaymentDateChange(invoice.id, e.target.value);
                                                         }
                                                     }}
-                                                    disabled={updatingPayment === invoice._id}
+                                                    disabled={updatingPayment === invoice.id}
                                                     className="block w-full min-w-0 rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                                     aria-label={`Data pagamento per fattura ${invoice.number}`}
                                                 />
-                                                {updatingPayment === invoice._id && (
+                                                {updatingPayment === invoice.id && (
                                                     <LoadingSpinner size="sm" />
                                                 )}
                                             </div>
@@ -191,7 +191,7 @@ export const InvoiceList = ({
                                         {/* Actions */}
                                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                             <button
-                                                onClick={() => invoice._id && onDeleteClick(invoice._id)}
+                                                onClick={() => invoice.id && onDeleteClick(invoice.id)}
                                                 className="inline-flex items-center gap-1 text-red-600 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-md p-1 transition-colors"
                                                 aria-label={`Elimina fattura ${invoice.number}`}
                                             >

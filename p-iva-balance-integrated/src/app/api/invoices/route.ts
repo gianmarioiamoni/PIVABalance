@@ -3,6 +3,7 @@ import { getInvoicesByYear, createInvoice } from "@/utils/invoiceQueries";
 import { validateSchema, invoiceSchema } from "@/lib/validations/schemas";
 import { getUserFromRequest } from "@/lib/auth/jwt";
 import { connectDB } from "@/lib/database/mongodb";
+import { IInvoice } from "@/types";
 import { z } from "zod";
 
 /**
@@ -104,8 +105,21 @@ export async function POST(request: NextRequest) {
     // Validate invoice data
     const validatedData = validateSchema(invoiceSchema, body);
 
+    // Convert string dates to Date objects
+    const processedData: Omit<
+      IInvoice,
+      "id" | "userId" | "createdAt" | "updatedAt"
+    > = {
+      ...validatedData,
+      // Override date fields with converted values
+      issueDate: new Date(validatedData.issueDate),
+      ...(validatedData.paymentDate && {
+        paymentDate: new Date(validatedData.paymentDate),
+      }),
+    } as Omit<IInvoice, "id" | "userId" | "createdAt" | "updatedAt">;
+
     // Create invoice
-    const invoice = await createInvoice(userData.userId, validatedData);
+    const invoice = await createInvoice(userData.userId, processedData);
 
     return NextResponse.json({ success: true, data: invoice }, { status: 201 });
   } catch (error) {

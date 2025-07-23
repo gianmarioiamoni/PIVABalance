@@ -1,5 +1,17 @@
 import { IInvoice } from "@/types";
 
+// Generic invoice interface for calculations (works with both IInvoice and PlainInvoice)
+type InvoiceForCalculation = {
+  amount: number;
+  issueDate: Date;
+  vat?: {
+    vatType: string;
+    vatRate: number;
+  };
+  paymentDate?: Date;
+  fiscalYear: number;
+};
+
 /**
  * Pure functions for invoice calculations
  * Follows functional programming principles
@@ -8,7 +20,7 @@ import { IInvoice } from "@/types";
 /**
  * Calculate VAT amount for an invoice
  */
-export const calculateVatAmount = (invoice: IInvoice): number => {
+export const calculateVatAmount = (invoice: InvoiceForCalculation): number => {
   if (!invoice.vat) return 0;
   return (invoice.amount * invoice.vat.vatRate) / 100;
 };
@@ -16,7 +28,9 @@ export const calculateVatAmount = (invoice: IInvoice): number => {
 /**
  * Calculate total amount including VAT
  */
-export const calculateTotalAmount = (invoice: IInvoice): number => {
+export const calculateTotalAmount = (
+  invoice: InvoiceForCalculation
+): number => {
   return invoice.amount + calculateVatAmount(invoice);
 };
 
@@ -31,7 +45,7 @@ export const isInvoicePaid = (invoice: IInvoice): boolean => {
  * Get payment status of an invoice
  */
 export const getPaymentStatus = (
-  invoice: IInvoice
+  invoice: InvoiceForCalculation
 ): "paid" | "pending" | "overdue" => {
   if (invoice.paymentDate) return "paid";
 
@@ -45,7 +59,9 @@ export const getPaymentStatus = (
 /**
  * Calculate total revenue from a list of invoices
  */
-export const calculateTotalRevenue = (invoices: IInvoice[]): number => {
+export const calculateTotalRevenue = (
+  invoices: InvoiceForCalculation[]
+): number => {
   return invoices.reduce((total, invoice) => total + invoice.amount, 0);
 };
 
@@ -53,9 +69,9 @@ export const calculateTotalRevenue = (invoices: IInvoice[]): number => {
  * Filter invoices by fiscal year
  */
 export const filterInvoicesByYear = (
-  invoices: IInvoice[],
+  invoices: InvoiceForCalculation[],
   year: number
-): IInvoice[] => {
+): InvoiceForCalculation[] => {
   return invoices.filter((invoice) => invoice.fiscalYear === year);
 };
 
@@ -78,4 +94,60 @@ export const sortInvoicesByDate = (
     const dateB = new Date(b.issueDate).getTime();
     return ascending ? dateA - dateB : dateB - dateA;
   });
+};
+
+/**
+ * Filter invoices by month and year
+ */
+export const filterInvoicesByMonth = (
+  invoices: InvoiceForCalculation[],
+  month: number,
+  year: number
+): InvoiceForCalculation[] => {
+  return invoices.filter((invoice) => {
+    const invoiceDate = new Date(invoice.issueDate);
+    return (
+      invoiceDate.getMonth() === month - 1 && // JavaScript months are 0-indexed
+      invoiceDate.getFullYear() === year
+    );
+  });
+};
+
+/**
+ * Calculate monthly statistics from invoices
+ */
+export const calculateMonthlyStats = (
+  invoices: InvoiceForCalculation[],
+  month: number,
+  year: number
+): {
+  count: number;
+  revenue: number;
+  formattedRevenue: string;
+} => {
+  const monthlyInvoices = filterInvoicesByMonth(invoices, month, year);
+  const revenue = calculateTotalRevenue(monthlyInvoices);
+
+  return {
+    count: monthlyInvoices.length,
+    revenue,
+    formattedRevenue: `€${revenue.toLocaleString("it-IT", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    })}`,
+  };
+};
+
+/**
+ * Get current month statistics from invoices
+ */
+export const getCurrentMonthStats = (
+  invoices: InvoiceForCalculation[]
+): {
+  count: number;
+  revenue: number;
+  formattedRevenue: string;
+} => {
+  const now = new Date();
+  return calculateMonthlyStats(invoices, now.getMonth() + 1, now.getFullYear());
 };

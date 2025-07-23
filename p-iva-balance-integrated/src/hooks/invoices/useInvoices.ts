@@ -5,23 +5,44 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { IInvoice } from "@/types";
+import { VatInfo } from "@/types";
 import { invoiceService, Invoice } from "@/services/invoiceService";
 
-// Convert Invoice to IInvoice format for compatibility
-const convertInvoiceFormat = (invoice: Invoice): IInvoice => ({
+// Plain invoice type for frontend use (without Mongoose properties)
+export type PlainInvoice = {
+  id: string;
+  userId: string;
+  number: string;
+  issueDate: Date;
+  title: string;
+  clientName: string;
+  amount: number;
+  paymentDate?: Date;
+  fiscalYear: number;
+  vat?: VatInfo;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// Convert Invoice to PlainInvoice format for compatibility
+const convertInvoiceFormat = (invoice: Invoice): PlainInvoice => ({
   id: invoice.id,
   userId: invoice.userId,
   number: invoice.number,
-  issueDate: invoice.issueDate,
+  issueDate: new Date(invoice.issueDate),
   title: invoice.title,
   clientName: invoice.clientName,
   amount: invoice.amount,
-  paymentDate: invoice.paymentDate,
+  paymentDate: invoice.paymentDate ? new Date(invoice.paymentDate) : undefined,
   fiscalYear: invoice.fiscalYear,
-  vat: invoice.vat,
-  createdAt: invoice.createdAt,
-  updatedAt: invoice.updatedAt,
+  vat: invoice.vat
+    ? {
+        vatType: invoice.vat.type,
+        vatRate: invoice.vat.rate,
+      }
+    : undefined,
+  createdAt: new Date(invoice.createdAt),
+  updatedAt: new Date(invoice.updatedAt),
 });
 
 export interface UseInvoicesProps {
@@ -31,7 +52,7 @@ export interface UseInvoicesProps {
 }
 
 export interface UseInvoicesReturn {
-  invoices: IInvoice[];
+  invoices: PlainInvoice[];
   isLoading: boolean;
   error: string | null;
   handleUpdatePaymentDate: (invoiceId: string, date: Date) => Promise<void>;

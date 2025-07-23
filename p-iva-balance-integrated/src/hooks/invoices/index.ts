@@ -7,6 +7,7 @@ export {
   useInvoices,
   type UseInvoicesProps,
   type UseInvoicesReturn,
+  type PlainInvoice,
 } from "./useInvoices";
 export {
   useNewInvoice,
@@ -14,6 +15,4 @@ export {
   type UseNewInvoiceReturn,
   vatOptions,
 } from "./useNewInvoice";
-export {
-  useInvoiceActions,
-} from "./useInvoiceActions";
+export { useInvoiceActions } from "./useInvoiceActions";

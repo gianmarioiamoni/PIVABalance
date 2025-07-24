@@ -115,7 +115,7 @@ function SignUpContent() {
 
     return (
         <div className="min-h-screen surface-secondary flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-lg">
+            <div className="sm:mx-auto sm:w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl">
                 {/* Logo/Brand */}
                 <div className="text-center">
                     <h1 className="heading-lg text-brand-primary mb-2">P.IVA Balance</h1>
@@ -134,9 +134,9 @@ function SignUpContent() {
                 </div>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg">
-                <div className="surface-primary py-8 px-6 shadow-xl rounded-2xl sm:px-10">
-                    <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl">
+                <div className="surface-primary py-8 px-6 shadow-xl rounded-2xl sm:px-10 md:px-16 lg:px-20">
+                    <form className="space-y-6 max-w-md mx-auto" onSubmit={handleSubmit}>
                         {error ? (
                             <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-md" role="alert">
                                 <span className="block sm:inline">{escapeHtml(error instanceof Error ? error.message : "Errore durante la registrazione")}</span>

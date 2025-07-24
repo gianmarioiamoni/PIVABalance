@@ -427,7 +427,6 @@ body {
   
   .body-lg { 
     font-size: 1rem;
-    color: var(--text-secondary);
   }
   
   .body-md { 

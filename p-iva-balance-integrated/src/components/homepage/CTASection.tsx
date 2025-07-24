@@ -35,7 +35,6 @@ export const CTASection: React.FC<CTASectionProps> = ({
             <Link
               href={ctaHref}
               className="btn-base btn-primary px-8 py-4 body-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-              style={{ color: 'white !important' }}
             >
               {ctaText}
               <svg className="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

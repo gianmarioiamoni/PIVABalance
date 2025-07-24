@@ -115,7 +115,7 @@ function SignUpContent() {
 
     return (
         <div className="min-h-screen surface-secondary flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl">
+            <div className="sm:mx-auto sm:w-full sm:max-w-lg md:max-w-2xl lg:max-w-max">
                 {/* Logo/Brand */}
                 <div className="text-center">
                     <h1 className="heading-lg text-brand-primary mb-2">P.IVA Balance</h1>
@@ -134,7 +134,7 @@ function SignUpContent() {
                 </div>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl">
+            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg md:max-w-2xl lg:max-w-max">
                 <div className="surface-primary py-8 px-6 shadow-xl rounded-2xl sm:px-10 md:px-16 lg:px-20">
                     <form className="space-y-6 max-w-md mx-auto" onSubmit={handleSubmit}>
                         {error ? (

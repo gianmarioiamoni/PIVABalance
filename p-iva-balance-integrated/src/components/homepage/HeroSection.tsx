@@ -35,7 +35,7 @@ export const HeroSection: React.FC<HeroSectionWithTrustProps> = ({
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 space-hero-buttons animate-slide-up delay-300">
         <Link
           href={primaryCTA.href}
-          className="btn-base btn-primary px-8 py-4 text-base rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          className="btn-base btn-primary text-white px-8 py-4 text-base rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
         >
           <span className="relative">{primaryCTA.text}</span>
           <svg className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">

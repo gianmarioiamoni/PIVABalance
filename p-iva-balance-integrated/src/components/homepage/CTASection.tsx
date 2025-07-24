@@ -23,9 +23,9 @@ export const CTASection: React.FC<CTASectionProps> = ({
                     <div className="absolute bottom-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                 </div>
 
-                {/* Content with white background for maximum readability */}
+                {/* Content with light gray background for maximum readability */}
                 <div className="relative text-center">
-                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 lg:p-12 mx-auto max-w-4xl shadow-2xl">
+                    <div className="bg-gray-50/95 backdrop-blur-sm rounded-2xl p-8 lg:p-12 mx-auto max-w-4xl shadow-2xl">
                         <h3 className="heading-lg text-gray-900 space-cta-title">
                             {title}
                         </h3>
@@ -34,7 +34,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
                         </p>
                         <Link
                             href={ctaHref}
-                            className="inline-flex items-center justify-center px-8 py-4 body-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
+                            className="btn-base btn-primary px-8 py-4 body-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                         >
                             {ctaText}
                             <svg className="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

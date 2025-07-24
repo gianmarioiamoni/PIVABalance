@@ -1,42 +1,34 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { QueryProvider } from '@/providers/QueryProvider';
+import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/providers/AuthProvider';
+import { QueryProvider } from '@/providers/QueryProvider';
 import { NotificationProvider } from '@/providers/NotificationProvider';
+import { ThemeProvider } from '@/components/ui';
+import './globals.css';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ['latin'] });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "P.IVA Balance",
-  description: "Gestisci la tua attività finanziaria professionale",
+export const metadata = {
+  title: 'P.IVA Balance - Gestione Finanziaria',
+  description: 'Sistema di gestione finanziaria per Partite IVA',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="it">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <QueryProvider>
-          <AuthProvider>
-            <NotificationProvider position="top-right">
-              {children}
-            </NotificationProvider>
-          </AuthProvider>
-        </QueryProvider>
+    <html lang="it" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ThemeProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <NotificationProvider>
+                {children}
+              </NotificationProvider>
+            </AuthProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

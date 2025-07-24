@@ -1,30 +1,30 @@
 'use client';
 
-import { useAuthContext } from '@/providers/AuthProvider';
 import { useDashboard } from '@/hooks/useDashboard';
 import { DashboardView } from './DashboardView';
 
 /**
- * Dashboard Container Component (Client Component)
+ * Dashboard Component (Client Component)
  * 
- * Container component that handles data fetching and state management.
- * Delegates UI rendering to DashboardView server component.
- * Follows Single Responsibility Principle - only handles data orchestration.
+ * Orchestrates dashboard data fetching and management.
+ * Delegates UI rendering to DashboardView (Server Component).
+ * Follows Single Responsibility Principle - only handles dashboard logic.
  */
-export const Dashboard = () => {
-    const { user, isLoading: authLoading } = useAuthContext();
-    const { stats, activities, quickActions, isLoading: dashboardLoading } = useDashboard();
-
-    // Show loading if either auth or dashboard data is loading
-    const isLoading = authLoading || dashboardLoading;
+export const Dashboard: React.FC = () => {
+    const {
+        stats,
+        activities,
+        quickActions,
+        isLoading
+    } = useDashboard();
 
     return (
         <DashboardView
-            user={user}
             stats={stats}
             activities={activities}
             quickActions={quickActions}
             isLoading={isLoading}
+            error={null}
         />
     );
 }; 

@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useAuthContext } from '@/providers/AuthProvider';
-import { LoadingSpinner } from '@/components/ui';
+import { LoadingSpinner, ThemeToggle } from '@/components/ui';
 import { NavbarLogo } from './NavbarLogo';
 import { NavbarMenu } from './NavbarMenu';
 import { UserProfile } from './UserProfile';
@@ -11,11 +11,12 @@ import { MobileMenu } from './MobileMenu';
 import { ARIA_LABELS } from './constants';
 
 /**
- * Navbar Component (Refactored)
+ * Navbar Component (Refactored with Design System)
  * 
  * Follows Single Responsibility Principle - only handles main navbar layout.
  * Uses composition pattern with extracted components for better maintainability.
  * Implements SOLID principles with clear separation of concerns.
+ * Now uses centralized design system classes.
  */
 export const Navbar = () => {
   const pathname = usePathname();
@@ -26,11 +27,11 @@ export const Navbar = () => {
 
   return (
     <nav 
-      className="bg-white shadow-lg sticky top-0 z-40"
+      className="navbar-base"
       aria-label={ARIA_LABELS.navbar}
       role="navigation"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container-app">
         <div className="flex justify-between h-16">
           {/* Left side: Logo and Desktop Menu */}
           <div className="flex items-center">
@@ -38,8 +39,11 @@ export const Navbar = () => {
             <NavbarMenu isAuthenticated={isAuthenticated} />
           </div>
 
-          {/* Right side: User Profile or Auth Buttons */}
+          {/* Right side: Theme Toggle, User Profile or Auth Buttons */}
           <div className="flex items-center space-x-4">
+            {/* Theme Toggle always visible */}
+            <ThemeToggle variant="icon" />
+            
             {isLoading ? (
               <LoadingSpinner size="sm" />
             ) : isAuthenticated && user ? (

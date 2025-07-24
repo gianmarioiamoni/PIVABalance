@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 import { Cost } from '@/services/costService';
-import { CostForm } from './CostForm';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { PencilIcon, TrashIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { formatCurrency } from '@/utils/formatters';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { CostFormWrapper } from './CostFormWrapper';
 
 interface CostListProps {
   costs: Cost[];
@@ -17,12 +17,12 @@ interface CostListProps {
   error?: string | null;
 }
 
-export const CostList: React.FC<CostListProps> = ({ 
-  costs, 
-  onUpdate, 
-  onDelete, 
+export const CostList: React.FC<CostListProps> = ({
+  costs,
+  onUpdate,
+  onDelete,
   loading = false,
-  error 
+  error
 }) => {
   const [editingCost, setEditingCost] = useState<Cost | null>(null);
   const [costToDelete, setCostToDelete] = useState<Cost | null>(null);
@@ -72,9 +72,23 @@ export const CostList: React.FC<CostListProps> = ({
     <div className="space-y-4">
       {editingCost && (
         <div className="border-l-4 border-blue-500 bg-blue-50 p-1 rounded-r-lg">
-          <CostForm
-            cost={editingCost}
-            onSubmit={handleUpdate}
+          <CostFormWrapper
+            cost={{
+              description: editingCost.description,
+              date: editingCost.date,
+              amount: editingCost.amount,
+              deductible: true // Default value for existing costs
+            }}
+            onSubmit={async (costData) => {
+              // Convert to the expected format for handleUpdate
+              const updateData = {
+                description: costData.description,
+                date: costData.date,
+                amount: costData.amount,
+                deductible: costData.deductible
+              };
+              await handleUpdate(updateData);
+            }}
             onCancel={() => setEditingCost(null)}
             loading={loading}
             error={error}
@@ -107,8 +121,8 @@ export const CostList: React.FC<CostListProps> = ({
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {costs.map((cost) => (
-                <tr 
-                  key={cost.id} 
+                <tr
+                  key={cost.id}
                   className="hover:bg-gray-50 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -123,11 +137,10 @@ export const CostList: React.FC<CostListProps> = ({
                     {formatCurrency(cost.amount)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      cost.deductible 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cost.deductible
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                      }`}>
                       {cost.deductible ? 'Sì' : 'No'}
                     </span>
                   </td>
@@ -163,8 +176,8 @@ export const CostList: React.FC<CostListProps> = ({
       {/* Mobile Card View */}
       <div className="md:hidden space-y-3">
         {costs.map((cost) => (
-          <div 
-            key={cost.id} 
+          <div
+            key={cost.id}
             className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
           >
             <div className="p-4">
@@ -186,16 +199,15 @@ export const CostList: React.FC<CostListProps> = ({
                       )}
                     </button>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <p className="text-lg font-semibold text-gray-900">
                       {formatCurrency(cost.amount)}
                     </p>
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      cost.deductible 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${cost.deductible
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                      }`}>
                       {cost.deductible ? 'Deducibile' : 'Non deducibile'}
                     </span>
                   </div>
@@ -241,7 +253,7 @@ export const CostList: React.FC<CostListProps> = ({
         onCancel={() => setCostToDelete(null)}
         onConfirm={handleDeleteConfirm}
         title="Conferma eliminazione costo"
-        message={`Sei sicuro di voler eliminare il costo "${costToDelete?.description}" di ${costToDelete ? formatCurrency(costToDelete.amount) : ""} del ${costToDelete ? format(new Date(costToDelete.date), "dd MMM yyyy", { locale: it }) : ""}? Questa azione non può essere annullata.`}        loading={loading}
+        message={`Sei sicuro di voler eliminare il costo "${costToDelete?.description}" di ${costToDelete ? formatCurrency(costToDelete.amount) : ""} del ${costToDelete ? format(new Date(costToDelete.date), "dd MMM yyyy", { locale: it }) : ""}? Questa azione non può essere annullata.`} loading={loading}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useInvoices, PlainInvoice } from "./invoices";
+import { useInvoices } from "./invoices";
 import { useCosts } from "./costs";
 import { getCurrentMonthStats } from "@/utils/invoiceCalculations";
 import { getCurrentMonthCostStats } from "@/utils/costCalculations";

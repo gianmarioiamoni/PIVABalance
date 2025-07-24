@@ -26,7 +26,7 @@ export function useLocalStorage<T>(
           // This handles both JSON objects and raw strings like JWT tokens
           try {
             setStoredValue(JSON.parse(item));
-          } catch (jsonError) {
+          } catch (_jsonError) {
             // If JSON.parse fails, it's likely a raw string (like JWT token)
             setStoredValue(item as T);
           }
@@ -55,7 +55,8 @@ export function useLocalStorage<T>(
             window.localStorage.removeItem(key);
           } else {
             // Store strings directly, JSON.stringify for objects
-            const valueToStore = typeof value === 'string' ? value : JSON.stringify(value);
+            const valueToStore =
+              typeof value === "string" ? value : JSON.stringify(value);
             window.localStorage.setItem(key, valueToStore);
           }
         }

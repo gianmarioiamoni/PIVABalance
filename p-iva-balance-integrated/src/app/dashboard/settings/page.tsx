@@ -21,6 +21,16 @@ const TaxSettings = lazy(() => import('@/components/tax-settings/main/TaxSetting
  * Expected impact: 177 kB → ~120 kB (-32%)
  */
 export default function SettingsPage() {
+    const handleTabChange = () => {
+        // 🔄 Tab change logic would be implemented here if needed
+        console.warn('Tab change requested but not implemented in settings page');
+    };
+
+    const handleCancelTabChange = () => {
+        // ❌ Cancel tab change logic would be implemented here if needed  
+        console.warn('Cancel tab change requested but not implemented in settings page');
+    };
+
     return (
         <SectionErrorBoundary
             sectionName="le impostazioni fiscali"
@@ -37,8 +47,8 @@ export default function SettingsPage() {
                 <TaxSettings
                     activeTab="settings"
                     attemptedTab={undefined}
-                    onTabChange={() => { }}
-                    onCancelTabChange={() => { }}
+                    onTabChange={handleTabChange}
+                    onCancelTabChange={handleCancelTabChange}
                 />
             </Suspense>
         </SectionErrorBoundary>

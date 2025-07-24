@@ -1,6 +1,5 @@
 import { Invoice } from "@/models/Invoice";
 import { IInvoice } from "@/types";
-import { connectDB } from "@/lib/database/mongodb";
 import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   filterInvoicesByYear,

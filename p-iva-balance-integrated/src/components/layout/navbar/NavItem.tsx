@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { NavItem as NavItemType, NavItemVariant } from '@/types/navigation';
 import { useNavigation } from '@/hooks/layout';
 
@@ -29,13 +28,10 @@ export const NavItem: React.FC<NavItemProps> = ({
     className = '',
     onClick
 }) => {
-    const pathname = usePathname();
     const { getNavItemClass, isActive } = useNavigation();
 
     const navItemClasses = `${getNavItemClass(item.href, item.exactMatch, variant)} ${className}`.trim();
     const isItemActive = isActive(item.href, item.exactMatch);
-
-
 
     return (
         <Link

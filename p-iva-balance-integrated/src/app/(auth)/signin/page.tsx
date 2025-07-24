@@ -103,19 +103,19 @@ function SignInContent() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="min-h-screen surface-secondary flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-lg">
                 {/* Logo/Brand */}
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-indigo-600 mb-2">P.IVA Balance</h1>
-                    <h2 className="text-3xl font-extrabold text-gray-900">
+                    <h1 className="heading-lg text-brand-primary mb-2">P.IVA Balance</h1>
+                    <h2 className="heading-xl text-primary">
                         Accedi al tuo account
                     </h2>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="mt-2 body-md text-secondary">
                         Oppure{' '}
                         <Link
                             href="/signup"
-                            className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+                            className="font-medium text-brand-primary hover:text-brand-primary-hover transition-colors"
                         >
                             crea un nuovo account
                         </Link>
@@ -123,8 +123,8 @@ function SignInContent() {
                 </div>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow-xl rounded-lg sm:px-10">
+            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg">
+                <div className="surface-primary py-8 px-6 shadow-xl rounded-2xl sm:px-10">
                     {/* Success message from signup */}
                     {message ? (
                         <div className="mb-4 bg-green-50 border border-green-400 text-green-700 px-4 py-3 rounded-md">
@@ -141,7 +141,7 @@ function SignInContent() {
 
                         {/* Email Field */}
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="email" className="block body-sm font-medium text-primary">
                                 Indirizzo email
                             </label>
                             <div className="mt-1">
@@ -153,21 +153,21 @@ function SignInContent() {
                                     required
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.email
+                                    className={`appearance-none block w-full px-4 py-3 border rounded-xl shadow-sm text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary body-md transition-colors ${validationErrors.email
                                         ? 'border-red-300 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-indigo-500'
+                                        : 'border-gray-200 focus:border-brand-primary'
                                         }`}
                                     placeholder="esempio@email.com"
                                 />
                                 {validationErrors.email ? (
-                                    <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
+                                    <p className="mt-1 body-sm text-red-600">{validationErrors.email}</p>
                                 ) : null}
                             </div>
                         </div>
 
                         {/* Password Field */}
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="password" className="block body-sm font-medium text-primary">
                                 Password
                             </label>
                             <div className="mt-1 relative">
@@ -179,25 +179,25 @@ function SignInContent() {
                                     required
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.password
+                                    className={`appearance-none block w-full px-4 py-3 pr-12 border rounded-xl shadow-sm text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary body-md transition-colors ${validationErrors.password
                                         ? 'border-red-300 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-indigo-500'
+                                        : 'border-gray-200 focus:border-brand-primary'
                                         }`}
                                     placeholder="Inserisci la tua password"
                                 />
                                 {/* Password visibility toggle */}
                                 <button
                                     type="button"
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
                                     onClick={() => setShowPassword(!showPassword)}
                                     tabIndex={-1}
                                 >
-                                    <span className="text-gray-400 hover:text-gray-600 text-sm">
+                                    <span className="text-gray-400 hover:text-gray-600 body-md">
                                         {showPassword ? '👁️‍🗨️' : '👁️'}
                                     </span>
                                 </button>
                                 {validationErrors.password ? (
-                                    <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
+                                    <p className="mt-1 body-sm text-red-600">{validationErrors.password}</p>
                                 ) : null}
                             </div>
                         </div>
@@ -207,7 +207,7 @@ function SignInContent() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="btn-base btn-primary w-full py-3 px-4 rounded-xl body-md font-medium transition-all duration-200 hover:scale-105"
                             >
                                 {isLoading ? (
                                     <>
@@ -224,7 +224,7 @@ function SignInContent() {
                         <div className="text-center">
                             <Link
                                 href="/forgot-password"
-                                className="text-sm text-indigo-600 hover:text-indigo-500 transition-colors"
+                                className="body-sm text-brand-primary hover:text-brand-primary-hover transition-colors"
                             >
                                 Password dimenticata?
                             </Link>

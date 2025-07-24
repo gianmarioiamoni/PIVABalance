@@ -114,28 +114,28 @@ function SignUpContent() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="min-h-screen surface-secondary flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-lg">
                 {/* Logo/Brand */}
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-indigo-600 mb-2">P.IVA Balance</h1>
-                    <h2 className="text-3xl font-extrabold text-gray-900">
+                    <h1 className="heading-lg text-brand-primary mb-2">P.IVA Balance</h1>
+                    <h2 className="heading-xl text-primary">
                         Crea il tuo account
                     </h2>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="mt-2 body-md text-secondary">
                         Oppure{' '}
                         <Link
                             href="/signin"
-                            className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+                            className="font-medium text-brand-primary hover:text-brand-primary-hover transition-colors"
                         >
-                            accedi con il tuo account esistente
+                            accedi al tuo account
                         </Link>
                     </p>
                 </div>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow-xl rounded-lg sm:px-10">
+            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg">
+                <div className="surface-primary py-8 px-6 shadow-xl rounded-2xl sm:px-10">
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         {error ? (
                             <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-md" role="alert">
@@ -145,7 +145,7 @@ function SignUpContent() {
 
                         {/* Name Field */}
                         <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="name" className="block body-sm font-medium text-primary">
                                 Nome completo
                             </label>
                             <div className="mt-1">
@@ -157,21 +157,21 @@ function SignUpContent() {
                                     required
                                     value={formData.name}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.name
+                                    className={`appearance-none block w-full px-4 py-3 border rounded-xl shadow-sm text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary body-md transition-colors ${validationErrors.name
                                         ? 'border-red-300 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-indigo-500'
+                                        : 'border-gray-200 focus:border-brand-primary'
                                         }`}
-                                    placeholder="Mario Rossi"
+                                    placeholder="Il tuo nome completo"
                                 />
                                 {validationErrors.name ? (
-                                    <p className="mt-1 text-sm text-red-600">{validationErrors.name}</p>
+                                    <p className="mt-1 body-sm text-red-600">{validationErrors.name}</p>
                                 ) : null}
                             </div>
                         </div>
 
                         {/* Email Field */}
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="email" className="block body-sm font-medium text-primary">
                                 Indirizzo email
                             </label>
                             <div className="mt-1">
@@ -183,21 +183,21 @@ function SignUpContent() {
                                     required
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.email
+                                    className={`appearance-none block w-full px-4 py-3 border rounded-xl shadow-sm text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary body-md transition-colors ${validationErrors.email
                                         ? 'border-red-300 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-indigo-500'
+                                        : 'border-gray-200 focus:border-brand-primary'
                                         }`}
                                     placeholder="esempio@email.com"
                                 />
                                 {validationErrors.email ? (
-                                    <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
+                                    <p className="mt-1 body-sm text-red-600">{validationErrors.email}</p>
                                 ) : null}
                             </div>
                         </div>
 
                         {/* Password Field */}
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="password" className="block body-sm font-medium text-primary">
                                 Password
                             </label>
                             <div className="mt-1 relative">
@@ -209,34 +209,31 @@ function SignUpContent() {
                                     required
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.password
+                                    className={`appearance-none block w-full px-4 py-3 pr-12 border rounded-xl shadow-sm text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary body-md transition-colors ${validationErrors.password
                                         ? 'border-red-300 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-indigo-500'
+                                        : 'border-gray-200 focus:border-brand-primary'
                                         }`}
-                                    placeholder="Crea una password sicura"
+                                    placeholder="Almeno 8 caratteri"
                                 />
                                 <button
                                     type="button"
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
                                     onClick={() => setShowPassword(!showPassword)}
                                     tabIndex={-1}
                                 >
-                                    <span className="text-gray-400 hover:text-gray-600 text-sm">
+                                    <span className="text-gray-400 hover:text-gray-600 body-md">
                                         {showPassword ? '👁️‍🗨️' : '👁️'}
                                     </span>
                                 </button>
                                 {validationErrors.password ? (
-                                    <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
+                                    <p className="mt-1 body-sm text-red-600">{validationErrors.password}</p>
                                 ) : null}
                             </div>
-                            <p className="mt-1 text-xs text-gray-500">
-                                Minimo 8 caratteri, almeno una lettera maiuscola, una minuscola e un numero
-                            </p>
                         </div>
 
                         {/* Confirm Password Field */}
                         <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="confirmPassword" className="block body-sm font-medium text-primary">
                                 Conferma password
                             </label>
                             <div className="mt-1 relative">
@@ -248,24 +245,24 @@ function SignUpContent() {
                                     required
                                     value={formData.confirmPassword}
                                     onChange={handleChange}
-                                    className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors ${validationErrors.confirmPassword
+                                    className={`appearance-none block w-full px-4 py-3 pr-12 border rounded-xl shadow-sm text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary body-md transition-colors ${validationErrors.confirmPassword
                                         ? 'border-red-300 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-indigo-500'
+                                        : 'border-gray-200 focus:border-brand-primary'
                                         }`}
                                     placeholder="Ripeti la password"
                                 />
                                 <button
                                     type="button"
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                     tabIndex={-1}
                                 >
-                                    <span className="text-gray-400 hover:text-gray-600 text-sm">
+                                    <span className="text-gray-400 hover:text-gray-600 body-md">
                                         {showConfirmPassword ? '👁️‍🗨️' : '👁️'}
                                     </span>
                                 </button>
                                 {validationErrors.confirmPassword ? (
-                                    <p className="mt-1 text-sm text-red-600">{validationErrors.confirmPassword}</p>
+                                    <p className="mt-1 body-sm text-red-600">{validationErrors.confirmPassword}</p>
                                 ) : null}
                             </div>
                         </div>
@@ -275,12 +272,12 @@ function SignUpContent() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="btn-base btn-primary w-full py-3 px-4 rounded-xl body-md font-medium transition-all duration-200 hover:scale-105"
                             >
                                 {isLoading ? (
                                     <>
                                         <LoadingSpinner size="sm" className="mr-2" />
-                                        Registrazione in corso...
+                                        Creazione in corso...
                                     </>
                                 ) : (
                                     'Crea account'
@@ -288,21 +285,15 @@ function SignUpContent() {
                             </button>
                         </div>
 
-                        {/* Terms and Privacy */}
+                        {/* Terms */}
                         <div className="text-center">
-                            <p className="text-xs text-gray-500">
+                            <p className="body-sm text-secondary">
                                 Creando un account accetti i nostri{' '}
-                                <Link
-                                    href="/terms"
-                                    className="text-indigo-600 hover:text-indigo-500"
-                                >
+                                <Link href="/terms" className="text-brand-primary hover:text-brand-primary-hover">
                                     Termini di Servizio
                                 </Link>{' '}
                                 e{' '}
-                                <Link
-                                    href="/privacy"
-                                    className="text-indigo-600 hover:text-indigo-500"
-                                >
+                                <Link href="/privacy" className="text-brand-primary hover:text-brand-primary-hover">
                                     Privacy Policy
                                 </Link>
                             </p>

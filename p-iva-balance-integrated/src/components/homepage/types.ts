@@ -15,7 +15,8 @@ export interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
-  hoverColor: string;
+  textColor: string; // Color for title on hover
+  linkColor: string; // Color for "Scopri di più" text
   accentColor: string;
   backgroundGradient: string;
   rotationClass: string;

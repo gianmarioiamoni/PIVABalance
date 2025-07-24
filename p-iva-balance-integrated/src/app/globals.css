@@ -495,6 +495,25 @@ body {
     border-bottom: 1px solid var(--surface-border);
   }
   
+  /* Spacing Classes */
+  .space-section { margin-top: 5rem; margin-bottom: 5rem; }
+  .space-hero-title { margin-bottom: 2rem; }
+  .space-hero-subtitle { margin-bottom: 3rem; }
+  .space-hero-buttons { margin-bottom: 3rem; }
+  .space-feature-title { margin-bottom: 3rem; }
+  .space-cta-title { margin-bottom: 1.5rem; }
+  .space-cta-description { margin-bottom: 2.5rem; }
+  
+  @media (min-width: 1024px) {
+    .space-section { margin-top: 6rem; margin-bottom: 6rem; }
+    .space-hero-title { margin-bottom: 2.5rem; }
+    .space-hero-subtitle { margin-bottom: 4rem; }
+    .space-hero-buttons { margin-bottom: 4rem; }
+    .space-feature-title { margin-bottom: 4rem; }
+    .space-cta-title { margin-bottom: 2rem; }
+    .space-cta-description { margin-bottom: 3rem; }
+  }
+  
   /* Animation Classes */
   .animate-fade-in {
     animation: fadeIn 0.3s ease-in-out;

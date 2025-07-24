@@ -12,7 +12,8 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
     icon,
     title,
     description,
-    hoverColor,
+    textColor,
+    linkColor,
     accentColor,
     backgroundGradient,
     rotationClass,
@@ -38,13 +39,13 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
                         <div className={`absolute -top-1 -right-1 w-4 h-4 ${accentColor} rounded-full animate-pulse`}></div>
                     </div>
                 </div>
-                <h3 className={`heading-sm mb-4 group-hover:${hoverColor} transition-colors duration-300`}>
+                <h3 className={`heading-sm mb-4 transition-colors duration-300 group-hover:${textColor}`}>
                     {title}
                 </h3>
                 <p className="body-lg leading-relaxed">
                     {description}
                 </p>
-                <div className={`mt-6 flex items-center ${hoverColor} body-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300`}>
+                <div className={`mt-6 flex items-center ${linkColor} body-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300`}>
                     Scopri di più
                     <svg className="ml-1 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

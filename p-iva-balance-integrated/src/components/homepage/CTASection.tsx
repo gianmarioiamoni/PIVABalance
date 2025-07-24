@@ -22,19 +22,20 @@ export const CTASection: React.FC<CTASectionProps> = ({
           <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
           <div className="absolute bottom-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
         </div>
-        
-        {/* Content with darker gray background for better contrast */}
+
+        {/* Content with surface-primary background from design system */}
         <div className="relative text-center">
-          <div className="bg-gray-200/95 backdrop-blur-sm rounded-2xl p-8 lg:p-12 mx-auto max-w-4xl shadow-2xl">
-            <h3 className="heading-lg text-gray-900 space-cta-title">
+          <div className="surface-primary backdrop-blur-sm rounded-2xl p-8 lg:p-12 mx-auto max-w-4xl shadow-2xl">
+            <h3 className="heading-lg text-primary space-cta-title">
               {title}
             </h3>
-            <p className="text-gray-700 body-lg space-cta-description content-medium mx-auto leading-relaxed">
+            <p className="text-secondary body-lg space-cta-description content-medium mx-auto leading-relaxed">
               {description}
             </p>
             <Link
               href={ctaHref}
-              className="btn-base btn-primary text-white px-8 py-4 body-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              className="btn-base btn-primary px-8 py-4 body-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              style={{ color: 'white !important' }}
             >
               {ctaText}
               <svg className="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

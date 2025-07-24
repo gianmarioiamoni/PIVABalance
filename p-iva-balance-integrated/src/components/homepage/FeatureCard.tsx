@@ -45,7 +45,7 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
             className={`group relative animate-slide-up ${animationDelay}`}
             style={{
                 '--title-hover-color': titleHoverColor,
-                '--link-color': linkHoverColor
+                '--link-hover-color': linkHoverColor
             } as React.CSSProperties}
         >
             <div className={`absolute inset-0 ${backgroundGradient} rounded-2xl transform ${rotationClass} ${hoverRotation} transition-transform duration-300`}></div>
@@ -62,7 +62,7 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
                 <p className="body-lg leading-relaxed">
                     {description}
                 </p>
-                <div className="mt-6 flex items-center body-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[var(--link-color)]">
+                <div className="mt-6 flex items-center body-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 text-gray-600 group-hover:text-[var(--link-hover-color)]">
                     Scopri di più
                     <svg className="ml-1 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

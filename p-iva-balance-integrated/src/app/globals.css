@@ -371,35 +371,26 @@ body {
     border: 1px solid var(--status-info-border);
   }
   
-  /* Layout Classes */
-  .container-app {
-    max-width: 80rem;
-    margin: 0 auto;
-    padding: 0 1rem;
+  /* Typography Classes */
+  .heading-xxl { 
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text-primary);
   }
   
   @media (min-width: 640px) {
-    .container-app {
-      padding: 0 1.5rem;
-    }
+    .heading-xxl { font-size: 4rem; }
   }
   
   @media (min-width: 1024px) {
-    .container-app {
-      padding: 0 2rem;
-    }
+    .heading-xxl { font-size: 5rem; }
   }
   
-  .navbar-base {
-    background-color: var(--surface-primary);
-    box-shadow: var(--shadow-lg);
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    border-bottom: 1px solid var(--surface-border);
+  @media (min-width: 1280px) {
+    .heading-xxl { font-size: 6rem; }
   }
   
-  /* Typography Classes */
   .heading-xl { 
     font-size: 1.875rem;
     font-weight: 700;
@@ -424,6 +415,16 @@ body {
     color: var(--text-primary);
   }
   
+  .body-xl { 
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+  
+  @media (min-width: 1024px) {
+    .body-xl { font-size: 1.5rem; }
+  }
+  
   .body-lg { 
     font-size: 1rem;
     color: var(--text-secondary);
@@ -437,6 +438,61 @@ body {
   .body-sm { 
     font-size: 0.75rem;
     color: var(--text-tertiary);
+  }
+  
+  /* Layout Classes */
+  .container-app {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .container-wide {
+    max-width: 90rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .container-full {
+    max-width: 100rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .content-narrow {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+  
+  .content-medium {
+    max-width: 64rem;
+    margin: 0 auto;
+  }
+  
+  .content-wide {
+    max-width: 80rem;
+    margin: 0 auto;
+  }
+  
+  @media (min-width: 640px) {
+    .container-app, .container-wide, .container-full {
+      padding: 0 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-app, .container-wide, .container-full {
+      padding: 0 2rem;
+    }
+  }
+  
+  .navbar-base {
+    background-color: var(--surface-primary);
+    box-shadow: var(--shadow-lg);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    border-bottom: 1px solid var(--surface-border);
   }
   
   /* Animation Classes */

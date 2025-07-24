@@ -140,9 +140,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     private reportError = (errorReport: ErrorReport) => {
         // In development, just log to console
         if (process.env.NODE_ENV === 'development') {
-            console.group('🚨 Error Boundary Report');
+            console.warn('🚨 Error Boundary Report');
             console.error('Error Details:', errorReport);
-            console.groupEnd();
+            console.warn('End Error Boundary Report');
             return;
         }
 
@@ -179,7 +179,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
         if (attempt <= maxAttempts) {
             this.resetTimeoutId = window.setTimeout(() => {
-                console.log(`Auto-retry attempt ${attempt}/${maxAttempts}`);
+                console.warn(`Auto-retry attempt ${attempt}/${maxAttempts}`);
                 this.resetErrorBoundary();
             }, delay);
         }

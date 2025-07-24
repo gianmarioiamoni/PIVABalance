@@ -183,7 +183,6 @@ export const validateFundParameters = (
 export const cleanFundForJSON = (
   fund: IProfessionalFund
 ): Omit<IProfessionalFund, "__v"> => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { __v, ...cleanFund } = fund as IProfessionalFund & { __v?: unknown };
   return cleanFund;
 };

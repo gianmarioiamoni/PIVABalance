@@ -21,15 +21,11 @@ export const compareUserPassword = async (
   userHashedPassword: string
 ): Promise<boolean> => {
   try {
-    if (!candidatePassword || candidatePassword.trim() === "") {
-      throw new Error("Password cannot be empty");
-    }
-    if (!userHashedPassword) {
-      throw new Error("User has no password set");
+    if (!candidatePassword || !userHashedPassword) {
+      throw new Error("Missing password data");
     }
     return await bcrypt.compare(candidatePassword, userHashedPassword);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
+  } catch (_error) {
     throw new Error("Password comparison failed");
   }
 };
@@ -39,11 +35,10 @@ export const compareUserPassword = async (
  */
 export const hashPassword = async (password: string): Promise<string> => {
   try {
-    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12");
+    const saltRounds = 12;
     const salt = await bcrypt.genSalt(saltRounds);
     return await bcrypt.hash(password, salt);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
+  } catch (_error) {
     throw new Error("Password hashing failed");
   }
 };
@@ -152,9 +147,7 @@ export const cleanUserForJSON = (
 ): Omit<IUser, "password" | "__v"> => {
   const userObj = user.toJSON?.() || user;
   const {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     password: _password,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     __v: _v,
     ...cleanUser
   } = userObj as typeof userObj & { password?: string; __v?: unknown };

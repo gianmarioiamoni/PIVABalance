@@ -75,7 +75,7 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
               onChange={(fundId) => handleChange('professionalFundId', fundId)}
               onFundChange={(fund) => {
                 // Fund change is handled by the component internally
-                console.log('Selected fund:', fund);
+                console.warn('Selected fund:', fund);
               }}
               onParametersChange={(params) => {
                 if (params) {

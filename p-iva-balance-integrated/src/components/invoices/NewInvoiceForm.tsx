@@ -336,7 +336,10 @@ export const NewInvoiceForm = ({
                                         onChange={(e) =>
                                             setNewInvoice({
                                                 ...newInvoice,
-                                                vat: { ...newInvoice.vat!, vatRate: Number(e.target.value) }
+                                                vat: {
+                                                    ...(newInvoice.vat || { vatType: 'standard' }),
+                                                    vatRate: Number(e.target.value)
+                                                }
                                             })
                                         }
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"

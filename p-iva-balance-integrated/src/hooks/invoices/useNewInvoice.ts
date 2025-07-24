@@ -10,7 +10,6 @@ import { VatOption, vatOptions } from "@/components/invoices/NewInvoiceForm";
 
 // Mock API function - this will be replaced with actual API call
 const mockInvoiceService = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async createInvoice(_invoice: Partial<IInvoice>): Promise<IInvoice> {
     // This will be replaced with actual API call
     throw new Error("Not implemented");
@@ -158,7 +157,6 @@ export const useNewInvoice = ({
 
       try {
         await createMutation.mutateAsync(invoiceData);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (_error) {
         // Error is handled in onError callback
       }

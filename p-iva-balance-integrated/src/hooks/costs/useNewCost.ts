@@ -63,9 +63,9 @@ export const useNewCost = ({ selectedYear, onSuccess }: UseNewCostProps) => {
     }
 
     const costData: CreateCostData = {
-      description: newCost.description!,
+      description: newCost.description || "",
       date: new Date(newCost.date).toISOString(),
-      amount: Number(newCost.amount!),
+      amount: Number(newCost.amount || 0),
       deductible: newCost.deductible ?? true,
     };
 

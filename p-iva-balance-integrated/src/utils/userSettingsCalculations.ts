@@ -257,7 +257,6 @@ export const cleanSettingsForJSON = (
   settings: IUserSettings
 ): Omit<IUserSettings, "__v"> => {
   const settingsObj = settings.toJSON?.() || settings;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { __v: _v, ...cleanSettings } = settingsObj as typeof settingsObj & {
     __v?: unknown;
   };

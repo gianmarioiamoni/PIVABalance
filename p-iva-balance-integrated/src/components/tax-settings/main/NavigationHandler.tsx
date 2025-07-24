@@ -17,7 +17,6 @@ interface NavigationHandlerProps {
 export const NavigationHandler: React.FC<NavigationHandlerProps> = ({
   hasChanges,
   showConfirmDialog,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   pendingNavigation: _pendingNavigation,
   onConfirmNavigation,
   onCancelNavigation,
@@ -25,7 +24,6 @@ export const NavigationHandler: React.FC<NavigationHandlerProps> = ({
   setPendingNavigation,
   activeTab,
   attemptedTab,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onTabChange: _onTabChange,
 }) => {
 
@@ -44,7 +42,6 @@ export const NavigationHandler: React.FC<NavigationHandlerProps> = ({
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleRouteInterception = (_e: PopStateEvent) => {
       if (hasChanges()) {
         window.history.pushState(null, '', window.location.href);

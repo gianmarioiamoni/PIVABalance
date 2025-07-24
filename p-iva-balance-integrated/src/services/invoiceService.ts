@@ -117,9 +117,12 @@ class InvoiceService {
    */
   async createInvoice(data: CreateInvoiceData): Promise<Invoice> {
     try {
-      console.log("Creating invoice with data:", JSON.stringify(data, null, 2));
+      console.warn(
+        "Creating invoice with data:",
+        JSON.stringify(data, null, 2)
+      );
       const invoice = await api.post<Invoice>("/invoices", data);
-      console.log("Invoice created successfully:", invoice);
+      console.warn("Invoice created successfully:", invoice);
       return invoice;
     } catch (error) {
       console.error("Error creating invoice:", error);

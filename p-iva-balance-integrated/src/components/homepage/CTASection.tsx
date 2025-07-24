@@ -17,7 +17,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
         <div className="space-section animate-fade-in delay-1000">
             <div className="relative p-8 lg:p-12 rounded-3xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 overflow-hidden">
                 {/* Enhanced overlay for better contrast */}
-                <div className="absolute inset-0 bg-black/20"></div>
+                <div className="absolute inset-0 bg-black/30"></div>
                 <div className="absolute top-0 left-0 w-full h-full">
                     <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
                     <div className="absolute bottom-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
@@ -26,7 +26,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
                     <h3 className="heading-lg text-white space-cta-title">
                         {title}
                     </h3>
-                    <p className="text-white/90 body-lg space-cta-description content-medium mx-auto leading-relaxed">
+                    <p className="text-white body-lg space-cta-description content-medium mx-auto leading-relaxed drop-shadow-md">
                         {description}
                     </p>
                     <Link

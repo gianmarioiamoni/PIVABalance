@@ -7,14 +7,7 @@ import { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { IInvoice } from "@/types";
 import { VatOption, vatOptions } from "@/components/invoices/NewInvoiceForm";
-
-// Mock API function - this will be replaced with actual API call
-const mockInvoiceService = {
-  async createInvoice(_invoice: Partial<IInvoice>): Promise<IInvoice> {
-    // This will be replaced with actual API call
-    throw new Error("Not implemented");
-  },
-};
+import { invoiceService, CreateInvoiceData } from "@/services/invoiceService";
 
 export interface UseNewInvoiceProps {
   selectedYear: number;
@@ -63,8 +56,35 @@ export const useNewInvoice = ({
 
   // Create invoice mutation
   const createMutation = useMutation({
-    mutationFn: (invoice: Partial<IInvoice>) =>
-      mockInvoiceService.createInvoice(invoice),
+    mutationFn: async (invoice: Partial<IInvoice>) => {
+      // Transform IInvoice to CreateInvoiceData format
+      const createData: CreateInvoiceData = {
+        number: invoice.number || "",
+        issueDate: invoice.issueDate
+          ? invoice.issueDate.toISOString()
+          : new Date().toISOString(),
+        title: invoice.title || "",
+        clientName: invoice.clientName || "",
+        amount: invoice.amount || 0,
+        paymentDate: invoice.paymentDate
+          ? invoice.paymentDate.toISOString()
+          : undefined,
+        fiscalYear: invoice.fiscalYear || new Date().getFullYear(),
+        vat: invoice.vat
+          ? {
+              type: invoice.vat.vatType as
+                | "standard"
+                | "reduced10"
+                | "reduced5"
+                | "reduced4"
+                | "custom",
+              rate: invoice.vat.vatRate,
+            }
+          : undefined,
+      };
+
+      return await invoiceService.createInvoice(createData);
+    },
     onSuccess: () => {
       setError(null);
       resetForm();

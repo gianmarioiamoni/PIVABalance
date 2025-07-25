@@ -129,8 +129,8 @@ export const InvoiceList = ({
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 bg-white">
-                                {invoices.map((invoice) => (
-                                    <tr key={invoice.id} className="hover:bg-gray-50 transition-colors">
+                                {invoices.map((invoice, index) => (
+                                    <tr key={invoice.id || `invoice-${index}`} className="hover:bg-gray-50 transition-colors">
                                         {/* Invoice Number */}
                                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                                             {invoice.number}

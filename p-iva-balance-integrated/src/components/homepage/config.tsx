@@ -68,6 +68,7 @@ export const HOMEPAGE_CONFIG: HomepageConfig = {
             icon: CalculatorIcon,
             title: "Calcoli Fiscali Automatici",
             description: "Calcola automaticamente tasse, contributi INPS e previdenziali per regime forfettario e ordinario con precisione garantita.",
+            href: "/features/calcoli-fiscali",
             textColor: "text-blue-600",       // Blue theme for calculator
             linkColor: "text-blue-600",       // Matching link color
             accentColor: "bg-green-400",
@@ -79,6 +80,7 @@ export const HOMEPAGE_CONFIG: HomepageConfig = {
             icon: DocumentIcon,
             title: "Gestione Fatture e Costi",
             description: "Organizza fatture emesse e costi sostenuti con categorizzazione automatica per deducibilità fiscale e reporting avanzato.",
+            href: "/features/gestione-fatture",
             textColor: "text-purple-600",     // Purple theme for documents
             linkColor: "text-purple-600",     // Matching link color
             accentColor: "bg-orange-400",
@@ -90,6 +92,7 @@ export const HOMEPAGE_CONFIG: HomepageConfig = {
             icon: DashboardIcon,
             title: "Dashboard Completa",
             description: "Visualizza in tempo reale la situazione fiscale con grafici intuitivi, report dettagliati e analisi predittive personalizzate.",
+            href: "/features/dashboard-completa",
             textColor: "text-green-600",      // Green theme for dashboard
             linkColor: "text-green-600",      // Matching link color
             accentColor: "bg-purple-400",

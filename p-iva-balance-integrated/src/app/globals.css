@@ -409,7 +409,6 @@ body {
   .body-xl { 
     font-size: 1.25rem;
     line-height: 1.6;
-    color: var(--text-secondary);
   }
   
   @media (min-width: 1024px) {
@@ -422,12 +421,10 @@ body {
   
   .body-md { 
     font-size: 0.875rem;
-    color: var(--text-secondary);
   }
   
   .body-sm { 
     font-size: 0.75rem;
-    color: var(--text-tertiary);
   }
   
   /* Layout Classes */

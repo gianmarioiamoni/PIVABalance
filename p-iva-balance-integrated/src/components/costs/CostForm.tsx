@@ -11,14 +11,14 @@ type CostFormData = ICost & {
 };
 
 interface CostFormProps {
-    isOpen: boolean;
-    onClose: () => void;
-    cost: Partial<CostFormData>;
-    onChange: (cost: Partial<CostFormData>) => void;
-    onSubmit: (e: React.FormEvent) => void;
-    errors: Record<string, string>;
-    touched: Record<string, boolean>;
-    isSubmitting: boolean;
+  isOpen: boolean;
+  onClose: () => void;
+  cost: Partial<CostFormData>;
+  onChange: (cost: Partial<CostFormData>) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  errors: Record<string, string>;
+  touched: Record<string, boolean>;
+  isSubmitting: boolean;
 }
 
 /**
@@ -43,7 +43,7 @@ export const CostForm: React.FC<CostFormProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="card max-w-md w-full max-h-[90vh] overflow-y-auto animate-slide-up">
+      <div className="card max-w-xl w-full max-h-[90vh] overflow-y-auto animate-slide-up">
         {/* Header */}
         <div className="card-header flex items-center justify-between">
           <h3 className="heading-md">
@@ -98,8 +98,8 @@ export const CostForm: React.FC<CostFormProps> = ({
               value={cost.date ? new Date(cost.date).toISOString().split('T')[0] : ''}
               onChange={(e) => onChange({ ...cost, date: new Date(e.target.value) })}
               className={`input-base px-3 py-2 ${touched.date && fieldErrors.date
-                  ? 'border-error focus:border-error focus:ring-error'
-                  : ''
+                ? 'border-error focus:border-error focus:ring-error'
+                : ''
                 }`}
               required
             />

@@ -136,7 +136,7 @@ function SignUpContent() {
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg md:max-w-2xl lg:max-w-max">
                 <div className="surface-primary py-8 px-6 shadow-xl rounded-2xl sm:px-10 md:px-16 lg:px-20">
-                    <form className="space-y-6 max-w-full sm:max-w-lg lg:max-w-xl mx-auto" onSubmit={handleSubmit}>
+                    <form className="space-y-6 w-full max-w-2xl mx-auto" onSubmit={handleSubmit}>
                         {error ? (
                             <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-md" role="alert">
                                 <span className="block sm:inline">{escapeHtml(error instanceof Error ? error.message : "Errore durante la registrazione")}</span>

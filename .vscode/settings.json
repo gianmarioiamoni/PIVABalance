@@ -1,0 +1,10 @@
+{
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.includeCompletionsForModuleExports": true,
+  "typescript.preferences.useAliasesForRenames": false,
+  "typescript.workspaceSymbols.scope": "allOpenProjects",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "eslint.workingDirectories": ["./"],
+  "typescript.referencesCodeLens.enabled": true,
+  "typescript.referencesCodeLens.showOnAllFunctions": true
+}

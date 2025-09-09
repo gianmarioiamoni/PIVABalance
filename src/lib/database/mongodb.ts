@@ -13,6 +13,7 @@ declare global {
 const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://localhost:27017/p-iva-balance";
 
+
 if (!MONGODB_URI) {
   throw new Error(
     "Please define the MONGODB_URI environment variable inside .env.local"
@@ -43,7 +44,7 @@ export async function connectDB(): Promise<typeof mongoose> {
     const opts = {
       bufferCommands: false,
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 10000, // Increased timeout
       socketTimeoutMS: 45000,
       family: 4, // Use IPv4, skip trying IPv6
     };
@@ -51,7 +52,7 @@ export async function connectDB(): Promise<typeof mongoose> {
     cached.promise = mongoose
       .connect(MONGODB_URI, opts)
       .then((mongoose) => {
-        console.warn("✅ Connected to MongoDB");
+        console.log("✅ Connected to MongoDB");
         return mongoose;
       })
       .catch((error) => {

@@ -13,8 +13,39 @@ export function useLocalStorage<T>(
   key: string,
   initialValue?: T
 ): [T | null, (value: T | null) => void, boolean] {
-  const [storedValue, setStoredValue] = useState<T | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [storedValue, setStoredValue] = useState<T | null>(() => {
+    // Try to load immediately on initialization (client-side only)
+    if (typeof window !== "undefined") {
+      try {
+        const item = window.localStorage.getItem(key);
+        console.log(
+          `🔍 useLocalStorage(${key}) - Initial load, item:`,
+          item ? "EXISTS" : "NULL"
+        );
+        if (item !== null) {
+          try {
+            return JSON.parse(item);
+          } catch {
+            return item as T;
+          }
+        }
+      } catch (error) {
+        console.error(
+          `🔍 useLocalStorage(${key}) - Initial load error:`,
+          error
+        );
+      }
+    }
+    return initialValue || null;
+  });
+
+  const [isLoaded, setIsLoaded] = useState(() => {
+    // FORCE isLoaded to true to bypass hydration issues
+    return true;
+  });
+
+  // Fallback: ensure isLoaded becomes true after a timeout (removed as no longer needed)
+  // useEffect removed since isLoaded is now initialized to true directly
 
   // Load value from localStorage on mount (client-side only)
   useEffect(() => {
@@ -39,8 +70,6 @@ export function useLocalStorage<T>(
       if (initialValue !== undefined) {
         setStoredValue(initialValue);
       }
-    } finally {
-      setIsLoaded(true);
     }
   }, [key, initialValue]);
 

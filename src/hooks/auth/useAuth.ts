@@ -25,11 +25,18 @@ export function useAuth() {
   } = useQuery<User | null>({
     queryKey: ["auth"],
     queryFn: async () => {
-      if (!token) return null;
-      const result = await authService.checkAuth();
-      return result;
+      if (!token) {
+        return null;
+      }
+      try {
+        const result = await authService.checkAuth();
+        return result;
+      } catch (error) {
+        console.error("Auth check error:", error);
+        throw error;
+      }
     },
-    enabled: isLoaded, // Only run query when localStorage is loaded
+    enabled: isLoaded && !!token, // Only run query when localStorage is loaded AND token exists
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)

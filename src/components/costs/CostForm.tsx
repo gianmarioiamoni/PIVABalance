@@ -38,11 +38,11 @@ export const CostForm: React.FC<CostFormProps> = ({
   isSubmitting
 }) => {
   console.log('🔍 DEBUG: CostForm called with isOpen:', isOpen);
-  
+
   if (!isOpen) return null;
 
   const fieldErrors = errors || {};
-  
+
   console.log('🔍 DEBUG: CostForm rendering modal');
 
   return (

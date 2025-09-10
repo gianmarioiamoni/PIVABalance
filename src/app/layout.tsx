@@ -89,7 +89,7 @@ export default function RootLayout({
             <AuthProvider>
               <NotificationProvider>
                 {children}
-                <PWAInstallPrompt autoShow={true} showDelay={5000} />
+                {/* <PWAInstallPrompt autoShow={true} showDelay={5000} /> */}
               </NotificationProvider>
             </AuthProvider>
           </QueryProvider>

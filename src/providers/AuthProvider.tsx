@@ -90,7 +90,7 @@ export function withAuth<P extends object>(
                             Devi effettuare l&apos;accesso per visualizzare questa pagina.
                         </p>
                         <a
-                            href="/auth/signin"
+                            href="/signin"
                             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-md font-medium"
                         >
                             Vai al Login

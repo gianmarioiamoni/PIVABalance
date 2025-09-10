@@ -47,8 +47,14 @@ export function useAuth() {
    */
   const checkAuth = useCallback(async () => {
     try {
+      console.log("🔍 checkAuth - invalidating queries...");
       await queryClient.invalidateQueries({ queryKey: ["auth"] });
+      console.log("🔍 checkAuth - calling refetch...");
       const result = await refetch();
+      console.log("🔍 checkAuth - refetch result:", {
+        data: result.data,
+        error: result.error,
+      });
       return result.data;
     } catch (error) {
       console.error("Auth check failed:", error);
@@ -91,10 +97,24 @@ export function useAuth() {
    */
   const updateToken = useCallback(
     async (newToken: string) => {
+      console.log(
+        "🔍 updateToken - starting with token:",
+        newToken ? "EXISTS" : "NULL"
+      );
+
+      // Set token and wait for it to be available
       setToken(newToken);
+
+      // Wait a bit for localStorage to update
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Clear cache and refetch with new token
       queryClient.setQueryData(["auth"], null);
       await queryClient.invalidateQueries({ queryKey: ["auth"] });
+
+      console.log("🔍 updateToken - calling checkAuth...");
       const userData = await checkAuth();
+      console.log("🔍 updateToken - checkAuth result:", userData);
       return userData;
     },
     [setToken, queryClient, checkAuth]

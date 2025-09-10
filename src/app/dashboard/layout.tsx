@@ -40,7 +40,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         }
 
         if (!isLoading && !user) {
-            router.push('/auth/signin');
+            router.push('/signin');
         }
     }, [searchParams, user, isLoading, router, setToken, isClient]);
 

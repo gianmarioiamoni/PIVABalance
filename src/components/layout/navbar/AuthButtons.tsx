@@ -18,20 +18,20 @@ interface AuthButtonsProps {
  * @param props - Component props
  * @returns Authentication buttons component
  */
-export const AuthButtons: React.FC<AuthButtonsProps> = ({ 
-  className = '' 
+export const AuthButtons: React.FC<AuthButtonsProps> = ({
+  className = ''
 }) => {
   const containerClasses = `flex items-center space-x-4 ${className}`.trim();
   const loginClasses = `${NAV_CLASSES.button.base} ${NAV_CLASSES.button.primary}`.trim();
   const signupClasses = `${NAV_CLASSES.button.base} ${NAV_CLASSES.button.secondary}`.trim();
 
   return (
-    <div 
+    <div
       className={containerClasses}
       aria-label={ARIA_LABELS.authButtons}
     >
       <Link
-        href="/auth/signin"
+        href="/signin"
         className={loginClasses}
         aria-label="Accedi al sistema"
       >

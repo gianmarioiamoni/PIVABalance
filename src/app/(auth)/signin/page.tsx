@@ -4,7 +4,7 @@ import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
-import { authService, type SignInCredentials } from '@/services/authService';
+import { type SignInCredentials } from '@/services/authService';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { sanitizeInput, escapeHtml, isValidEmail } from '@/utils/security';
 import { LoadingSpinner } from '@/components/ui';
@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
 function SignInContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { setToken } = useAuth();
+    const { signIn: authSignIn } = useAuth();
     const [formData, setFormData] = useState<SignInCredentials>({
         email: '',
         password: '',
@@ -37,15 +37,18 @@ function SignInContent() {
         isPending: isLoading,
         error
     } = useMutation({
-        mutationFn: (credentials: SignInCredentials) => authService.signIn(credentials),
+        mutationFn: (credentials: SignInCredentials) => authSignIn(credentials),
         onSuccess: async (data) => {
             try {
-                const userData = await setToken(data.token);
-                if (userData) {
+                console.log('🔍 SignIn onSuccess - data received:', data);
+                // authSignIn already handles token setting and user data fetching
+                if (data && data.token && data.user) {
+                    console.log('✅ SignIn success - redirecting to:', redirect);
                     // Clean URL and redirect
                     window.history.replaceState({}, '', '/signin');
                     router.push(redirect);
                 } else {
+                    console.error('❌ SignIn failed - missing data:', { data, hasToken: !!data?.token, hasUser: !!data?.user });
                     throw new Error('Failed to authenticate user');
                 }
             } catch (error) {

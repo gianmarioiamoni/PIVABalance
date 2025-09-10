@@ -106,8 +106,20 @@ export function useAuth() {
   const signIn = useCallback(
     async (credentials: { email: string; password: string }) => {
       try {
+        console.log("🔍 useAuth.signIn - starting authentication");
         const authResponse = await authService.signIn(credentials);
-        await updateToken(authResponse.token);
+        console.log("🔍 useAuth.signIn - authService response:", {
+          hasToken: !!authResponse.token,
+          hasUser: !!authResponse.user,
+        });
+
+        const userData = await updateToken(authResponse.token);
+        console.log("🔍 useAuth.signIn - updateToken result:", { userData });
+
+        console.log("✅ useAuth.signIn - returning authResponse:", {
+          hasToken: !!authResponse.token,
+          hasUser: !!authResponse.user,
+        });
         return authResponse;
       } catch (error) {
         console.error("Sign in failed:", error);

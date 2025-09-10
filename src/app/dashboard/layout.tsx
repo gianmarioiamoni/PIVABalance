@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, Suspense } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/auth/useAuth';
 import Link from 'next/link';
@@ -19,10 +19,18 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const { user, isLoading, setToken } = useAuth();
     const { state: { settings } } = useTaxSettings();
+    const [isClient, setIsClient] = useState(false);
 
     const isOrdinaryRegime = settings?.taxRegime === 'ordinario';
 
+    // Ensure client-side rendering to avoid hydration mismatch
     useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isClient) return;
+
         const token = searchParams.get('token');
         if (token) {
             setToken(token);
@@ -34,9 +42,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         if (!isLoading && !user) {
             router.push('/auth/signin');
         }
-    }, [searchParams, user, isLoading, router, setToken]);
+    }, [searchParams, user, isLoading, router, setToken, isClient]);
 
-    if (isLoading) {
+    // Show loading on server-side and during hydration
+    if (!isClient || isLoading) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>

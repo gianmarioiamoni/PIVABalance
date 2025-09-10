@@ -68,6 +68,20 @@ describe('LogoutButton', () => {
       expect(button).toHaveTextContent('Logout');
     });
 
+    it('should not render when user is null', () => {
+      mockUseAuth.mockReturnValue({
+        user: null,
+        logout: mockLogout,
+        isLoading: false,
+        isAuthenticated: false,
+      } as any);
+
+      renderComponent();
+      
+      const button = screen.queryByRole('button', { name: /logout|esci/i });
+      expect(button).not.toBeInTheDocument();
+    });
+
     it('should render with custom className when provided', () => {
       renderComponent({ className: 'custom-class' });
       

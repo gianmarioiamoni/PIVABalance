@@ -45,8 +45,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         }
     }, [searchParams, user, isLoading, router, setToken, isClient]);
 
-    // Show loading on server-side and during hydration
-    if (!isClient || isLoading) {
+    // Show loading on server-side and during initial hydration
+    if (!isClient) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -54,6 +54,21 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         );
     }
 
+    // Show loading only if we don't have a user AND we're actually loading (not just a token refresh)
+    if (!user && isLoading) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    // If we don't have a user and we're not loading, redirect to signin
+    if (!user && !isLoading) {
+        return null;
+    }
+
+    // If we have a user, show the dashboard (even if isLoading is true due to token refresh)
     if (!user) {
         return null;
     }

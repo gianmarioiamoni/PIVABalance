@@ -33,7 +33,7 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({
   variant = 'default',
   size = 'md'
 }) => {
-  const { logout, isLoading: authLoading } = useAuth();
+  const { logout, isLoading: authLoading, user } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   /**
@@ -50,6 +50,11 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({
       setIsLoggingOut(false);
     }
   }, [logout]);
+
+  // Don't render if no user (avoids flash during auth refresh)
+  if (!user) {
+    return null;
+  }
 
   // Button styling based on variant and size
   const getButtonClasses = () => {

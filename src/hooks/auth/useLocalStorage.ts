@@ -14,28 +14,24 @@ export function useLocalStorage<T>(
   initialValue?: T
 ): [T | null, (value: T | null) => void, boolean] {
   const [storedValue, setStoredValue] = useState<T | null>(() => {
-    // Try to load immediately on initialization (client-side only)
-    if (typeof window !== "undefined") {
-      try {
-        const item = window.localStorage.getItem(key);
-        console.log(
-          `🔍 useLocalStorage(${key}) - Initial load, item:`,
-          item ? "EXISTS" : "NULL"
-        );
-        if (item !== null) {
-          try {
-            return JSON.parse(item);
-          } catch {
-            return item as T;
-          }
-        }
-      } catch (error) {
-        console.error(
-          `🔍 useLocalStorage(${key}) - Initial load error:`,
-          error
-        );
-      }
+    // Return null on server-side and during hydration to prevent mismatch
+    if (typeof window === "undefined") {
+      return null;
     }
+    
+    try {
+      const item = window.localStorage.getItem(key);
+      if (item !== null) {
+        try {
+          return JSON.parse(item);
+        } catch {
+          return item as T;
+        }
+      }
+    } catch (error) {
+      console.error(`Error loading localStorage key "${key}":`, error);
+    }
+    
     return initialValue || null;
   });
 

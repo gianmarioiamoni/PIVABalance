@@ -39,7 +39,7 @@ export const Icon: React.FC<IconProps> = ({
                     }
                 })
                 .catch((error) => {
-                    console.warn(`Failed to load icon: ${name}`, error);
+                    console.error('Error loading icon:', error);
                 })
                 .finally(() => {
                     setIsLoaded(true);

@@ -51,11 +51,6 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({
     }
   }, [logout]);
 
-  // Don't render if no user (avoids flash during auth refresh)
-  if (!user) {
-    return null;
-  }
-
   // Button styling based on variant and size
   const getButtonClasses = () => {
     const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
@@ -74,6 +69,16 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({
 
     return `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim();
   };
+
+  // Show placeholder if no user but we're in an authenticated context
+  // This prevents the button from disappearing during auth refresh
+  if (!user) {
+    return (
+      <div className={getButtonClasses()} style={{ opacity: 0.5 }}>
+        <span>Logout</span>
+      </div>
+    );
+  }
 
   const isDisabled = authLoading || isLoggingOut;
   const buttonText = isLoggingOut ? 'Logout...' : 'Logout';

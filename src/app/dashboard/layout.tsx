@@ -68,9 +68,15 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         return null;
     }
 
-    // If we have a user, show the dashboard (even if isLoading is true due to token refresh)
+    // At this point we either have a user OR we're loading, so we can proceed with rendering
+    // But we need to ensure user exists for the UI elements that require it
     if (!user) {
-        return null;
+        // This should only happen during loading states, show loading
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
+        );
     }
 
     // Normalize pathname by removing trailing slash for consistent comparison

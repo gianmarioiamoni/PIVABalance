@@ -22,7 +22,20 @@ export async function POST(
     await connectDB();
 
     // Parse and validate request body
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (error) {
+      console.error('JSON parsing error:', error);
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid request format",
+        },
+        { status: 400 }
+      );
+    }
+    
     const validatedData: SignInCredentials = validateSchema(signInSchema, body);
 
     // Find user by email

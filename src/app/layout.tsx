@@ -3,7 +3,7 @@ import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { NotificationProvider } from '@/providers/NotificationProvider';
 import { ThemeProvider } from '@/components/ui';
-import { PWAInstallPrompt } from '@/components/pwa';
+// import { PWAInstallPrompt } from '@/components/pwa';
 import './globals.css';
 
 const inter = Inter({

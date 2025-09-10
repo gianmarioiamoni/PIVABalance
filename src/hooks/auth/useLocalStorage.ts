@@ -39,7 +39,7 @@ export function useLocalStorage<T>(
     return initialValue || null;
   });
 
-  const [isLoaded, setIsLoaded] = useState(() => {
+  const [isLoaded] = useState(() => {
     // FORCE isLoaded to true to bypass hydration issues
     return true;
   });

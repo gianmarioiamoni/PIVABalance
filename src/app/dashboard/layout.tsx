@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTaxSettings } from '@/hooks/useTaxSettings';
 import { PageErrorBoundary } from '@/components/error-boundaries';
+import { LogoutButton } from '@/components/dashboard/LogoutButton';
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ');
@@ -84,13 +85,22 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             <main className="max-w-7xl mx-auto py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">
                 <div className="space-y-8">
                     {/* Header */}
-                    <div className="text-center">
+                    <div className="relative text-center">
                         <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
                             Benvenuto, {user.name}!
                         </h1>
                         <p className="mt-3 text-xl text-gray-500">
                             Gestisci le tue impostazioni fiscali e monitora le tue performance finanziarie.
                         </p>
+                        
+                        {/* Logout Button - positioned in top right */}
+                        <div className="absolute top-0 right-0">
+                            <LogoutButton 
+                                variant="outline" 
+                                size="sm" 
+                                className="shadow-sm"
+                            />
+                        </div>
                     </div>
 
                     {/* Navigation */}

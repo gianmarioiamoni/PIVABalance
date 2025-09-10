@@ -28,6 +28,7 @@ export const Costs: React.FC = () => {
 
     const {
         showForm: showNewCostForm,
+        openForm: openNewCostForm,
         closeForm: closeNewCostForm,
         submitForm: submitNewCost,
         loading: createLoading,
@@ -62,7 +63,7 @@ export const Costs: React.FC = () => {
                     </select>
 
                     <button
-                        onClick={() => window.location.href = '#new-cost'}
+                        onClick={openNewCostForm}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2"
                     >
                         <Icon name="PlusIcon" className="h-5 w-5" />

@@ -40,8 +40,13 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             return;
         }
 
-        if (!isLoading && !user) {
-            router.push('/signin');
+        // Only redirect to signin if we're sure there's no valid authentication
+        // Check if there's a token in localStorage before redirecting
+        if (!isLoading && !user && isClient) {
+            const storedToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+            if (!storedToken) {
+                router.push('/signin');
+            }
         }
     }, [searchParams, user, isLoading, router, setToken, isClient]);
 

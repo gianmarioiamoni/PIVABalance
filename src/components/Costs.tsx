@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState } from 'react';
 import { useCosts, useCostForm } from '@/hooks/costs';
 // ✅ Code splitting: Lazy load CostFormWrapper (caricato solo quando necessario)
-const CostFormWrapper = lazy(() => import('./costs/CostFormWrapper').then(module => ({ default: module.CostFormWrapper })));
+// const CostFormWrapper = lazy(() => import('./costs/CostFormWrapper').then(module => ({ default: module.CostFormWrapper })));
+// Temporary: Use direct import for debugging
+import { CostFormWrapper } from './costs/CostFormWrapper';
 import { CostList } from './costs/CostList';
 import { SummaryCard } from './costs/SummaryCard';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+// import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 // ✅ Ottimizzazione: Uso sistema Icon dinamico invece di import diretti
 import { Icon } from '@/components/ui';
 import {
@@ -109,14 +111,15 @@ export const Costs: React.FC = () => {
 
             {/* New Cost Form */}
             {showNewCostForm && (
-                <Suspense fallback={<LoadingSpinner />}>
+                <>
+                    {console.log('🔍 DEBUG: Rendering CostFormWrapper, showNewCostForm:', showNewCostForm)}
                     <CostFormWrapper
                         onSubmit={submitNewCost}
                         onCancel={closeNewCostForm}
                         loading={createLoading}
                         error={createError}
                     />
-                </Suspense>
+                </>
             )}
 
             {/* Cost List */}

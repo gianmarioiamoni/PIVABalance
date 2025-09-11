@@ -5,8 +5,8 @@
  * Separates container logic from widget content
  */
 
-import React from 'react';
-import { MoreVertical, RefreshCw, X, Move, Settings } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { MoreVertical, RefreshCw, X, Move, Settings, Info } from 'lucide-react';
 import { BaseWidgetProps, WidgetSize } from './types';
 
 /**
@@ -65,6 +65,24 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
     const hasError = !!data?.error;
     const lastUpdated = data?.lastUpdated;
 
+    // Menu dropdown state
+    const [showMenu, setShowMenu] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setShowMenu(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     // Container classes based on state
     const containerClasses = [
         'widget-container',
@@ -81,7 +99,7 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
     // Handle widget actions
     const handleRefresh = () => {
         if (onRefresh) {
-            onRefresh(config.id);
+            onRefresh(); // Call without parameters - widgets handle their own ID
         }
     };
 
@@ -92,6 +110,7 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
     };
 
     const handleSettings = () => {
+        setShowMenu(false);
         // Open widget settings modal/panel
         if (onConfigChange) {
             // For now, just toggle visibility as example
@@ -99,6 +118,24 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
                 ...config,
                 isVisible: !config.isVisible
             });
+        }
+    };
+
+    const handleInfo = () => {
+        setShowMenu(false);
+        // Show widget info/help
+        alert(`Widget: ${config.title}\nTipo: ${config.type}\nUltimo aggiornamento: ${lastUpdated?.toLocaleString('it-IT') || 'Mai'}`);
+    };
+
+    const handleMenuRefresh = () => {
+        setShowMenu(false);
+        handleRefresh();
+    };
+
+    const handleMenuRemove = () => {
+        setShowMenu(false);
+        if (confirm(`Sei sicuro di voler rimuovere il widget "${config.title}"?`)) {
+            handleRemove();
         }
     };
 
@@ -146,43 +183,64 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
                             aria-label="Aggiorna widget"
                             title="Aggiorna dati"
                         >
-                            <RefreshCw className="h-4 w-4" />
+                            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                         </button>
 
-                        {/* Settings Button (edit mode) */}
-                        {isEditing && (
+                        {/* Menu Dropdown */}
+                        <div className="relative" ref={menuRef}>
                             <button
-                                onClick={handleSettings}
+                                onClick={() => setShowMenu(!showMenu)}
                                 className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                                aria-label="Impostazioni widget"
-                                title="Configurazione widget"
-                            >
-                                <Settings className="h-4 w-4" />
-                            </button>
-                        )}
-
-                        {/* Remove Button (edit mode) */}
-                        {isEditing && (
-                            <button
-                                onClick={handleRemove}
-                                className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                aria-label="Rimuovi widget"
-                                title="Rimuovi widget"
-                            >
-                                <X className="h-4 w-4" />
-                            </button>
-                        )}
-
-                        {/* More Options */}
-                        {!isEditing && (
-                            <button
-                                className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                                aria-label="Opzioni widget"
-                                title="Altre opzioni"
+                                aria-label="Menu widget"
+                                title="Opzioni widget"
                             >
                                 <MoreVertical className="h-4 w-4" />
                             </button>
-                        )}
+
+                            {/* Dropdown Menu */}
+                            {showMenu && (
+                                <div className="absolute right-0 top-8 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                                    <button
+                                        onClick={handleInfo}
+                                        className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                                    >
+                                        <Info className="h-4 w-4" />
+                                        <span>Informazioni</span>
+                                    </button>
+                                    
+                                    <button
+                                        onClick={handleMenuRefresh}
+                                        disabled={isLoading}
+                                        className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                                        <span>Aggiorna dati</span>
+                                    </button>
+
+                                    {isEditing && (
+                                        <>
+                                            <hr className="my-1 border-gray-100" />
+                                            
+                                            <button
+                                                onClick={handleSettings}
+                                                className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                                            >
+                                                <Settings className="h-4 w-4" />
+                                                <span>Impostazioni</span>
+                                            </button>
+                                            
+                                            <button
+                                                onClick={handleMenuRemove}
+                                                className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
+                                            >
+                                                <X className="h-4 w-4" />
+                                                <span>Rimuovi widget</span>
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>

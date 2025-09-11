@@ -16,6 +16,12 @@
   --brand-secondary: #6366f1;    /* indigo-500 */
   --brand-accent: #8b5cf6;       /* violet-500 */
 
+  /* Custom Pastel Colors for Tab Groups */
+  --blue-25: #f8faff;           /* Ultra light blue */
+  --purple-25: #faf8ff;         /* Ultra light purple */
+  --emerald-25: #f0fdf9;        /* Ultra light emerald */
+  --amber-25: #fffef7;          /* Ultra light amber */
+
   /* Neutral Colors - Light Theme */
   --surface-primary: #ffffff;     /* white */
   --surface-secondary: #f9fafb;   /* gray-50 */
@@ -667,4 +673,67 @@ body {
     background-repeat: no-repeat;
     background-origin: content-box;
   }
+}
+
+/* ===============================================
+   CUSTOM TAB NAVIGATION STYLES
+   =============================================== */
+
+/* Ultra light pastel backgrounds for tab groups */
+.bg-blue-25 {
+  background-color: var(--blue-25);
+}
+
+.bg-purple-25 {
+  background-color: var(--purple-25);
+}
+
+.bg-emerald-25 {
+  background-color: var(--emerald-25);
+}
+
+.bg-amber-25 {
+  background-color: var(--amber-25);
+}
+
+/* Hover scale utilities for smooth animations */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+/* Custom shadow utilities for enhanced depth */
+.shadow-blue-100\/30 {
+  box-shadow: 0 4px 15px -3px rgb(219 234 254 / 0.3), 0 2px 6px -4px rgb(219 234 254 / 0.3);
+}
+
+.shadow-blue-200\/50 {
+  box-shadow: 0 8px 25px -5px rgb(191 219 254 / 0.5), 0 4px 10px -6px rgb(191 219 254 / 0.5);
+}
+
+.shadow-purple-100\/30 {
+  box-shadow: 0 4px 15px -3px rgb(237 233 254 / 0.3), 0 2px 6px -4px rgb(237 233 254 / 0.3);
+}
+
+.shadow-purple-200\/50 {
+  box-shadow: 0 8px 25px -5px rgb(221 214 254 / 0.5), 0 4px 10px -6px rgb(221 214 254 / 0.5);
+}
+
+.shadow-emerald-100\/30 {
+  box-shadow: 0 4px 15px -3px rgb(209 250 229 / 0.3), 0 2px 6px -4px rgb(209 250 229 / 0.3);
+}
+
+.shadow-emerald-200\/50 {
+  box-shadow: 0 8px 25px -5px rgb(167 243 208 / 0.5), 0 4px 10px -6px rgb(167 243 208 / 0.5);
+}
+
+.shadow-amber-100\/30 {
+  box-shadow: 0 4px 15px -3px rgb(254 243 199 / 0.3), 0 2px 6px -4px rgb(254 243 199 / 0.3);
+}
+
+.shadow-amber-200\/50 {
+  box-shadow: 0 8px 25px -5px rgb(253 230 138 / 0.5), 0 4px 10px -6px rgb(253 230 138 / 0.5);
+}
+
+.shadow-gray-100\/20 {
+  box-shadow: 0 4px 15px -3px rgb(243 244 246 / 0.2), 0 2px 6px -4px rgb(243 244 246 / 0.2);
 }

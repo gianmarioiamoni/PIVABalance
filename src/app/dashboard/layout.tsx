@@ -13,6 +13,49 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ');
 }
 
+// Get group color scheme for tabs
+function getGroupColors(group: string, current: boolean, disabled: boolean) {
+    const colorSchemes = {
+        core: {
+            bg: current ? 'bg-blue-50 border-blue-200' : 'bg-blue-25 hover:bg-blue-50 border-blue-100',
+            text: current ? 'text-blue-900' : 'text-blue-700 hover:text-blue-800',
+            shadow: current ? 'shadow-blue-200/50' : 'shadow-blue-100/30',
+            accent: 'bg-blue-500'
+        },
+        analytics: {
+            bg: current ? 'bg-purple-50 border-purple-200' : 'bg-purple-25 hover:bg-purple-50 border-purple-100',
+            text: current ? 'text-purple-900' : 'text-purple-700 hover:text-purple-800',
+            shadow: current ? 'shadow-purple-200/50' : 'shadow-purple-100/30',
+            accent: 'bg-purple-500'
+        },
+        financial: {
+            bg: current ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-25 hover:bg-emerald-50 border-emerald-100',
+            text: current ? 'text-emerald-900' : 'text-emerald-700 hover:text-emerald-800',
+            shadow: current ? 'shadow-emerald-200/50' : 'shadow-emerald-100/30',
+            accent: 'bg-emerald-500'
+        },
+        management: {
+            bg: current ? 'bg-amber-50 border-amber-200' : 'bg-amber-25 hover:bg-amber-50 border-amber-100',
+            text: current ? 'text-amber-900' : 'text-amber-700 hover:text-amber-800',
+            shadow: current ? 'shadow-amber-200/50' : 'shadow-amber-100/30',
+            accent: 'bg-amber-500'
+        }
+    };
+
+    const scheme = colorSchemes[group as keyof typeof colorSchemes] || colorSchemes.core;
+    
+    if (disabled) {
+        return {
+            bg: 'bg-gray-100 border-gray-200',
+            text: 'text-gray-400',
+            shadow: 'shadow-gray-100/20',
+            accent: 'bg-gray-400'
+        };
+    }
+    
+    return scheme;
+}
+
 // Component that uses useSearchParams - must be wrapped in Suspense
 function DashboardContent({ children }: { children: React.ReactNode }) {
     const router = useRouter();
@@ -88,19 +131,63 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     const normalizedPathname = pathname?.replace(/\/$/, '') || '';
 
     const navigationItems = [
-        { name: 'Dashboard', href: '/dashboard', current: normalizedPathname === '/dashboard' },
-        { name: 'Dashboard Personalizzabile', href: '/dashboard/customizable', current: normalizedPathname === '/dashboard/customizable' },
-        { name: 'Analytics Avanzate', href: '/dashboard/analytics', current: normalizedPathname === '/dashboard/analytics' },
-        { name: 'Monitoring', href: '/dashboard/monitoring', current: normalizedPathname === '/dashboard/monitoring' },
-        { name: 'Impostazioni', href: '/dashboard/settings', current: normalizedPathname === '/dashboard/settings' },
-        { name: 'Fatture', href: '/dashboard/invoices', current: normalizedPathname === '/dashboard/invoices' },
-        { name: 'Costi', href: '/dashboard/costs', current: normalizedPathname === '/dashboard/costs' },
+        { 
+            name: 'Dashboard', 
+            href: '/dashboard', 
+            current: normalizedPathname === '/dashboard',
+            group: 'core',
+            icon: '📊'
+        },
+        { 
+            name: 'Dashboard Personalizzabile', 
+            href: '/dashboard/customizable', 
+            current: normalizedPathname === '/dashboard/customizable',
+            group: 'core',
+            icon: '⚙️'
+        },
+        { 
+            name: 'Analytics Avanzate', 
+            href: '/dashboard/analytics', 
+            current: normalizedPathname === '/dashboard/analytics',
+            group: 'analytics',
+            icon: '📈'
+        },
+        { 
+            name: 'Monitoring', 
+            href: '/dashboard/monitoring', 
+            current: normalizedPathname === '/dashboard/monitoring',
+            group: 'analytics',
+            icon: '🔍'
+        },
+        { 
+            name: 'Impostazioni', 
+            href: '/dashboard/settings', 
+            current: normalizedPathname === '/dashboard/settings',
+            group: 'management',
+            icon: '⚙️'
+        },
+        { 
+            name: 'Fatture', 
+            href: '/dashboard/invoices', 
+            current: normalizedPathname === '/dashboard/invoices',
+            group: 'financial',
+            icon: '📄'
+        },
+        { 
+            name: 'Costi', 
+            href: '/dashboard/costs', 
+            current: normalizedPathname === '/dashboard/costs',
+            group: 'financial',
+            icon: '💰'
+        },
         {
             name: 'Tasse e Contributi',
             href: '/dashboard/taxes',
             current: normalizedPathname === '/dashboard/taxes',
             disabled: isOrdinaryRegime,
-            tooltip: isOrdinaryRegime ? "Tasse e Contributi disponibili solo per Regime Forfettario" : undefined
+            tooltip: isOrdinaryRegime ? "Tasse e Contributi disponibili solo per Regime Forfettario" : undefined,
+            group: 'financial',
+            icon: '🏛️'
         },
     ];
 
@@ -133,34 +220,79 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                     <div>
                         <div className="lg:col-span-3">
                             <div className="px-4 sm:px-0">
-                                <nav className="isolate flex divide-x divide-gray-200 rounded-lg shadow" aria-label="Tabs">
-                                    {navigationItems.map((item) => (
-                                        <Link
-                                            key={item.name}
-                                            href={item.disabled ? '#' : item.href}
-                                            className={classNames(
-                                                item.current
-                                                    ? 'text-gray-900'
-                                                    : 'text-gray-500 hover:text-gray-700',
-                                                item.disabled
-                                                    ? 'cursor-not-allowed opacity-50'
-                                                    : 'hover:bg-gray-50',
-                                                'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium focus:z-10'
-                                            )}
-                                            aria-current={item.current ? 'page' : undefined}
-                                            title={item.tooltip}
-                                            onClick={item.disabled ? (e) => e.preventDefault() : undefined}
-                                        >
-                                            <span>{item.name}</span>
-                                            <span
-                                                aria-hidden="true"
+                                <nav className="flex flex-wrap gap-2 p-2 bg-white rounded-xl shadow-lg border border-gray-100" aria-label="Tabs">
+                                    {navigationItems.map((item) => {
+                                        const colors = getGroupColors(item.group, item.current, item.disabled);
+                                        return (
+                                            <Link
+                                                key={item.name}
+                                                href={item.disabled ? '#' : item.href}
                                                 className={classNames(
-                                                    item.current ? 'bg-indigo-500' : 'bg-transparent',
-                                                    'absolute inset-x-0 bottom-0 h-0.5'
+                                                    // Base styling with enhanced depth
+                                                    'group relative min-w-0 flex-1 min-h-[4rem] overflow-hidden rounded-lg border-2 transition-all duration-300 ease-in-out transform',
+                                                    
+                                                    // 3D depth effects
+                                                    item.current 
+                                                        ? 'shadow-lg scale-105 translate-y-[-2px]' 
+                                                        : 'shadow-md hover:shadow-lg hover:scale-102 hover:translate-y-[-1px]',
+                                                    
+                                                    // Group colors
+                                                    colors.bg,
+                                                    colors.text,
+                                                    
+                                                    // Interactive states
+                                                    item.disabled
+                                                        ? 'cursor-not-allowed opacity-50'
+                                                        : 'cursor-pointer hover:shadow-xl',
+                                                    
+                                                    // Focus states
+                                                    'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
                                                 )}
-                                            />
-                                        </Link>
-                                    ))}
+                                                style={{
+                                                    boxShadow: item.current 
+                                                        ? `0 8px 25px -5px ${colors.shadow}, 0 4px 10px -6px ${colors.shadow}` 
+                                                        : `0 4px 15px -3px ${colors.shadow}, 0 2px 6px -4px ${colors.shadow}`
+                                                }}
+                                                aria-current={item.current ? 'page' : undefined}
+                                                title={item.tooltip}
+                                                onClick={item.disabled ? (e) => e.preventDefault() : undefined}
+                                            >
+                                                {/* Content container with perfect centering */}
+                                                <div className="flex flex-col items-center justify-center h-full p-3 text-center">
+                                                    {/* Icon */}
+                                                    <span className="text-xl mb-1 transform transition-transform group-hover:scale-110">
+                                                        {item.icon}
+                                                    </span>
+                                                    
+                                                    {/* Text with perfect vertical centering */}
+                                                    <span className={classNames(
+                                                        'text-xs font-medium leading-tight',
+                                                        'flex items-center justify-center min-h-[2rem]'
+                                                    )}>
+                                                        {item.name}
+                                                    </span>
+                                                </div>
+                                                
+                                                {/* Enhanced accent bar */}
+                                                <span
+                                                    aria-hidden="true"
+                                                    className={classNames(
+                                                        'absolute inset-x-0 bottom-0 h-1 transition-all duration-300',
+                                                        item.current 
+                                                            ? `${colors.accent} opacity-100 shadow-sm` 
+                                                            : 'bg-transparent opacity-0 group-hover:opacity-50'
+                                                    )}
+                                                />
+                                                
+                                                {/* Subtle gradient overlay for depth */}
+                                                <div className={classNames(
+                                                    'absolute inset-0 opacity-0 transition-opacity duration-300',
+                                                    'bg-gradient-to-t from-white/10 to-transparent',
+                                                    item.current ? 'opacity-100' : 'group-hover:opacity-50'
+                                                )} />
+                                            </Link>
+                                        );
+                                    })}
                                 </nav>
                             </div>
 

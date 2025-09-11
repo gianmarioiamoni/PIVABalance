@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: layouts.length === 1 ? layouts[0] : layouts,
+      data: layouts.length === 0 ? null : (layouts.length === 1 ? layouts[0] : layouts),
     });
   } catch (error) {
     console.error("Dashboard layout GET error:", error);

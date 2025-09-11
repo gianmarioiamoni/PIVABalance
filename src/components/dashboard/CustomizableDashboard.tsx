@@ -369,8 +369,8 @@ export const CustomizableDashboard: React.FC<CustomizableDashboardProps> = ({
         setShowWidgetLibrary(true);
     }, [widgets.length, maxWidgets]);
 
-    const handleWidgetSelect = useCallback((widgetType: string) => {
-        addWidget(widgetType);
+    const handleWidgetSelect = useCallback((widgetType: string, selectedSize?: string) => {
+        addWidget(widgetType, selectedSize);
         setShowWidgetLibrary(false);
     }, [addWidget]);
 

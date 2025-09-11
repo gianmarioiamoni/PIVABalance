@@ -17,7 +17,7 @@ import { WidgetRegistryEntry } from '../widgets/base/types';
  * SRP: Interface for widget library specific properties
  */
 export interface WidgetLibraryProps {
-    onSelect: (widgetType: string) => void;
+    onSelect: (widgetType: string, selectedSize?: string) => void;
     onClose: () => void;
     maxWidgets: number;
     currentWidgetCount: number;
@@ -66,9 +66,10 @@ const CategoryFilter: React.FC<{
  */
 const WidgetCard: React.FC<{
     widget: WidgetRegistryEntry;
-    onSelect: () => void;
+    onSelect: (selectedSize?: string) => void;
     disabled?: boolean;
 }> = ({ widget, onSelect, disabled = false }) => {
+    const [selectedSize, setSelectedSize] = useState(widget.defaultSize);
     const IconComponent = widget.icon;
 
     return (
@@ -109,22 +110,42 @@ const WidgetCard: React.FC<{
                 {widget.description}
             </p>
 
-            {/* Supported Sizes */}
+            {/* Size Selector */}
             <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-500 font-medium">Dimensioni:</span>
-                    <div className="flex flex-wrap gap-1">
-                        {widget.supportedSizes.map(size => (
-                            <span key={size} className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-md border border-blue-200 font-medium">
-                                {size}
-                            </span>
-                        ))}
+                {widget.supportedSizes.length > 1 ? (
+                    <div className="space-y-2">
+                        <span className="text-xs text-gray-500 font-medium">Scegli dimensione:</span>
+                        <div className="flex flex-wrap gap-2">
+                            {widget.supportedSizes.map(size => (
+                                <button
+                                    key={size}
+                                    onClick={() => setSelectedSize(size)}
+                                    disabled={disabled}
+                                    className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition-all duration-200 ${
+                                        selectedSize === size
+                                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                            : disabled
+                                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                            : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 hover:border-blue-300'
+                                    }`}
+                                >
+                                    {size}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="flex items-center space-x-2">
+                        <span className="text-xs text-gray-500 font-medium">Dimensione:</span>
+                        <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-md border border-blue-200 font-medium">
+                            {widget.defaultSize}
+                        </span>
+                    </div>
+                )}
 
                 {/* Add Button - Full Width and More Prominent */}
                 <button
-                    onClick={onSelect}
+                    onClick={() => onSelect(selectedSize)}
                     disabled={disabled}
                     className={`
                         w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm font-semibold rounded-lg
@@ -386,7 +407,7 @@ export const WidgetLibrary: React.FC<WidgetLibraryProps> = ({
                                 <WidgetCard
                                     key={widget.id}
                                     widget={widget}
-                                    onSelect={() => onSelect(widget.id)}
+                                    onSelect={(selectedSize) => onSelect(widget.id, selectedSize)}
                                     disabled={!canAddMore}
                                 />
                             ))}

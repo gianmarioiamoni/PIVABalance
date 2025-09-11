@@ -338,7 +338,7 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
 
   // Widget management functions
   const addWidget = useCallback(
-    (widgetType: string, customPosition?: Partial<WidgetPosition>) => {
+    (widgetType: string, selectedSize?: string, customPosition?: Partial<WidgetPosition>) => {
       const registryEntry = WidgetRegistry.getById(widgetType);
       if (!registryEntry) {
         showError(
@@ -348,21 +348,26 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         return;
       }
 
+      // Use selected size if provided and supported, otherwise use default
+      const widgetSize = selectedSize && registryEntry.supportedSizes.includes(selectedSize as any) 
+        ? selectedSize as WidgetConfig["size"]
+        : registryEntry.defaultSize;
+
       const position = customPosition
         ? {
             ...positionUtils.findNextPosition(
               widgets,
-              registryEntry.defaultSize
+              widgetSize
             ),
             ...customPosition,
           }
-        : positionUtils.findNextPosition(widgets, registryEntry.defaultSize);
+        : positionUtils.findNextPosition(widgets, widgetSize);
 
       const newWidget: WidgetConfig = {
         id: `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         type: registryEntry.type as WidgetType, // Use registry type, not widget ID
         title: registryEntry.name,
-        size: registryEntry.defaultSize,
+        size: widgetSize,
         position,
         isVisible: true,
         refreshInterval: registryEntry.defaultConfig.refreshInterval || 300,

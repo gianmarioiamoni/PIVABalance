@@ -14,7 +14,7 @@ import { WidgetSkeleton } from '../widgets/base/WidgetSkeleton';
 import { WidgetLibrary } from './WidgetLibrary';
 import { useDashboardLayout } from '@/hooks/widgets/useDashboardLayout';
 import { WidgetRegistry } from '../widgets/registry/WidgetRegistry';
-import { WidgetConfig } from '../widgets/base/types';
+import { WidgetConfig, WidgetPosition } from '../widgets/base/types';
 
 /**
  * Customizable Dashboard Props
@@ -173,7 +173,7 @@ const WidgetRenderer: React.FC<{
 
 /**
  * Widget Grid Component
- * SRP: Handles only grid layout container
+ * SRP: Handles only grid layout container with drag & drop
  */
 const WidgetGrid: React.FC<{
     widgets: WidgetConfig[];
@@ -181,18 +181,112 @@ const WidgetGrid: React.FC<{
     onWidgetChange: (id: string, updates: Partial<WidgetConfig>) => void;
     onWidgetRemove: (id: string) => void;
     onWidgetRefresh: (id: string) => void;
-}> = ({ widgets, isEditing, onWidgetChange, onWidgetRemove, onWidgetRefresh }) => {
+    onWidgetMove?: (widgetId: string, position: WidgetPosition) => void;
+}> = ({ widgets, isEditing, onWidgetChange, onWidgetRemove, onWidgetRefresh, onWidgetMove }) => {
+    const [draggedWidget, setDraggedWidget] = useState<string | null>(null);
+    const [dragOverPosition, setDragOverPosition] = useState<{x: number, y: number} | null>(null);
+
+    // Handle drag start
+    const handleDragStart = useCallback((e: React.DragEvent, widgetId: string) => {
+        if (!isEditing) return;
+        
+        setDraggedWidget(widgetId);
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', widgetId);
+        
+        // Add some visual feedback
+        const target = e.currentTarget as HTMLElement;
+        target.style.opacity = '0.5';
+    }, [isEditing]);
+
+    // Handle drag end
+    const handleDragEnd = useCallback((e: React.DragEvent) => {
+        const target = e.currentTarget as HTMLElement;
+        target.style.opacity = '1';
+        setDraggedWidget(null);
+        setDragOverPosition(null);
+    }, []);
+
+    // Handle drag over (for drop zones)
+    const handleDragOver = useCallback((e: React.DragEvent) => {
+        if (!isEditing || !draggedWidget) return;
+        
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        
+        // Calculate grid position based on mouse position
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = Math.floor(((e.clientX - rect.left) / rect.width) * 12);
+        const y = Math.floor((e.clientY - rect.top) / 150); // Assuming 150px row height
+        
+        setDragOverPosition({ x: Math.max(0, Math.min(11, x)), y: Math.max(0, y) });
+    }, [isEditing, draggedWidget]);
+
+    // Handle drop
+    const handleDrop = useCallback((e: React.DragEvent) => {
+        if (!isEditing || !draggedWidget || !onWidgetMove) return;
+        
+        e.preventDefault();
+        
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = Math.floor(((e.clientX - rect.left) / rect.width) * 12);
+        const y = Math.floor((e.clientY - rect.top) / 150);
+        
+        const widget = widgets.find(w => w.id === draggedWidget);
+        if (widget) {
+            const newPosition: WidgetPosition = {
+                x: Math.max(0, Math.min(12 - widget.position.w, x)),
+                y: Math.max(0, y),
+                w: widget.position.w,
+                h: widget.position.h
+            };
+            
+            onWidgetMove(draggedWidget, newPosition);
+        }
+        
+        setDraggedWidget(null);
+        setDragOverPosition(null);
+    }, [isEditing, draggedWidget, onWidgetMove, widgets]);
+
     return (
-        <div className="grid grid-cols-12 gap-4 auto-rows-fr min-h-[200px]">
-            {widgets.map(widget => (
-                <WidgetRenderer
-                    key={widget.id}
-                    widget={widget}
-                    isEditing={isEditing}
-                    onWidgetChange={onWidgetChange}
-                    onWidgetRemove={onWidgetRemove}
-                    onWidgetRefresh={onWidgetRefresh}
+        <div 
+            className={`grid grid-cols-12 gap-4 auto-rows-fr min-h-[200px] relative ${
+                isEditing ? 'transition-all duration-200' : ''
+            }`}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+        >
+            {/* Drag overlay indicator */}
+            {isEditing && dragOverPosition && draggedWidget && (
+                <div 
+                    className="absolute bg-blue-200 bg-opacity-50 border-2 border-blue-400 border-dashed rounded-lg pointer-events-none z-10"
+                    style={{
+                        left: `${(dragOverPosition.x / 12) * 100}%`,
+                        top: `${dragOverPosition.y * 150}px`,
+                        width: `${(widgets.find(w => w.id === draggedWidget)?.position.w || 3) / 12 * 100}%`,
+                        height: `${(widgets.find(w => w.id === draggedWidget)?.position.h || 1) * 150}px`
+                    }}
                 />
+            )}
+            
+            {widgets.map(widget => (
+                <div
+                    key={widget.id}
+                    draggable={isEditing}
+                    onDragStart={(e) => handleDragStart(e, widget.id)}
+                    onDragEnd={handleDragEnd}
+                    className={`${getWidgetGridClasses(widget.size)} ${
+                        isEditing ? 'cursor-move' : ''
+                    } ${draggedWidget === widget.id ? 'z-50' : ''}`}
+                >
+                    <WidgetRenderer
+                        widget={widget}
+                        isEditing={isEditing}
+                        onWidgetChange={onWidgetChange}
+                        onWidgetRemove={onWidgetRemove}
+                        onWidgetRefresh={onWidgetRefresh}
+                    />
+                </div>
             ))}
         </div>
     );
@@ -230,6 +324,7 @@ export const CustomizableDashboard: React.FC<CustomizableDashboardProps> = ({
         addWidget,
         removeWidget,
         updateWidget,
+        moveWidget,
         saveLayout,
         resetLayout,
         refreshWidget,
@@ -319,6 +414,7 @@ export const CustomizableDashboard: React.FC<CustomizableDashboardProps> = ({
                         onWidgetChange={updateWidget}
                         onWidgetRemove={removeWidget}
                         onWidgetRefresh={refreshWidget}
+                        onWidgetMove={moveWidget}
                     />
                 )}
             </div>

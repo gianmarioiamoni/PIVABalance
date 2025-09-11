@@ -74,7 +74,7 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
         isEditing ? 'ring-2 ring-blue-200 shadow-md' : '',
         hasError ? 'border-red-300 bg-red-50' : '',
         isLoading ? 'opacity-75' : '',
-        isDraggable && isEditing ? 'cursor-move' : '',
+        // Drag cursor now handled by parent grid container
         className
     ].filter(Boolean).join(' ');
 

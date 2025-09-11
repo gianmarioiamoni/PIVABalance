@@ -204,39 +204,39 @@ const WidgetGrid: React.FC<{
     // Handle drag over (for drop zones)
     const handleDragOver = useCallback((e: React.DragEvent) => {
         if (!isEditing || !draggedWidget) return;
-        
+
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
-        
+
         // Calculate grid position based on mouse position
         const rect = e.currentTarget.getBoundingClientRect();
         const x = Math.floor(((e.clientX - rect.left) / rect.width) * 12);
         const y = Math.floor((e.clientY - rect.top) / 150); // Assuming 150px row height
-        
+
         setDragOverPosition({ x: Math.max(0, Math.min(11, x)), y: Math.max(0, y) });
     }, [isEditing, draggedWidget]);
 
     // Check which widgets would be affected by the drop
     const getAffectedWidgets = useCallback(() => {
         if (!draggedWidget || !dragOverPosition) return [];
-        
+
         const draggedWidgetData = widgets.find(w => w.id === draggedWidget);
         if (!draggedWidgetData) return [];
-        
+
         const proposedPosition = {
             x: Math.max(0, Math.min(12 - draggedWidgetData.position.w, dragOverPosition.x)),
             y: Math.max(0, dragOverPosition.y),
             w: draggedWidgetData.position.w,
             h: draggedWidgetData.position.h
         };
-        
+
         // Find widgets that would collide with the proposed position
-        return widgets.filter(w => 
-            w.id !== draggedWidget && 
+        return widgets.filter(w =>
+            w.id !== draggedWidget &&
             !(proposedPosition.x >= w.position.x + w.position.w ||
-              proposedPosition.x + proposedPosition.w <= w.position.x ||
-              proposedPosition.y >= w.position.y + w.position.h ||
-              proposedPosition.y + proposedPosition.h <= w.position.y)
+                proposedPosition.x + proposedPosition.w <= w.position.x ||
+                proposedPosition.y >= w.position.y + w.position.h ||
+                proposedPosition.y + proposedPosition.h <= w.position.y)
         );
     }, [draggedWidget, dragOverPosition, widgets]);
 
@@ -295,7 +295,7 @@ const WidgetGrid: React.FC<{
                 const affectedWidgets = getAffectedWidgets();
                 const isAffected = affectedWidgets.some(w => w.id === widget.id);
                 const isDragged = draggedWidget === widget.id;
-                
+
                 return (
                     <div
                         key={widget.id}
@@ -303,11 +303,9 @@ const WidgetGrid: React.FC<{
                         onDragStart={(e) => handleDragStart(e, widget.id)}
                         onDragEnd={handleDragEnd}
                         style={getWidgetGridStyle(widget)}
-                        className={`${isEditing ? 'cursor-move' : ''} ${
-                            isDragged ? 'z-50 opacity-50' : ''
-                        } ${
-                            isAffected ? 'ring-2 ring-orange-400 ring-opacity-75 transition-all duration-200' : ''
-                        }`}
+                        className={`${isEditing ? 'cursor-move' : ''} ${isDragged ? 'z-50 opacity-50' : ''
+                            } ${isAffected ? 'ring-2 ring-orange-400 ring-opacity-75 transition-all duration-200' : ''
+                            }`}
                     >
                         <WidgetRenderer
                             widget={widget}

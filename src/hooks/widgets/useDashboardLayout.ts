@@ -140,14 +140,28 @@ const positionUtils = {
 
     const { w, h } = sizeMap[widgetSize];
 
-    // Simple algorithm: find first available spot
+    // Try to find a position with minimal Y (prefer higher positions)
+    // and minimal X (prefer left positions)
+    let bestPosition: WidgetPosition | null = null;
+    let bestScore = Infinity;
+
     for (let y = 0; y < 20; y++) {
       for (let x = 0; x <= columns - w; x++) {
         const position = { x, y, w, h };
         if (!this.hasCollision(position, existingWidgets)) {
-          return position;
+          // Score: prioritize higher positions (lower Y) and left positions (lower X)
+          const score = y * 100 + x; // Y is much more important than X
+          if (score < bestScore) {
+            bestScore = score;
+            bestPosition = position;
+          }
         }
       }
+    }
+
+    // If we found a good position, return it
+    if (bestPosition) {
+      return bestPosition;
     }
 
     // Fallback: place at bottom
@@ -185,31 +199,61 @@ const positionUtils = {
     // Update the moved widget position
     movedWidget.position = { ...newPosition };
     
-    // Sort widgets by Y position to process from top to bottom
-    const sortedWidgets = result.sort((a, b) => a.position.y - b.position.y);
+    // Find widgets that collide with the moved widget
+    const collidingWidgets = result.filter(w => 
+      w.id !== movedWidgetId && this.hasCollision(newPosition, [w])
+    );
     
-    // Check for collisions and push down overlapping widgets
-    for (let i = 0; i < sortedWidgets.length; i++) {
-      const widget = sortedWidgets[i];
+    // For each colliding widget, find a new position
+    for (const collidingWidget of collidingWidgets) {
+      const newPos = this.findNextPosition(
+        result.filter(w => w.id !== collidingWidget.id), // Exclude the widget we're moving
+        collidingWidget.size
+      );
+      collidingWidget.position = newPos;
+    }
+    
+    // After moving colliding widgets, check for any new collisions created
+    // and resolve them recursively (but limit recursion to prevent infinite loops)
+    return this.resolveAllCollisions(result, 3);
+  },
+
+  /**
+   * Resolve all collisions in the layout
+   */
+  resolveAllCollisions(widgets: WidgetConfig[], maxIterations: number = 3): WidgetConfig[] {
+    let result = [...widgets];
+    let iteration = 0;
+    
+    while (iteration < maxIterations) {
+      let hasCollisions = false;
       
-      // Skip the moved widget
-      if (widget.id === movedWidgetId) continue;
-      
-      // Check if this widget collides with any widget above it
-      const widgetsAbove = sortedWidgets.slice(0, i);
-      let hasCollision = false;
-      
-      do {
-        hasCollision = false;
-        for (const upperWidget of widgetsAbove) {
-          if (this.hasCollision(widget.position, [upperWidget])) {
-            // Move this widget down to avoid collision
-            widget.position.y = upperWidget.position.y + upperWidget.position.h;
-            hasCollision = true;
-            break;
+      // Find all collision pairs
+      for (let i = 0; i < result.length; i++) {
+        for (let j = i + 1; j < result.length; j++) {
+          const widgetA = result[i];
+          const widgetB = result[j];
+          
+          if (this.hasCollision(widgetA.position, [widgetB])) {
+            hasCollisions = true;
+            
+            // Move the widget that's lower (higher Y) or rightmost if same Y
+            const toMove = widgetA.position.y > widgetB.position.y || 
+                          (widgetA.position.y === widgetB.position.y && widgetA.position.x > widgetB.position.x) 
+                          ? widgetA : widgetB;
+            
+            // Find new position for the widget to move
+            const newPos = this.findNextPosition(
+              result.filter(w => w.id !== toMove.id),
+              toMove.size
+            );
+            toMove.position = newPos;
           }
         }
-      } while (hasCollision);
+      }
+      
+      if (!hasCollisions) break;
+      iteration++;
     }
     
     return result;
@@ -368,8 +412,17 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
 
   const moveWidget = useCallback(
     (widgetId: string, position: WidgetPosition) => {
+      console.log('🔄 Moving widget:', widgetId, 'to position:', position);
+      
       // Use reorganization logic to avoid overlaps
       const reorganizedWidgets = positionUtils.reorganizeWidgets(widgets, widgetId, position);
+      
+      console.log('📊 Reorganized widgets:', reorganizedWidgets.map(w => ({
+        id: w.id,
+        title: w.title,
+        position: w.position
+      })));
+      
       setWidgets(reorganizedWidgets);
       setHasChanges(true);
     },

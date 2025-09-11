@@ -79,23 +79,39 @@ export async function GET(request: NextRequest) {
     let layouts;
 
     if (layoutId) {
-      // Get specific layout
-      const layout = await DashboardLayout.findOne({
-        _id: layoutId,
-        userId: userData.userId,
-      }).lean();
+      // Handle special case for "default" layoutId
+      if (layoutId === "default") {
+        // Get default layout for the user
+        const defaultLayout = await DashboardLayout.findOne({
+          userId: userData.userId,
+          isDefault: true,
+        }).lean();
 
-      if (!layout) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: "Layout non trovato",
-          },
-          { status: 404 }
-        );
+        if (!defaultLayout) {
+          // No default layout exists, return empty array to trigger default creation
+          layouts = [];
+        } else {
+          layouts = [defaultLayout];
+        }
+      } else {
+        // Get specific layout by MongoDB ObjectId
+        const layout = await DashboardLayout.findOne({
+          _id: layoutId,
+          userId: userData.userId,
+        }).lean();
+
+        if (!layout) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: "Layout non trovato",
+            },
+            { status: 404 }
+          );
+        }
+
+        layouts = [layout];
       }
-
-      layouts = [layout];
     } else if (defaultOnly) {
       // Get default layout only
       const defaultLayout = await DashboardLayout.findOne({

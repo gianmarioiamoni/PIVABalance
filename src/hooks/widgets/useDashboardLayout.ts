@@ -353,13 +353,6 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         ? selectedSize as WidgetConfig["size"]
         : registryEntry.defaultSize;
 
-      console.log('🎯 Adding widget:', {
-        widgetType,
-        selectedSize,
-        supportedSizes: registryEntry.supportedSizes,
-        finalSize: widgetSize,
-        defaultSize: registryEntry.defaultSize
-      });
 
       const position = customPosition
         ? {
@@ -385,11 +378,6 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         },
       };
 
-      console.log('📦 Created widget:', {
-        size: newWidget.size,
-        position: newWidget.position,
-        title: newWidget.title
-      });
 
       setWidgets((prev) => [...prev, newWidget]);
       setHasChanges(true);
@@ -431,17 +419,8 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
 
   const moveWidget = useCallback(
     (widgetId: string, position: WidgetPosition) => {
-      console.log('🔄 Moving widget:', widgetId, 'to position:', position);
-      
       // Use reorganization logic to avoid overlaps
       const reorganizedWidgets = positionUtils.reorganizeWidgets(widgets, widgetId, position);
-      
-      console.log('📊 Reorganized widgets:', reorganizedWidgets.map(w => ({
-        id: w.id,
-        title: w.title,
-        position: w.position
-      })));
-      
       setWidgets(reorganizedWidgets);
       setHasChanges(true);
     },

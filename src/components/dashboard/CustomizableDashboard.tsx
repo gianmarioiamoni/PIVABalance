@@ -139,14 +139,16 @@ const WidgetRenderer: React.FC<{
     onWidgetRemove: (id: string) => void;
     onWidgetRefresh: (id: string) => void;
 }> = ({ widget, isEditing, onWidgetChange, onWidgetRemove, onWidgetRefresh }) => {
-    const registryEntry = WidgetRegistry.getById(widget.type);
+    // Get the actual widget registry ID from customSettings, fallback to type for backward compatibility
+    const widgetRegistryId = (widget.customSettings as { widgetRegistryId?: string })?.widgetRegistryId || widget.type;
+    const registryEntry = WidgetRegistry.getById(widgetRegistryId);
 
     if (!registryEntry) {
         return (
             <div className={getWidgetGridClasses(widget.size)}>
                 <WidgetSkeleton
                     size={widget.size}
-                    title={`Widget non trovato: ${widget.type}`}
+                    title={`Widget non trovato: ${widgetRegistryId}`}
                     showHeader={true}
                 />
             </div>

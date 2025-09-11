@@ -81,13 +81,16 @@ const _createDefaultLayout = (): DashboardLayout => {
 
       return {
         id: `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        type: item.widgetId,
+        type: registryEntry.type, // Use registry type, not widget ID
         title: registryEntry.name,
         size: registryEntry.defaultSize,
         position: item.position,
         isVisible: true,
         refreshInterval: 300,
-        customSettings: registryEntry.defaultConfig.customSettings || {},
+        customSettings: {
+          ...registryEntry.defaultConfig.customSettings || {},
+          widgetRegistryId: item.widgetId, // Store the actual widget ID for component rendering
+        },
       } as WidgetConfig;
     })
     .filter(Boolean) as WidgetConfig[];
@@ -271,13 +274,16 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
 
       const newWidget: WidgetConfig = {
         id: `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        type: widgetType as WidgetType,
+        type: registryEntry.type as WidgetType, // Use registry type, not widget ID
         title: registryEntry.name,
         size: registryEntry.defaultSize,
         position,
         isVisible: true,
         refreshInterval: registryEntry.defaultConfig.refreshInterval || 300,
-        customSettings: registryEntry.defaultConfig.customSettings || {},
+        customSettings: {
+          ...registryEntry.defaultConfig.customSettings || {},
+          widgetRegistryId: widgetType, // Store the actual widget ID for component rendering
+        },
       };
 
       setWidgets((prev) => [...prev, newWidget]);

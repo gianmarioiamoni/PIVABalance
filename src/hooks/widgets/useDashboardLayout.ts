@@ -201,10 +201,23 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
   // Save layout mutation
   const saveLayoutMutation = useMutation({
     mutationFn: (layout: DashboardLayout) => {
-      if (layout.id && layout.id !== "default") {
+      console.log("🔄 Saving layout:", { id: layout.id, widgetCount: layout.widgets.length });
+      
+      // If we have a real MongoDB _id (not "default"), update existing layout
+      if (layout.id && layout.id !== "default" && layout.id.length === 24) {
+        console.log("📝 Updating existing layout with ID:", layout.id);
         return dashboardLayoutService.updateLayout(layout.id, layout);
       } else {
-        return dashboardLayoutService.createLayout(layout);
+        // Create new default layout (will be marked as default)
+        const layoutToCreate = {
+          ...layout,
+          isDefault: true, // Ensure it's marked as default
+          name: layout.name || "Dashboard Personalizzata"
+        };
+        // Remove the "default" id as it's not a real MongoDB id
+        const { id, ...layoutData } = layoutToCreate;
+        console.log("✨ Creating new default layout:", { widgetCount: layoutData.widgets.length });
+        return dashboardLayoutService.createLayout(layoutData);
       }
     },
     onSuccess: (savedLayout) => {
@@ -318,15 +331,42 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
   }, []);
 
   const saveLayout = useCallback(async () => {
-    if (!layout || !hasChanges) return;
+    if (!hasChanges) {
+      console.log("⚠️ No changes to save");
+      return;
+    }
 
-    const updatedLayout: DashboardLayout = {
+    console.log("💾 saveLayout called:", { hasLayout: !!layout, widgetCount: widgets.length });
+
+    // Create layout object to save
+    const layoutToSave: DashboardLayout = layout ? {
       ...layout,
       widgets,
       updatedAt: new Date(),
+    } : {
+      // Create new default layout if no existing layout
+      id: "default",
+      userId: "current-user", // Will be set by API
+      name: "Dashboard Personalizzata",
+      isDefault: true,
+      widgets,
+      layoutSettings: {
+        columns: 12,
+        rowHeight: 150,
+        margin: [16, 16],
+        containerPadding: [16, 16],
+        breakpoints: {
+          lg: 1200,
+          md: 996,
+          sm: 768,
+          xs: 480,
+        },
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
-    await saveLayoutMutation.mutateAsync(updatedLayout);
+    await saveLayoutMutation.mutateAsync(layoutToSave);
   }, [layout, widgets, hasChanges, saveLayoutMutation]);
 
   const resetLayout = useCallback(() => {

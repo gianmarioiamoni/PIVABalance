@@ -34,7 +34,7 @@ export const RecentActivities: React.FC<RecentActivitiesProps> = ({ activities }
                                     ? 'text-green-600'
                                     : 'text-red-600'
                             }>
-                                {activity.type === 'income' ? '+' : '-'}{activity.amount}
+                                {activity.amount}
                             </span>
                         </div>
                     ))}

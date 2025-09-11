@@ -172,6 +172,48 @@ const positionUtils = {
       );
     });
   },
+
+  /**
+   * Reorganize widgets to avoid overlaps after moving one widget
+   */
+  reorganizeWidgets(widgets: WidgetConfig[], movedWidgetId: string, newPosition: WidgetPosition): WidgetConfig[] {
+    const result = [...widgets];
+    const movedWidget = result.find(w => w.id === movedWidgetId);
+    
+    if (!movedWidget) return result;
+    
+    // Update the moved widget position
+    movedWidget.position = { ...newPosition };
+    
+    // Sort widgets by Y position to process from top to bottom
+    const sortedWidgets = result.sort((a, b) => a.position.y - b.position.y);
+    
+    // Check for collisions and push down overlapping widgets
+    for (let i = 0; i < sortedWidgets.length; i++) {
+      const widget = sortedWidgets[i];
+      
+      // Skip the moved widget
+      if (widget.id === movedWidgetId) continue;
+      
+      // Check if this widget collides with any widget above it
+      const widgetsAbove = sortedWidgets.slice(0, i);
+      let hasCollision = false;
+      
+      do {
+        hasCollision = false;
+        for (const upperWidget of widgetsAbove) {
+          if (this.hasCollision(widget.position, [upperWidget])) {
+            // Move this widget down to avoid collision
+            widget.position.y = upperWidget.position.y + upperWidget.position.h;
+            hasCollision = true;
+            break;
+          }
+        }
+      } while (hasCollision);
+    }
+    
+    return result;
+  },
 };
 
 /**
@@ -326,9 +368,12 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
 
   const moveWidget = useCallback(
     (widgetId: string, position: WidgetPosition) => {
-      updateWidget(widgetId, { position });
+      // Use reorganization logic to avoid overlaps
+      const reorganizedWidgets = positionUtils.reorganizeWidgets(widgets, widgetId, position);
+      setWidgets(reorganizedWidgets);
+      setHasChanges(true);
     },
-    [updateWidget]
+    [widgets]
   );
 
   // Layout management functions

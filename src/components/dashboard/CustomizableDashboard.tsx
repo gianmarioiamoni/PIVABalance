@@ -118,14 +118,14 @@ const DashboardToolbar: React.FC<{
  * Widget Size Utility
  * SRP: Handles only CSS class mapping for widget sizes
  */
-const getWidgetGridClasses = (size: string): string => {
-    const sizeClasses = {
-        'small': 'col-span-3 row-span-1',
-        'medium': 'col-span-6 row-span-1',
-        'large': 'col-span-6 row-span-2',
-        'full': 'col-span-12 row-span-2'
+const getWidgetGridStyle = (widget: WidgetConfig): React.CSSProperties => {
+    const { position } = widget;
+    
+    // Use CSS Grid positioning with specific coordinates
+    return {
+        gridColumn: `${position.x + 1} / span ${position.w}`,
+        gridRow: `${position.y + 1} / span ${position.h}`,
     };
-    return sizeClasses[size as keyof typeof sizeClasses] || 'col-span-6 row-span-1';
 };
 
 /**
@@ -145,7 +145,7 @@ const WidgetRenderer: React.FC<{
 
     if (!registryEntry) {
         return (
-            <div className={getWidgetGridClasses(widget.size)}>
+            <div style={getWidgetGridStyle(widget)}>
                 <WidgetSkeleton
                     size={widget.size}
                     title={`Widget non trovato: ${widgetRegistryId}`}
@@ -158,7 +158,7 @@ const WidgetRenderer: React.FC<{
     const WidgetComponent = registryEntry.component;
 
     return (
-        <div className={getWidgetGridClasses(widget.size)}>
+        <div style={getWidgetGridStyle(widget)}>
             <WidgetComponent
                 config={widget}
                 isEditing={isEditing}
@@ -184,7 +184,7 @@ const WidgetGrid: React.FC<{
     onWidgetMove?: (widgetId: string, position: WidgetPosition) => void;
 }> = ({ widgets, isEditing, onWidgetChange, onWidgetRemove, onWidgetRefresh, onWidgetMove }) => {
     const [draggedWidget, setDraggedWidget] = useState<string | null>(null);
-    const [dragOverPosition, setDragOverPosition] = useState<{x: number, y: number} | null>(null);
+    const [dragOverPosition, setDragOverPosition] = useState<{ x: number, y: number } | null>(null);
 
     // Handle drag start
     const handleDragStart = useCallback((e: React.DragEvent, widgetId: string) => {
@@ -193,16 +193,10 @@ const WidgetGrid: React.FC<{
         setDraggedWidget(widgetId);
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', widgetId);
-        
-        // Add some visual feedback
-        const target = e.currentTarget as HTMLElement;
-        target.style.opacity = '0.5';
     }, [isEditing]);
 
     // Handle drag end
-    const handleDragEnd = useCallback((e: React.DragEvent) => {
-        const target = e.currentTarget as HTMLElement;
-        target.style.opacity = '1';
+    const handleDragEnd = useCallback((_e: React.DragEvent) => {
         setDraggedWidget(null);
         setDragOverPosition(null);
     }, []);
@@ -210,28 +204,28 @@ const WidgetGrid: React.FC<{
     // Handle drag over (for drop zones)
     const handleDragOver = useCallback((e: React.DragEvent) => {
         if (!isEditing || !draggedWidget) return;
-        
+
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
-        
+
         // Calculate grid position based on mouse position
         const rect = e.currentTarget.getBoundingClientRect();
         const x = Math.floor(((e.clientX - rect.left) / rect.width) * 12);
         const y = Math.floor((e.clientY - rect.top) / 150); // Assuming 150px row height
-        
+
         setDragOverPosition({ x: Math.max(0, Math.min(11, x)), y: Math.max(0, y) });
     }, [isEditing, draggedWidget]);
 
     // Handle drop
     const handleDrop = useCallback((e: React.DragEvent) => {
         if (!isEditing || !draggedWidget || !onWidgetMove) return;
-        
+
         e.preventDefault();
-        
+
         const rect = e.currentTarget.getBoundingClientRect();
         const x = Math.floor(((e.clientX - rect.left) / rect.width) * 12);
         const y = Math.floor((e.clientY - rect.top) / 150);
-        
+
         const widget = widgets.find(w => w.id === draggedWidget);
         if (widget) {
             const newPosition: WidgetPosition = {
@@ -240,25 +234,29 @@ const WidgetGrid: React.FC<{
                 w: widget.position.w,
                 h: widget.position.h
             };
-            
+
             onWidgetMove(draggedWidget, newPosition);
         }
-        
+
         setDraggedWidget(null);
         setDragOverPosition(null);
     }, [isEditing, draggedWidget, onWidgetMove, widgets]);
 
+    // Calculate the maximum row needed
+    const maxRow = Math.max(0, ...widgets.map(w => w.position.y + w.position.h));
+    const gridTemplateRows = `repeat(${Math.max(maxRow, 4)}, 150px)`;
+
     return (
-        <div 
-            className={`grid grid-cols-12 gap-4 auto-rows-fr min-h-[200px] relative ${
-                isEditing ? 'transition-all duration-200' : ''
-            }`}
+        <div
+            className={`grid grid-cols-12 gap-4 min-h-[200px] relative ${isEditing ? 'transition-all duration-200' : ''
+                }`}
+            style={{ gridTemplateRows }}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
         >
             {/* Drag overlay indicator */}
             {isEditing && dragOverPosition && draggedWidget && (
-                <div 
+                <div
                     className="absolute bg-blue-200 bg-opacity-50 border-2 border-blue-400 border-dashed rounded-lg pointer-events-none z-10"
                     style={{
                         left: `${(dragOverPosition.x / 12) * 100}%`,
@@ -268,16 +266,15 @@ const WidgetGrid: React.FC<{
                     }}
                 />
             )}
-            
+
             {widgets.map(widget => (
                 <div
                     key={widget.id}
                     draggable={isEditing}
                     onDragStart={(e) => handleDragStart(e, widget.id)}
                     onDragEnd={handleDragEnd}
-                    className={`${getWidgetGridClasses(widget.size)} ${
-                        isEditing ? 'cursor-move' : ''
-                    } ${draggedWidget === widget.id ? 'z-50' : ''}`}
+                    style={getWidgetGridStyle(widget)}
+                    className={`${isEditing ? 'cursor-move' : ''} ${draggedWidget === widget.id ? 'z-50 opacity-50' : ''}`}
                 >
                     <WidgetRenderer
                         widget={widget}

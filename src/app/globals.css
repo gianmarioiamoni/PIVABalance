@@ -701,6 +701,21 @@ body {
   transform: scale(1.02);
 }
 
+/* Line clamp utilities for text truncation */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
 /* Custom shadow utilities for enhanced depth */
 .shadow-blue-100\/30 {
   box-shadow: 0 4px 15px -3px rgb(219 234 254 / 0.3), 0 2px 6px -4px rgb(219 234 254 / 0.3);

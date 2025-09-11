@@ -73,62 +73,70 @@ const WidgetCard: React.FC<{
 
     return (
         <div className={`
-      bg-white border border-gray-200 rounded-lg p-4 transition-all duration-200 cursor-pointer
-      ${disabled
-                ? 'opacity-50 cursor-not-allowed'
-                : 'hover:border-blue-300 hover:shadow-md hover:scale-[1.02]'
+            bg-white border-2 rounded-xl p-5 transition-all duration-300 relative
+            min-h-[200px] flex flex-col justify-between
+            ${disabled
+                ? 'opacity-50 cursor-not-allowed border-gray-200 bg-gray-50'
+                : 'border-gray-200 hover:border-blue-400 hover:shadow-lg hover:scale-[1.03] cursor-pointer bg-gradient-to-br from-white to-gray-50'
             }
-    `}>
+        `}>
             {/* Widget Header */}
-            <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center space-x-2">
+            <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-3">
                     {IconComponent && (
-                        <div className="p-2 bg-blue-50 rounded-lg">
-                            <IconComponent className="h-5 w-5 text-blue-600" />
+                        <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-sm">
+                            <IconComponent className="h-6 w-6 text-blue-600" />
                         </div>
                     )}
-                    <div>
-                        <h3 className="font-semibold text-gray-900 text-sm">
+                    <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-gray-900 text-base truncate">
                             {widget.name}
                         </h3>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-sm text-blue-600 font-medium">
                             {widget.category}
                         </p>
                     </div>
                 </div>
 
                 {/* Size Indicator */}
-                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                <span className="text-xs bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 py-1.5 rounded-full font-semibold shadow-sm">
                     {widget.defaultSize}
                 </span>
             </div>
 
             {/* Widget Description */}
-            <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+            <p className="text-sm text-gray-600 mb-4 line-clamp-3 leading-relaxed flex-grow">
                 {widget.description}
             </p>
 
             {/* Supported Sizes */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-1">
-                    <span className="text-xs text-gray-500">Dimensioni:</span>
-                    <div className="flex space-x-1">
+            <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500 font-medium">Dimensioni:</span>
+                    <div className="flex flex-wrap gap-1">
                         {widget.supportedSizes.map(size => (
-                            <span key={size} className="text-xs bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded">
+                            <span key={size} className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-md border border-blue-200 font-medium">
                                 {size}
                             </span>
                         ))}
                     </div>
                 </div>
 
-                {/* Add Button */}
+                {/* Add Button - Full Width and More Prominent */}
                 <button
                     onClick={onSelect}
                     disabled={disabled}
-                    className="flex items-center space-x-1 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`
+                        w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm font-semibold rounded-lg
+                        transition-all duration-300 shadow-sm
+                        ${disabled
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 hover:shadow-md transform hover:scale-105'
+                        }
+                    `}
                 >
-                    <Plus className="h-3 w-3" />
-                    <span>Aggiungi</span>
+                    <Plus className="h-4 w-4" />
+                    <span>{disabled ? 'Limite Raggiunto' : 'Aggiungi Widget'}</span>
                 </button>
             </div>
         </div>
@@ -176,22 +184,37 @@ const WidgetLibraryHeader: React.FC<{
     maxWidgets: number;
     onClose: () => void;
 }> = ({ currentWidgetCount, maxWidgets, onClose }) => {
+    const progressPercentage = (currentWidgetCount / maxWidgets) * 100;
+    
     return (
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <div>
-                <h2 className="text-xl font-semibold text-gray-900">
-                    Libreria Widget
+        <div className="flex items-center justify-between p-6 border-b-2 border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    🎯 Libreria Widget
                 </h2>
-                <p className="text-sm text-gray-600 mt-1">
-                    Scegli widget da aggiungere alla tua dashboard ({currentWidgetCount}/{maxWidgets})
-                </p>
+                <div className="flex items-center space-x-4">
+                    <p className="text-sm text-gray-700 font-medium">
+                        Scegli widget da aggiungere alla tua dashboard
+                    </p>
+                    <div className="flex items-center space-x-2">
+                        <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300"
+                                style={{ width: `${progressPercentage}%` }}
+                            />
+                        </div>
+                        <span className="text-xs font-semibold text-gray-600">
+                            {currentWidgetCount}/{maxWidgets}
+                        </span>
+                    </div>
+                </div>
             </div>
 
             <button
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-3 text-gray-400 hover:text-gray-600 hover:bg-white hover:shadow-md rounded-xl transition-all duration-300 transform hover:scale-110"
             >
-                <X className="h-5 w-5" />
+                <X className="h-6 w-6" />
             </button>
         </div>
     );
@@ -303,8 +326,8 @@ export const WidgetLibrary: React.FC<WidgetLibraryProps> = ({
     const canAddMore = currentWidgetCount < maxWidgets;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className={`bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden ${className}`}>
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+            <div className={`bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden flex flex-col ${className}`}>
                 {/* Header */}
                 <WidgetLibraryHeader
                     currentWidgetCount={currentWidgetCount}
@@ -325,30 +348,40 @@ export const WidgetLibrary: React.FC<WidgetLibraryProps> = ({
                 />
 
                 {/* Widget List */}
-                <div className="p-6 max-h-96 overflow-y-auto">
+                <div className="px-6 pb-6 flex-1 overflow-y-auto">
                     {!canAddMore && (
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                            <div className="flex items-center space-x-2">
-                                <Info className="h-4 w-4 text-yellow-600" />
-                                <span className="text-sm text-yellow-700">
-                                    Hai raggiunto il limite massimo di {maxWidgets} widget
-                                </span>
+                        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-200 rounded-xl p-4 mb-6 shadow-sm">
+                            <div className="flex items-center space-x-3">
+                                <div className="p-2 bg-yellow-100 rounded-lg">
+                                    <Info className="h-5 w-5 text-yellow-600" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-semibold text-yellow-800">
+                                        Limite Raggiunto
+                                    </p>
+                                    <p className="text-xs text-yellow-700">
+                                        Hai raggiunto il limite massimo di {maxWidgets} widget. Rimuovi alcuni widget per aggiungerne di nuovi.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     )}
 
                     {filteredWidgets.length === 0 ? (
-                        <div className="text-center py-8">
-                            <Search className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                            <p className="text-gray-500">Nessun widget trovato</p>
+                        <div className="text-center py-12">
+                            <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                <Search className="h-8 w-8 text-gray-400" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-700 mb-2">Nessun widget trovato</h3>
+                            <p className="text-gray-500 text-sm">Prova a modificare i filtri di ricerca</p>
                         </div>
                     ) : (
                         <div className={`
-              ${viewMode === 'grid'
-                                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'
-                                : 'space-y-3'
+                            ${viewMode === 'grid'
+                                ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'
+                                : 'space-y-4'
                             }
-            `}>
+                        `}>
                             {filteredWidgets.map(widget => (
                                 <WidgetCard
                                     key={widget.id}
@@ -362,16 +395,22 @@ export const WidgetLibrary: React.FC<WidgetLibraryProps> = ({
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-                    <p className="text-sm text-gray-600">
-                        Puoi riorganizzare i widget trascinandoli nella dashboard
-                    </p>
+                <div className="flex items-center justify-between p-6 border-t-2 border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+                    <div className="flex items-center space-x-2">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                            <Info className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <p className="text-sm text-gray-700 font-medium">
+                            Puoi riorganizzare i widget trascinandoli nella dashboard
+                        </p>
+                    </div>
 
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                        className="flex items-center space-x-2 px-6 py-3 text-sm font-semibold bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                     >
-                        Chiudi
+                        <X className="h-4 w-4" />
+                        <span>Chiudi Libreria</span>
                     </button>
                 </div>
             </div>

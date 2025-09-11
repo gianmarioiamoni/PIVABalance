@@ -171,6 +171,7 @@ export const RevenueWidget: React.FC<RevenueWidgetProps> = ({
         revenueData,
         isLoading,
         error,
+        lastUpdated,
         refresh
     } = useRevenueData(monthsToAnalyze);
 
@@ -186,7 +187,7 @@ export const RevenueWidget: React.FC<RevenueWidgetProps> = ({
     const widgetData = {
         id: config.id,
         data: revenueData,
-        lastUpdated: new Date(),
+        lastUpdated,
         isLoading,
         error: error || undefined
     };

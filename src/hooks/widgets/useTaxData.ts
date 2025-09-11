@@ -248,6 +248,7 @@ const calculateSavingsOpportunity = (
  */
 export const useTaxData = () => {
   const [taxData, setTaxData] = useState<TaxData | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // Fetch all required data
   const {
@@ -255,6 +256,7 @@ export const useTaxData = () => {
     isLoading: settingsLoading,
     error: settingsError,
     refetch: refetchSettings,
+    dataUpdatedAt: settingsUpdatedAt,
   } = useQuery({
     queryKey: ["settings"],
     queryFn: () => settingsService.getUserSettings(),
@@ -266,6 +268,7 @@ export const useTaxData = () => {
     isLoading: invoicesLoading,
     error: invoicesError,
     refetch: refetchInvoices,
+    dataUpdatedAt: invoicesUpdatedAt,
   } = useQuery({
     queryKey: ["invoices", "tax-calculation"],
     queryFn: () => invoiceService.getAllInvoices(),
@@ -277,6 +280,7 @@ export const useTaxData = () => {
     isLoading: costsLoading,
     error: costsError,
     refetch: refetchCosts,
+    dataUpdatedAt: costsUpdatedAt,
   } = useQuery({
     queryKey: ["costs", "tax-calculation"],
     queryFn: () => costService.getAllCosts(),
@@ -288,8 +292,11 @@ export const useTaxData = () => {
     if (settings && invoices && costs) {
       const processed = calculateTaxes(invoices, costs, settings);
       setTaxData(processed);
+      // Update lastUpdated with the most recent data timestamp
+      const latestUpdate = Math.max(settingsUpdatedAt, invoicesUpdatedAt, costsUpdatedAt);
+      setLastUpdated(new Date(latestUpdate));
     }
-  }, [settings, invoices, costs]);
+  }, [settings, invoices, costs, settingsUpdatedAt, invoicesUpdatedAt, costsUpdatedAt]);
 
   // Refresh function
   const refresh = useCallback(() => {
@@ -310,6 +317,7 @@ export const useTaxData = () => {
     taxData,
     isLoading,
     error,
+    lastUpdated,
     refresh,
   };
 };

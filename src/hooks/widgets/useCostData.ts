@@ -203,6 +203,7 @@ const processCostData = (
  */
 export const useCostData = (monthsToAnalyze: number = 12) => {
   const [costData, setCostData] = useState<CostData | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // Fetch costs data
   const {
@@ -210,6 +211,7 @@ export const useCostData = (monthsToAnalyze: number = 12) => {
     isLoading,
     error,
     refetch,
+    dataUpdatedAt,
   } = useQuery({
     queryKey: ["costs", "cost-analysis"],
     queryFn: () => costService.getAllCosts(),
@@ -222,8 +224,10 @@ export const useCostData = (monthsToAnalyze: number = 12) => {
     if (costs) {
       const processed = processCostData(costs, monthsToAnalyze);
       setCostData(processed);
+      // Update lastUpdated when data is actually processed
+      setLastUpdated(new Date(dataUpdatedAt));
     }
-  }, [costs, monthsToAnalyze]);
+  }, [costs, monthsToAnalyze, dataUpdatedAt]);
 
   // Refresh function
   const refresh = useCallback(() => {
@@ -234,6 +238,7 @@ export const useCostData = (monthsToAnalyze: number = 12) => {
     costData,
     isLoading,
     error: error?.message || null,
+    lastUpdated,
     refresh,
   };
 };

@@ -148,6 +148,7 @@ const processRevenueData = (
  */
 export const useRevenueData = (monthsToAnalyze: number = 12) => {
   const [revenueData, setRevenueData] = useState<RevenueData | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // Fetch invoices data
   const {
@@ -155,6 +156,7 @@ export const useRevenueData = (monthsToAnalyze: number = 12) => {
     isLoading,
     error,
     refetch,
+    dataUpdatedAt,
   } = useQuery({
     queryKey: ["invoices", "revenue-analysis"],
     queryFn: () => invoiceService.getAllInvoices(),
@@ -167,8 +169,10 @@ export const useRevenueData = (monthsToAnalyze: number = 12) => {
     if (invoices) {
       const processed = processRevenueData(invoices, monthsToAnalyze);
       setRevenueData(processed);
+      // Update lastUpdated when data is actually processed
+      setLastUpdated(new Date(dataUpdatedAt));
     }
-  }, [invoices, monthsToAnalyze]);
+  }, [invoices, monthsToAnalyze, dataUpdatedAt]);
 
   // Refresh function
   const refresh = useCallback(() => {
@@ -179,6 +183,7 @@ export const useRevenueData = (monthsToAnalyze: number = 12) => {
     revenueData,
     isLoading,
     error: error?.message || null,
+    lastUpdated,
     refresh,
   };
 };

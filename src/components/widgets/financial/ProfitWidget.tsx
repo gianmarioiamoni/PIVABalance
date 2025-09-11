@@ -247,6 +247,7 @@ export const ProfitWidget: React.FC<ProfitWidgetProps> = ({
         profitData,
         isLoading,
         error,
+        lastUpdated,
         refresh
     } = useProfitData(monthsToAnalyze);
 
@@ -262,7 +263,7 @@ export const ProfitWidget: React.FC<ProfitWidgetProps> = ({
     const widgetData = {
         id: config.id,
         data: profitData,
-        lastUpdated: new Date(),
+        lastUpdated,
         isLoading,
         error: error || undefined
     };

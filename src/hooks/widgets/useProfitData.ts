@@ -316,6 +316,7 @@ const processProfitData = (
  */
 export const useProfitData = (monthsToAnalyze: number = 12) => {
   const [profitData, setProfitData] = useState<ProfitData | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // Fetch invoices and costs data
   const {
@@ -323,6 +324,7 @@ export const useProfitData = (monthsToAnalyze: number = 12) => {
     isLoading: invoicesLoading,
     error: invoicesError,
     refetch: refetchInvoices,
+    dataUpdatedAt: invoicesUpdatedAt,
   } = useQuery({
     queryKey: ["invoices", "profit-analysis"],
     queryFn: () => invoiceService.getAllInvoices(),
@@ -335,6 +337,7 @@ export const useProfitData = (monthsToAnalyze: number = 12) => {
     isLoading: costsLoading,
     error: costsError,
     refetch: refetchCosts,
+    dataUpdatedAt: costsUpdatedAt,
   } = useQuery({
     queryKey: ["costs", "profit-analysis"],
     queryFn: () => costService.getAllCosts(),
@@ -347,8 +350,11 @@ export const useProfitData = (monthsToAnalyze: number = 12) => {
     if (invoices && costs) {
       const processed = processProfitData(invoices, costs, monthsToAnalyze);
       setProfitData(processed);
+      // Update lastUpdated with the most recent data timestamp
+      const latestUpdate = Math.max(invoicesUpdatedAt, costsUpdatedAt);
+      setLastUpdated(new Date(latestUpdate));
     }
-  }, [invoices, costs, monthsToAnalyze]);
+  }, [invoices, costs, monthsToAnalyze, invoicesUpdatedAt, costsUpdatedAt]);
 
   // Refresh function
   const refresh = useCallback(() => {
@@ -364,6 +370,7 @@ export const useProfitData = (monthsToAnalyze: number = 12) => {
     profitData,
     isLoading,
     error,
+    lastUpdated,
     refresh,
   };
 };

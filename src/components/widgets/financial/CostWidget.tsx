@@ -193,6 +193,7 @@ export const CostWidget: React.FC<CostWidgetProps> = ({
         costData,
         isLoading,
         error,
+        lastUpdated,
         refresh
     } = useCostData(monthsToAnalyze);
 
@@ -208,7 +209,7 @@ export const CostWidget: React.FC<CostWidgetProps> = ({
     const widgetData = {
         id: config.id,
         data: costData,
-        lastUpdated: new Date(),
+        lastUpdated,
         isLoading,
         error: error || undefined
     };

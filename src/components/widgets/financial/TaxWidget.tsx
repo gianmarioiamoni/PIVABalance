@@ -224,6 +224,7 @@ export const TaxWidget: React.FC<TaxWidgetProps> = ({
         taxData,
         isLoading,
         error,
+        lastUpdated,
         refresh
     } = useTaxData();
 
@@ -239,7 +240,7 @@ export const TaxWidget: React.FC<TaxWidgetProps> = ({
     const widgetData = {
         id: config.id,
         data: taxData,
-        lastUpdated: new Date(),
+        lastUpdated,
         isLoading,
         error: error || undefined
     };

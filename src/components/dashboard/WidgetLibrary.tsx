@@ -99,9 +99,9 @@ const WidgetCard: React.FC<{
                     </div>
                 </div>
 
-                {/* Size Indicator */}
-                <span className="text-xs bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 py-1.5 rounded-full font-semibold shadow-sm">
-                    {widget.defaultSize}
+                {/* Size Indicator - Shows selected size */}
+                <span className="text-xs bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 px-3 py-1.5 rounded-full font-semibold shadow-sm transition-all duration-200">
+                    {selectedSize}
                 </span>
             </div>
 

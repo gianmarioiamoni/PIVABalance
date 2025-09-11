@@ -353,6 +353,14 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         ? selectedSize as WidgetConfig["size"]
         : registryEntry.defaultSize;
 
+      console.log('🎯 Adding widget:', {
+        widgetType,
+        selectedSize,
+        supportedSizes: registryEntry.supportedSizes,
+        finalSize: widgetSize,
+        defaultSize: registryEntry.defaultSize
+      });
+
       const position = customPosition
         ? {
             ...positionUtils.findNextPosition(
@@ -376,6 +384,12 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
           widgetRegistryId: widgetType, // Store the actual widget ID for component rendering
         },
       };
+
+      console.log('📦 Created widget:', {
+        size: newWidget.size,
+        position: newWidget.position,
+        title: newWidget.title
+      });
 
       setWidgets((prev) => [...prev, newWidget]);
       setHasChanges(true);

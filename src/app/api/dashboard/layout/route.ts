@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     const layoutId = searchParams.get("id");
     const defaultOnly = searchParams.get("default") === "true";
 
-    let layouts;
+    let layouts: unknown[] = [];
 
     if (layoutId) {
       // Handle special case for "default" layoutId

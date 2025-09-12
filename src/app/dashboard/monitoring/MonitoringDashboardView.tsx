@@ -14,8 +14,7 @@ import {
     BarChart3,
     AlertTriangle
 } from 'lucide-react';
-import { PerformanceDashboard } from '@/components/monitoring/PerformanceDashboard';
-import { SecurityDashboard } from '@/components/monitoring/SecurityDashboard';
+import { LazyPerformanceDashboard, LazySecurityDashboard } from '@/components/common/LazyComponents';
 
 type MonitoringTab = 'performance' | 'security' | 'mobile' | 'deployment';
 
@@ -282,7 +281,7 @@ export const MonitoringDashboardView: React.FC = () => {
         switch (activeTab) {
             case 'performance':
                 return (
-                    <PerformanceDashboard
+                    <LazyPerformanceDashboard
                         autoCollect={true}
                         showRealTime={true}
                     />
@@ -290,7 +289,7 @@ export const MonitoringDashboardView: React.FC = () => {
 
             case 'security':
                 return (
-                    <SecurityDashboard
+                    <LazySecurityDashboard
                         autoAudit={true}
                     />
                 );

@@ -49,7 +49,7 @@ export class PerformanceMonitor {
    * SRP: Data collection ONLY
    */
   static collectWebVitals(): Promise<PerformanceMetrics> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
         if (typeof window === "undefined") {
           // Return default metrics for SSR

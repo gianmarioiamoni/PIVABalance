@@ -222,7 +222,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                             <div className="px-4 sm:px-0">
                                 <nav className="flex flex-wrap gap-2 p-2 bg-white rounded-xl shadow-lg border border-gray-100" aria-label="Tabs">
                                     {navigationItems.map((item) => {
-                                        const colors = getGroupColors(item.group, item.current, item.disabled);
+                                        const colors = getGroupColors(item.group, item.current, item.disabled || false);
                                         return (
                                             <Link
                                                 key={item.name}

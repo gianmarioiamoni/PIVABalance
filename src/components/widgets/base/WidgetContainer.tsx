@@ -81,7 +81,7 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
     // Handle widget actions
     const handleRefresh = () => {
         if (onRefresh) {
-            onRefresh(); // Call without parameters - widgets handle their own ID
+            onRefresh(config.id); // Call with widget ID
         }
     };
 

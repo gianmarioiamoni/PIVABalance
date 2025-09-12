@@ -3,6 +3,7 @@ import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { NotificationProvider } from '@/providers/NotificationProvider';
 import { ThemeProvider } from '@/components/ui';
+import { ServiceWorkerProvider } from '@/providers/ServiceWorkerProvider';
 // import { PWAInstallPrompt } from '@/components/pwa';
 import './globals.css';
 
@@ -85,14 +86,16 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ThemeProvider>
-          <QueryProvider>
-            <AuthProvider>
-              <NotificationProvider>
-                {children}
-                {/* <PWAInstallPrompt autoShow={true} showDelay={5000} /> */}
-              </NotificationProvider>
-            </AuthProvider>
-          </QueryProvider>
+          <ServiceWorkerProvider>
+            <QueryProvider>
+              <AuthProvider>
+                <NotificationProvider>
+                  {children}
+                  {/* <PWAInstallPrompt autoShow={true} showDelay={5000} /> */}
+                </NotificationProvider>
+              </AuthProvider>
+            </QueryProvider>
+          </ServiceWorkerProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -93,7 +93,7 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
 
     const handleSettings = () => {
         // Show widget settings modal with current configuration
-        const currentSettings = {
+        const _currentSettings = {
             title: config.title,
             size: config.size,
             refreshInterval: config.refreshInterval,

@@ -19,7 +19,6 @@ import {
     RefreshCw,
 } from 'lucide-react';
 import {
-    SecurityAuditService,
     SecurityHardeningService,
     SecurityVulnerability,
     SecurityAuditReport
@@ -270,17 +269,34 @@ export const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
     const [error, setError] = useState<string | null>(null);
 
     /**
-     * Perform security audit
+     * Perform security audit via API
      */
     const performAudit = async () => {
         setIsAuditing(true);
         setError(null);
 
         try {
-            const report = await SecurityAuditService.performSecurityAudit();
-            setAuditReport(report);
+            const response = await fetch('/api/security/audit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ forceRefresh: true }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Security audit failed: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            
+            if (result.success) {
+                setAuditReport(result.data);
+            } else {
+                throw new Error(result.message || 'Security audit failed');
+            }
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown audit error';
+            const errorMessage = error instanceof Error ? error.message : 'Security audit failed';
             setError(errorMessage);
             console.error('Security audit error:', error);
         } finally {

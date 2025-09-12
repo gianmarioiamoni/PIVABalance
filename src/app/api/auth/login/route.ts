@@ -9,6 +9,7 @@ import {
 } from "@/lib/validations/schemas";
 import { SignInCredentials, ApiResponse, AuthResponse } from "@/types";
 import { compareUserPassword } from "@/utils/userCalculations";
+import { authRateLimiter, getClientIP } from "@/lib/rateLimiter";
 
 /**
  * POST /api/auth/login
@@ -18,6 +19,29 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<ApiResponse<AuthResponse>>> {
   try {
+    // Apply rate limiting
+    const clientIP = getClientIP(request);
+    const { allowed, resetTime, remaining } = authRateLimiter.isAllowed(clientIP);
+    
+    if (!allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Rate limit exceeded",
+          message: "Too many login attempts. Please try again later.",
+        },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Remaining': remaining.toString(),
+            'X-RateLimit-Reset': resetTime.toString(),
+            'Retry-After': Math.ceil((resetTime - Date.now()) / 1000).toString(),
+          }
+        }
+      );
+    }
+
     // Connect to database
     await connectDB();
 

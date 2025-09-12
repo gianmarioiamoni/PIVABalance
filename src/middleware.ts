@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const CORS_CONFIG = {
   allowedOrigins: process.env.NODE_ENV === 'production' 
     ? [process.env.NEXT_PUBLIC_APP_URL || 'https://your-domain.com']
-    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    : ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001'],
   allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: [
     'Content-Type',
@@ -19,6 +19,8 @@ const CORS_CONFIG = {
     'X-Requested-With',
     'X-API-Key',
     'X-CSRF-Token',
+    'Cache-Control',
+    'Pragma',
   ],
   exposedHeaders: [
     'X-RateLimit-Limit',
@@ -65,18 +67,27 @@ export function middleware(request: NextRequest) {
     return applyCorsHeaders(response, origin);
   }
 
+  // Skip middleware for Next.js static files
+  if (pathname.startsWith('/_next/') || pathname.includes('.')) {
+    return NextResponse.next();
+  }
+
   // Apply security headers for API routes
   if (pathname.startsWith('/api/')) {
     const response = NextResponse.next();
     
-    // Apply CORS
-    applyCorsHeaders(response, origin);
+    // Apply CORS only in production or for cross-origin requests
+    if (process.env.NODE_ENV === 'production' || (origin && !origin.includes('localhost'))) {
+      applyCorsHeaders(response, origin);
+    }
     
-    // Additional API security headers
-    response.headers.set('X-Content-Type-Options', 'nosniff');
-    response.headers.set('X-Frame-Options', 'DENY');
-    response.headers.set('X-XSS-Protection', '1; mode=block');
-    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    // Additional API security headers (only in production)
+    if (process.env.NODE_ENV === 'production') {
+      response.headers.set('X-Content-Type-Options', 'nosniff');
+      response.headers.set('X-Frame-Options', 'DENY');
+      response.headers.set('X-XSS-Protection', '1; mode=block');
+      response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    }
     
     // Prevent caching of sensitive API responses
     if (pathname.includes('/auth/') || pathname.includes('/user/')) {

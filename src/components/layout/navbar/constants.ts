@@ -25,6 +25,11 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     label: "Impostazioni",
     exactMatch: false,
   },
+  {
+    href: "/dashboard/account",
+    label: "Account",
+    exactMatch: false,
+  },
 ];
 
 /**

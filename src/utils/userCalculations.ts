@@ -31,6 +31,11 @@ export const compareUserPassword = async (
 };
 
 /**
+ * Alias for compareUserPassword for compatibility
+ */
+export const comparePassword = compareUserPassword;
+
+/**
  * Hash a password for storage
  */
 export const hashPassword = async (password: string): Promise<string> => {

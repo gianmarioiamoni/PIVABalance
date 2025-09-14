@@ -167,6 +167,13 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             icon: '⚙️'
         },
         { 
+            name: 'Account', 
+            href: '/dashboard/account', 
+            current: normalizedPathname === '/dashboard/account',
+            group: 'management',
+            icon: '👤'
+        },
+        { 
             name: 'Fatture', 
             href: '/dashboard/invoices', 
             current: normalizedPathname === '/dashboard/invoices',

@@ -109,7 +109,7 @@ const StatsGrid: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
                 variant="warning"
             />
             <StatCard
-                title="Tasse Stimate (Anno)"
+                title="Tasse su Dati Reali"
                 value={stats.estimatedTaxes}
                 icon={<CalculatorIcon className="h-5 w-5" />}
                 variant="info"
@@ -169,7 +169,7 @@ const FinancialOverview: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
                         <div className="text-2xl font-bold text-warning mb-2">
                             {stats.estimatedTaxes}
                         </div>
-                        <div className="text-tertiary text-sm">Tasse stimate annue</div>
+                        <div className="text-tertiary text-sm">Tasse su dati effettivi</div>
                     </div>
                 </div>
             </div>

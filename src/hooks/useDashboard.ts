@@ -81,14 +81,27 @@ export const useDashboard = (): UseDashboardReturn => {
       };
     }
 
-    // Calculate current month statistics
+    // Calculate year-to-date statistics for current year
+    const currentYear = new Date().getFullYear();
+    const yearToDateInvoices = invoices.filter(inv => {
+      const invoiceDate = new Date(inv.issueDate || inv.date);
+      return invoiceDate.getFullYear() === currentYear;
+    });
+    const yearToDateCosts = costsWithDates.filter(cost => {
+      return cost.date.getFullYear() === currentYear;
+    });
+    
+    const yearToDateRevenue = yearToDateInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+    const yearToDateCostsTotal = yearToDateCosts.reduce((sum, cost) => sum + cost.amount, 0);
+    
+    // Calculate current month statistics for display
     const invoiceStats = getCurrentMonthStats(invoices);
     const costStats = getCurrentMonthCostStats(costsWithDates);
     
-    // Use accurate tax calculation with user settings
+    // Use year-to-date data for accurate tax calculation
     const taxStats = calculateEstimatedMonthlyTaxes(
-      invoiceStats.revenue,
-      costStats.total,
+      yearToDateRevenue,
+      yearToDateCostsTotal,
       taxSettings
     );
 

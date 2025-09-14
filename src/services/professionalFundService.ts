@@ -54,11 +54,11 @@ class ProfessionalFundService {
 
   /**
    * Get professional fund by code
-   * Uses GET /api/professional-funds/{code} endpoint
+   * Uses GET /api/professional-funds/by-code/{code} endpoint
    */
   async getFundByCode(code: string): Promise<ProfessionalFund> {
     try {
-      const fund = await api.get<ProfessionalFund>(`/professional-funds/${code}`);
+      const fund = await api.get<ProfessionalFund>(`/professional-funds/by-code/${code}`);
       return fund;
     } catch (error) {
       console.error('Error fetching professional fund:', error);

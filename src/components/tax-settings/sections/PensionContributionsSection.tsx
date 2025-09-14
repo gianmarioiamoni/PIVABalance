@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -19,6 +19,18 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
   settings,
   handleChange,
 }) => {
+  // Memoized callback to prevent infinite loops
+  const handleParametersChange = useCallback((params: any) => {
+    if (params) {
+      handleChange('manualContributionRate', params.contributionRate);
+      handleChange('manualMinimumContribution', params.minimumContribution);
+      handleChange('manualFixedAnnualContributions', params.fixedAnnualContributions);
+    } else {
+      handleChange('manualContributionRate', undefined);
+      handleChange('manualMinimumContribution', undefined);
+      handleChange('manualFixedAnnualContributions', undefined);
+    }
+  }, [handleChange]);
   return (
     <div className="space-y-6">
       <div>
@@ -77,17 +89,7 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
                 // Fund change is handled by the component internally
                 console.warn('Selected fund:', fund);
               }}
-              onParametersChange={(params) => {
-                if (params) {
-                  handleChange('manualContributionRate', params.contributionRate);
-                  handleChange('manualMinimumContribution', params.minimumContribution);
-                  handleChange('manualFixedAnnualContributions', params.fixedAnnualContributions);
-                } else {
-                  handleChange('manualContributionRate', undefined);
-                  handleChange('manualMinimumContribution', undefined);
-                  handleChange('manualFixedAnnualContributions', undefined);
-                }
-              }}
+              onParametersChange={handleParametersChange}
               aria-describedby="professional-fund-description"
             />
             <div id="professional-fund-description" className="sr-only">

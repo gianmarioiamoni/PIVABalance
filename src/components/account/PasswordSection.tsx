@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/auth/useAuth';
+import { api } from '@/services/api';
 import { 
   KeyIcon, 
   EyeIcon, 
@@ -54,23 +55,11 @@ export const PasswordSection: React.FC = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/auth/change-password', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword,
-          confirmPassword,
-        }),
+      await api.put('/auth/change-password', {
+        currentPassword,
+        newPassword,
+        confirmPassword,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to change password');
-      }
 
       setSuccess('Password cambiata con successo!');
       

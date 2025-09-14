@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/auth/useAuth';
+import { api } from '@/services/api';
 import { UserIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
 
 /**
@@ -37,19 +38,7 @@ export const ProfileSection: React.FC = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/auth/update-profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: name.trim() }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to update profile');
-      }
+      await api.put('/auth/update-profile', { name: name.trim() });
 
       // Refresh user data
       await refetch();

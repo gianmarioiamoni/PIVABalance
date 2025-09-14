@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/auth/useAuth';
+import { api } from '@/services/api';
 import { useRouter } from 'next/navigation';
 import { 
   ExclamationTriangleIcon,
@@ -37,10 +38,12 @@ export const DangerZone: React.FC = () => {
     setError('');
 
     try {
+      // Use a custom request since delete method doesn't support body
       const response = await fetch('/api/auth/delete-account', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
           password: isGoogleUser ? '' : password,
@@ -48,9 +51,8 @@ export const DangerZone: React.FC = () => {
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
+        const data = await response.json();
         throw new Error(data.error || 'Failed to delete account');
       }
 

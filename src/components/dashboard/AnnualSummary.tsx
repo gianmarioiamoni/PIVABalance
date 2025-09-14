@@ -57,15 +57,19 @@ export const AnnualSummary: React.FC<AnnualSummaryProps> = ({ annualSummary }) =
       <div className="card-body">
         {/* Progress Bar */}
         <div className="mb-6">
-          <div className="flex justify-between text-sm text-tertiary mb-2">
-            <span>Progresso Anno</span>
-            <span>{annualSummary.yearProgress}%</span>
+          <div className="flex justify-between text-sm text-gray-600 mb-2">
+            <span>Progresso Anno {currentYear}</span>
+            <span className="font-semibold">{annualSummary.yearProgress}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner">
             <div 
-              className="bg-primary h-2 rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 ease-out shadow-sm"
               style={{ width: `${Math.min(annualSummary.yearProgress, 100)}%` }}
             />
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>Gen</span>
+            <span>Dic</span>
           </div>
         </div>
 

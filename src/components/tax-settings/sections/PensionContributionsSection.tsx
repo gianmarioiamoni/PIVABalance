@@ -27,6 +27,17 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
     // The parameters will be handled directly in the fund selection component
     console.log('Parameters changed:', params);
   }, []);
+
+  // Memoized onChange for professional fund to prevent infinite loops
+  const handleProfessionalFundChange = useCallback((fundId: string) => {
+    handleChange('professionalFundId', fundId);
+  }, [handleChange]);
+
+  // Memoized onFundChange to prevent infinite loops
+  const handleFundChange = useCallback((fund: any) => {
+    // Fund change is handled by the component internally
+    console.warn('Selected fund:', fund);
+  }, []);
   return (
     <div className="space-y-6">
       <div>
@@ -83,11 +94,8 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
           <div className="mt-4">
             <ProfessionalFundSelector
               value={settings.professionalFundId}
-              onChange={(fundId) => handleChange('professionalFundId', fundId)}
-              onFundChange={(fund) => {
-                // Fund change is handled by the component internally
-                console.warn('Selected fund:', fund);
-              }}
+              onChange={handleProfessionalFundChange}
+              onFundChange={handleFundChange}
               onParametersChange={handleParametersChange}
               aria-describedby="professional-fund-description"
             />

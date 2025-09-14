@@ -63,6 +63,31 @@ const userSchema = new Schema<IUser>(
         message: "Google ID cannot be empty",
       },
     },
+    role: {
+      type: String,
+      enum: ['user', 'admin', 'super_admin'],
+      default: 'user',
+      required: [true, "User role is required"],
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+      required: [true, "Active status is required"],
+    },
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
+    createdBy: {
+      type: String,
+      default: null,
+      validate: {
+        validator: function (createdBy: string) {
+          return !createdBy || mongoose.Types.ObjectId.isValid(createdBy);
+        },
+        message: "Created by must be a valid user ID",
+      },
+    },
   },
   {
     timestamps: true,

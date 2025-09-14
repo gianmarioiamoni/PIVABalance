@@ -130,62 +130,47 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     // Normalize pathname by removing trailing slash for consistent comparison
     const normalizedPathname = pathname?.replace(/\/$/, '') || '';
 
-    const navigationItems = [
+    // Base navigation items with role requirements
+    const baseNavigationItems = [
         { 
             name: 'Dashboard', 
             href: '/dashboard', 
             current: normalizedPathname === '/dashboard',
             group: 'core',
-            icon: '📊'
+            icon: '📊',
+            requiredRole: 'user' as const
         },
         { 
             name: 'Dashboard Personalizzabile', 
             href: '/dashboard/customizable', 
             current: normalizedPathname === '/dashboard/customizable',
             group: 'core',
-            icon: '⚙️'
+            icon: '⚙️',
+            requiredRole: 'user' as const
         },
         { 
             name: 'Analytics Avanzate', 
             href: '/dashboard/analytics', 
             current: normalizedPathname === '/dashboard/analytics',
             group: 'analytics',
-            icon: '📈'
-        },
-        { 
-            name: 'Monitoring', 
-            href: '/dashboard/monitoring', 
-            current: normalizedPathname === '/dashboard/monitoring',
-            group: 'analytics',
-            icon: '🔍'
-        },
-        { 
-            name: 'Impostazioni', 
-            href: '/dashboard/settings', 
-            current: normalizedPathname === '/dashboard/settings',
-            group: 'management',
-            icon: '⚙️'
-        },
-        { 
-            name: 'Account', 
-            href: '/dashboard/account', 
-            current: normalizedPathname === '/dashboard/account',
-            group: 'management',
-            icon: '👤'
+            icon: '📈',
+            requiredRole: 'user' as const
         },
         { 
             name: 'Fatture', 
             href: '/dashboard/invoices', 
             current: normalizedPathname === '/dashboard/invoices',
             group: 'financial',
-            icon: '📄'
+            icon: '📄',
+            requiredRole: 'user' as const
         },
         { 
             name: 'Costi', 
             href: '/dashboard/costs', 
             current: normalizedPathname === '/dashboard/costs',
             group: 'financial',
-            icon: '💰'
+            icon: '💰',
+            requiredRole: 'user' as const
         },
         {
             name: 'Tasse e Contributi',
@@ -194,9 +179,59 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             disabled: isOrdinaryRegime,
             tooltip: isOrdinaryRegime ? "Tasse e Contributi disponibili solo per Regime Forfettario" : undefined,
             group: 'financial',
-            icon: '🏛️'
+            icon: '🏛️',
+            requiredRole: 'user' as const
+        },
+        { 
+            name: 'Impostazioni', 
+            href: '/dashboard/settings', 
+            current: normalizedPathname === '/dashboard/settings',
+            group: 'management',
+            icon: '⚙️',
+            requiredRole: 'user' as const
+        },
+        { 
+            name: 'Account', 
+            href: '/dashboard/account', 
+            current: normalizedPathname === '/dashboard/account',
+            group: 'management',
+            icon: '👤',
+            requiredRole: 'user' as const
+        },
+        // Admin-only items
+        { 
+            name: 'Monitoring', 
+            href: '/dashboard/monitoring', 
+            current: normalizedPathname === '/dashboard/monitoring',
+            group: 'admin',
+            icon: '🔍',
+            requiredRole: 'admin' as const
+        },
+        { 
+            name: 'Amministrazione', 
+            href: '/dashboard/admin', 
+            current: normalizedPathname === '/dashboard/admin',
+            group: 'admin',
+            icon: '👨‍💼',
+            requiredRole: 'admin' as const
         },
     ];
+
+    // Helper function to check if user has required role
+    const hasRole = (userRole: string, requiredRole: string): boolean => {
+        const roleHierarchy: Record<string, number> = {
+            user: 1,
+            admin: 2,
+            super_admin: 3,
+        };
+        return roleHierarchy[userRole] >= roleHierarchy[requiredRole];
+    };
+
+    // Filter navigation items based on user role
+    const navigationItems = baseNavigationItems.filter(item => {
+        if (!item.requiredRole) return true;
+        return hasRole(user.role || 'user', item.requiredRole);
+    });
 
 
 

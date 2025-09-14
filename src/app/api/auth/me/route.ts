@@ -47,6 +47,10 @@ export async function GET(
           id: user._id.toString(),
           email: user.email,
           name: user.name,
+          role: user.role || 'user',
+          isActive: user.isActive !== false,
+          lastLogin: user.lastLogin,
+          createdAt: user.createdAt,
         },
       },
       { status: 200 }

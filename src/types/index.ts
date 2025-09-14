@@ -13,6 +13,10 @@ export interface IUser extends BaseDocument {
   password: string;
   name: string;
   googleId?: string;
+  role: 'user' | 'admin' | 'super_admin';
+  isActive: boolean;
+  lastLogin?: Date;
+  createdBy?: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -20,6 +24,10 @@ export interface UserResponse {
   id: string;
   email: string;
   name: string;
+  role: 'user' | 'admin' | 'super_admin';
+  isActive: boolean;
+  lastLogin?: Date;
+  createdAt: Date;
 }
 
 // Auth types

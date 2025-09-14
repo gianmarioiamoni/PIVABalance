@@ -554,12 +554,12 @@ export class SecurityHardeningService {
           },
           {
             task: "Rate limiting implemented on auth endpoints",
-            completed: false,
+            completed: true,
             priority: "high",
           },
           {
             task: "Account lockout after failed attempts",
-            completed: false,
+            completed: true,
             priority: "medium",
           },
         ],
@@ -584,7 +584,7 @@ export class SecurityHardeningService {
           },
           {
             task: "HTTPS enforcement in production",
-            completed: false,
+            completed: true,
             priority: "critical",
           },
         ],
@@ -594,7 +594,7 @@ export class SecurityHardeningService {
         items: [
           {
             task: "Security headers configured",
-            completed: false,
+            completed: true,
             priority: "high",
           },
           {
@@ -629,7 +629,7 @@ export class SecurityHardeningService {
           },
           {
             task: "CORS configured securely",
-            completed: false,
+            completed: true,
             priority: "high",
           },
           {

@@ -10,6 +10,7 @@ import {
 import { SignInCredentials, ApiResponse, AuthResponse } from "@/types";
 import { compareUserPassword } from "@/utils/userCalculations";
 import { authRateLimiter, getClientIP } from "@/lib/rateLimiter";
+import { accountLockout } from "@/lib/accountLockout";
 
 /**
  * POST /api/auth/login
@@ -62,9 +63,25 @@ export async function POST(
     
     const validatedData: SignInCredentials = validateSchema(signInSchema, body);
 
+    // Check account lockout
+    const lockStatus = accountLockout.isAccountLocked(validatedData.email);
+    if (lockStatus.isLocked) {
+      const remainingMinutes = Math.ceil((lockStatus.remainingTime || 0) / (60 * 1000));
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Account temporarily locked",
+          message: `Account is locked due to too many failed login attempts. Try again in ${remainingMinutes} minutes.`,
+        },
+        { status: 423 } // 423 Locked
+      );
+    }
+
     // Find user by email
     const user = await User.findOne({ email: validatedData.email });
     if (!user) {
+      // Record failed attempt for non-existent users too (prevent enumeration)
+      accountLockout.recordFailedAttempt(validatedData.email);
       return NextResponse.json(
         {
           success: false,
@@ -80,6 +97,8 @@ export async function POST(
       user.password
     );
     if (!isPasswordValid) {
+      // Record failed attempt
+      accountLockout.recordFailedAttempt(validatedData.email);
       return NextResponse.json(
         {
           success: false,
@@ -88,6 +107,9 @@ export async function POST(
         { status: 401 }
       );
     }
+
+    // Clear any existing failed attempts on successful login
+    accountLockout.clearFailedAttempts(validatedData.email);
 
     // Generate JWT token
     const token = generateToken(user._id.toString(), user.email);

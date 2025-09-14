@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useInvoices } from "./invoices";
 import { useCosts } from "./costs";
+import { useTaxSettings } from "./useTaxSettings";
 import { getCurrentMonthStats } from "@/utils/invoiceCalculations";
 import { getCurrentMonthCostStats } from "@/utils/costCalculations";
 import { calculateEstimatedMonthlyTaxes } from "@/utils";
@@ -55,6 +56,11 @@ export const useDashboard = (): UseDashboardReturn => {
     loading: costsLoading,
     error: costsError,
   } = useCosts(currentYear);
+  
+  // Load user tax settings for accurate calculations
+  const {
+    state: { settings: taxSettings, loading: settingsLoading },
+  } = useTaxSettings();
 
   // Convert cost dates from strings to Date objects for calculations
   const costsWithDates = useMemo(() => {
@@ -66,7 +72,7 @@ export const useDashboard = (): UseDashboardReturn => {
 
   // Calculate real monthly statistics
   const stats: DashboardStats = useMemo(() => {
-    if (invoicesLoading || costsLoading) {
+    if (invoicesLoading || costsLoading || settingsLoading) {
       return {
         invoicesThisMonth: 0,
         monthlyRevenue: "€0",
@@ -78,9 +84,12 @@ export const useDashboard = (): UseDashboardReturn => {
     // Calculate current month statistics
     const invoiceStats = getCurrentMonthStats(invoices);
     const costStats = getCurrentMonthCostStats(costsWithDates);
+    
+    // Use accurate tax calculation with user settings
     const taxStats = calculateEstimatedMonthlyTaxes(
       invoiceStats.revenue,
-      costStats.total
+      costStats.total,
+      taxSettings
     );
 
     return {
@@ -89,7 +98,7 @@ export const useDashboard = (): UseDashboardReturn => {
       monthlyCosts: costStats.formattedTotal,
       estimatedTaxes: taxStats.formattedTaxes,
     };
-  }, [invoices, costsWithDates, invoicesLoading, costsLoading]);
+  }, [invoices, costsWithDates, invoicesLoading, costsLoading, settingsLoading, taxSettings]);
 
   // Create recent activities from real data
   const activities: Activity[] = useMemo(() => {
@@ -155,7 +164,7 @@ export const useDashboard = (): UseDashboardReturn => {
   );
 
   // Determine loading state and errors
-  const isLoading = invoicesLoading || costsLoading;
+  const isLoading = invoicesLoading || costsLoading || settingsLoading;
   const error = invoicesError || costsError || null;
 
   return {

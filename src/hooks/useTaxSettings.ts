@@ -112,30 +112,37 @@ export function useTaxSettings() {
   // Separate function for handling professional fund with parameters
   const handleProfessionalFundChange = useCallback(
     async (fundCode: string) => {
-      console.log('🏦 handleProfessionalFundChange called with:', fundCode);
+      console.log("🏦 handleProfessionalFundChange called with:", fundCode);
       try {
         const fund = await professionalFundService.getFundByCode(fundCode);
         const params = professionalFundService.getCurrentParameters(fund);
 
         if (params) {
-          // Use batch change to update all fields at once
-          handleBatchChange({
+          // Use direct setSettings to avoid any dependency issues
+          setSettings((prev) => ({
+            ...prev,
             professionalFundId: fundCode,
             manualContributionRate: params.contributionRate,
             manualMinimumContribution: params.minimumContribution,
             manualFixedAnnualContributions: params.fixedAnnualContributions,
-          });
+          }));
         } else {
           // Just update the fund ID if no parameters
-          handleChange("professionalFundId", fundCode);
+          setSettings((prev) => ({
+            ...prev,
+            professionalFundId: fundCode,
+          }));
         }
       } catch (error) {
         console.error("Error fetching professional fund parameters:", error);
         // Fallback to just updating the fund ID
-        handleChange("professionalFundId", fundCode);
+        setSettings((prev) => ({
+          ...prev,
+          professionalFundId: fundCode,
+        }));
       }
     },
-    [handleChange, handleBatchChange]
+    [] // No dependencies - completely self-contained
   );
 
   const handleRateSelect = (rate: ProfitabilityRate) => {

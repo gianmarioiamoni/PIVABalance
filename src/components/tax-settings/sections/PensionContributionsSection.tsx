@@ -27,19 +27,16 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
   const handleParametersChange = useCallback((params: any) => {
     // Don't call handleChange here to avoid infinite loops
     // The parameters will be handled directly in the fund selection component
-    console.log('Parameters changed:', params);
   }, []);
 
   // Memoized onChange for professional fund to prevent infinite loops
   const handleProfessionalFundSelection = useCallback((fundId: string) => {
-    console.log('🔄 handleProfessionalFundSelection called with:', fundId);
     handleProfessionalFundChange(fundId);
   }, [handleProfessionalFundChange]);
 
   // Memoized onFundChange to prevent infinite loops
   const handleFundChange = useCallback((fund: any) => {
     // Fund change is handled by the component internally
-    console.warn('Selected fund:', fund);
   }, []);
   return (
     <div className="space-y-6">

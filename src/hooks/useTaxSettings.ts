@@ -81,7 +81,8 @@ export function useTaxSettings() {
     }
   };
 
-  const handleChange = useCallback(
+  // Create a stable reference for handleChange to avoid infinite loops
+  const handleChangeRef = useCallback(
     async (
       field: keyof UserSettings,
       value: string | number | boolean | undefined
@@ -106,6 +107,7 @@ export function useTaxSettings() {
           }
         } catch (error) {
           console.error("Error fetching professional fund parameters:", error);
+          // Continue with normal update even if parameters fetch fails
         }
       }
 
@@ -120,8 +122,11 @@ export function useTaxSettings() {
           : {}),
       }));
     },
-    []
+    [] // Empty dependencies to ensure stable reference
   );
+
+  // Use ref to maintain stable reference
+  const handleChange = handleChangeRef;
 
   const handleRateSelect = (rate: ProfitabilityRate) => {
     handleChange("profitabilityRate", rate.rate);

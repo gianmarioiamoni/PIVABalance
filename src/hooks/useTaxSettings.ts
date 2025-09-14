@@ -112,10 +112,11 @@ export function useTaxSettings() {
   // Separate function for handling professional fund with parameters
   const handleProfessionalFundChange = useCallback(
     async (fundCode: string) => {
+      console.log('🏦 handleProfessionalFundChange called with:', fundCode);
       try {
         const fund = await professionalFundService.getFundByCode(fundCode);
         const params = professionalFundService.getCurrentParameters(fund);
-        
+
         if (params) {
           // Use batch change to update all fields at once
           handleBatchChange({

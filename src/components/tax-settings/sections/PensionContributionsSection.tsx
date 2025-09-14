@@ -32,6 +32,7 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
 
   // Memoized onChange for professional fund to prevent infinite loops
   const handleProfessionalFundSelection = useCallback((fundId: string) => {
+    console.log('🔄 handleProfessionalFundSelection called with:', fundId);
     handleProfessionalFundChange(fundId);
   }, [handleProfessionalFundChange]);
 

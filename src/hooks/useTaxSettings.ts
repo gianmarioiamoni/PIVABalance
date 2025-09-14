@@ -101,6 +101,14 @@ export function useTaxSettings() {
     [] // Empty dependencies to ensure stable reference
   );
 
+  // Batch multiple field updates to avoid multiple re-renders
+  const handleBatchChange = useCallback((updates: Partial<UserSettings>) => {
+    setSettings((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+  }, []);
+
   // Separate function for handling professional fund with parameters
   const handleProfessionalFundChange = useCallback(
     async (fundCode: string) => {
@@ -118,24 +126,16 @@ export function useTaxSettings() {
           });
         } else {
           // Just update the fund ID if no parameters
-          handleChange('professionalFundId', fundCode);
+          handleChange("professionalFundId", fundCode);
         }
       } catch (error) {
         console.error("Error fetching professional fund parameters:", error);
         // Fallback to just updating the fund ID
-        handleChange('professionalFundId', fundCode);
+        handleChange("professionalFundId", fundCode);
       }
     },
     [handleChange, handleBatchChange]
   );
-
-  // Batch multiple field updates to avoid multiple re-renders
-  const handleBatchChange = useCallback((updates: Partial<UserSettings>) => {
-    setSettings((prev) => ({
-      ...prev,
-      ...updates,
-    }));
-  }, []);
 
   const handleRateSelect = (rate: ProfitabilityRate) => {
     handleChange("profitabilityRate", rate.rate);

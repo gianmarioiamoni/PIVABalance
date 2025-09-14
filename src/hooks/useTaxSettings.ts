@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useSWR from "swr";
 import { UserSettings, settingsService } from "@/services/settingsService";
 import {
@@ -81,7 +81,7 @@ export function useTaxSettings() {
     }
   };
 
-  const handleChange = async (
+  const handleChange = useCallback(async (
     field: keyof UserSettings,
     value: string | number | boolean | undefined
   ) => {
@@ -114,7 +114,7 @@ export function useTaxSettings() {
           }
         : {}),
     }));
-  };
+  }, []);
 
   const handleRateSelect = (rate: ProfitabilityRate) => {
     handleChange("profitabilityRate", rate.rate);

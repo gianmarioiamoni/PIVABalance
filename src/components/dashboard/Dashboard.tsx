@@ -13,18 +13,21 @@ import { DashboardView } from './DashboardView';
 export const Dashboard: React.FC = () => {
     const {
         stats,
+        annualSummary,
         activities,
         quickActions,
-        isLoading
+        isLoading,
+        error
     } = useDashboard();
 
     return (
         <DashboardView
             stats={stats}
+            annualSummary={annualSummary}
             activities={activities}
             quickActions={quickActions}
             isLoading={isLoading}
-            error={null}
+            error={error}
         />
     );
 }; 

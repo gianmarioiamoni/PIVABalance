@@ -14,6 +14,20 @@ interface DashboardStats {
   estimatedTaxes: string;
 }
 
+interface AnnualSummary {
+  totalRevenue: number;
+  totalCosts: number;
+  grossCashFlow: number;
+  totalTaxes: number;
+  netCashFlow: number;
+  yearProgress: number;
+  formattedRevenue: string;
+  formattedCosts: string;
+  formattedGrossCashFlow: string;
+  formattedTaxes: string;
+  formattedNetCashFlow: string;
+}
+
 interface Activity {
   description: string;
   amount: string;
@@ -29,6 +43,7 @@ interface QuickAction {
 
 interface UseDashboardReturn {
   stats: DashboardStats;
+  annualSummary: AnnualSummary;
   activities: Activity[];
   quickActions: QuickAction[];
   isLoading: boolean;
@@ -113,6 +128,69 @@ export const useDashboard = (): UseDashboardReturn => {
     };
   }, [invoices, costsWithDates, invoicesLoading, costsLoading, settingsLoading, taxSettings]);
 
+  // Calculate annual summary with cash flow analysis
+  const annualSummary: AnnualSummary = useMemo(() => {
+    if (invoicesLoading || costsLoading || settingsLoading) {
+      return {
+        totalRevenue: 0,
+        totalCosts: 0,
+        grossCashFlow: 0,
+        totalTaxes: 0,
+        netCashFlow: 0,
+        yearProgress: 0,
+        formattedRevenue: "€0",
+        formattedCosts: "€0",
+        formattedGrossCashFlow: "€0",
+        formattedTaxes: "€0",
+        formattedNetCashFlow: "€0",
+      };
+    }
+
+    // Calculate year-to-date statistics for current year
+    const currentYear = new Date().getFullYear();
+    const yearToDateInvoices = invoices.filter(inv => {
+      const invoiceDate = new Date(inv.issueDate || inv.date);
+      return invoiceDate.getFullYear() === currentYear;
+    });
+    const yearToDateCosts = costsWithDates.filter(cost => {
+      return cost.date.getFullYear() === currentYear;
+    });
+    
+    const totalRevenue = yearToDateInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+    const totalCosts = yearToDateCosts.reduce((sum, cost) => sum + cost.amount, 0);
+    const grossCashFlow = totalRevenue - totalCosts;
+    
+    // Get taxes from our calculation
+    const totalTaxes = parseFloat(stats.estimatedTaxes.replace(/[€.,]/g, '')) || 0;
+    const netCashFlow = grossCashFlow - totalTaxes;
+    
+    // Calculate year progress (percentage of year completed)
+    const now = new Date();
+    const startOfYear = new Date(currentYear, 0, 1);
+    const endOfYear = new Date(currentYear + 1, 0, 1);
+    const yearProgress = ((now.getTime() - startOfYear.getTime()) / (endOfYear.getTime() - startOfYear.getTime())) * 100;
+
+    const formatCurrency = (amount: number) => 
+      `€${amount.toLocaleString("it-IT", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      })}`;
+
+    return {
+      totalRevenue,
+      totalCosts,
+      grossCashFlow,
+      totalTaxes,
+      netCashFlow,
+      yearProgress: Math.round(yearProgress),
+      formattedRevenue: formatCurrency(totalRevenue),
+      formattedCosts: formatCurrency(totalCosts),
+      formattedGrossCashFlow: formatCurrency(grossCashFlow),
+      formattedTaxes: formatCurrency(totalTaxes),
+      formattedNetCashFlow: formatCurrency(netCashFlow),
+    };
+  }, [invoices, costsWithDates, stats.estimatedTaxes, invoicesLoading, costsLoading, settingsLoading]);
+
   // Create recent activities from real data
   const activities: Activity[] = useMemo(() => {
     if (invoicesLoading || costsLoading) return [];
@@ -182,6 +260,7 @@ export const useDashboard = (): UseDashboardReturn => {
 
   return {
     stats,
+    annualSummary,
     activities,
     quickActions,
     isLoading,

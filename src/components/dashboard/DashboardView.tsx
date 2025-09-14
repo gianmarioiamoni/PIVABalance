@@ -3,6 +3,7 @@ import { StatCard } from './StatCard';
 import { RecentActivities } from './RecentActivities';
 import { QuickActions } from './QuickActions';
 import { CashFlowWidget } from './CashFlowWidget';
+import { AnnualSummary } from './AnnualSummary';
 import {
     DocumentTextIcon,
     CurrencyEuroIcon,
@@ -30,8 +31,23 @@ interface QuickAction {
     hoverColor: string;
 }
 
+interface AnnualSummary {
+    totalRevenue: number;
+    totalCosts: number;
+    grossCashFlow: number;
+    totalTaxes: number;
+    netCashFlow: number;
+    yearProgress: number;
+    formattedRevenue: string;
+    formattedCosts: string;
+    formattedGrossCashFlow: string;
+    formattedTaxes: string;
+    formattedNetCashFlow: string;
+}
+
 interface DashboardViewProps {
     stats: DashboardStats;
+    annualSummary: AnnualSummary;
     activities: Activity[];
     quickActions: QuickAction[];
     isLoading: boolean;
@@ -193,6 +209,7 @@ const FinancialOverview: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
  */
 export const DashboardView: React.FC<DashboardViewProps> = ({
     stats,
+    annualSummary,
     activities,
     quickActions,
     isLoading,
@@ -213,6 +230,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="container-app py-8 space-y-8">
             <DashboardHeader />
             <StatsGrid stats={stats} />
+
+            {/* Annual Summary with Cash Flow Analysis */}
+            <div className="animate-fade-in">
+                <AnnualSummary annualSummary={annualSummary} />
+            </div>
 
             {/* Cash Flow Section - Most Important for Freelancers */}
             <div className="animate-fade-in">

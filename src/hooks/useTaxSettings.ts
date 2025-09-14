@@ -81,36 +81,12 @@ export function useTaxSettings() {
     }
   };
 
-  // Create a stable reference for handleChange to avoid infinite loops
-  const handleChangeRef = useCallback(
-    async (
+  // Simple, stable handleChange without professional fund logic
+  const handleChange = useCallback(
+    (
       field: keyof UserSettings,
       value: string | number | boolean | undefined
     ) => {
-      if (
-        field === "professionalFundId" &&
-        value &&
-        typeof value === "string"
-      ) {
-        try {
-          const fund = await professionalFundService.getFundByCode(value);
-          const params = professionalFundService.getCurrentParameters(fund);
-          if (params) {
-            setSettings((prev) => ({
-              ...prev,
-              [field]: value,
-              manualContributionRate: params.contributionRate,
-              manualMinimumContribution: params.minimumContribution,
-              manualFixedAnnualContributions: params.fixedAnnualContributions,
-            }));
-            return;
-          }
-        } catch (error) {
-          console.error("Error fetching professional fund parameters:", error);
-          // Continue with normal update even if parameters fetch fails
-        }
-      }
-
       setSettings((prev) => ({
         ...prev,
         [field]: value,
@@ -125,8 +101,33 @@ export function useTaxSettings() {
     [] // Empty dependencies to ensure stable reference
   );
 
-  // Use ref to maintain stable reference
-  const handleChange = handleChangeRef;
+  // Separate function for handling professional fund with parameters
+  const handleProfessionalFundChange = useCallback(
+    async (fundCode: string) => {
+      try {
+        const fund = await professionalFundService.getFundByCode(fundCode);
+        const params = professionalFundService.getCurrentParameters(fund);
+        
+        if (params) {
+          // Use batch change to update all fields at once
+          handleBatchChange({
+            professionalFundId: fundCode,
+            manualContributionRate: params.contributionRate,
+            manualMinimumContribution: params.minimumContribution,
+            manualFixedAnnualContributions: params.fixedAnnualContributions,
+          });
+        } else {
+          // Just update the fund ID if no parameters
+          handleChange('professionalFundId', fundCode);
+        }
+      } catch (error) {
+        console.error("Error fetching professional fund parameters:", error);
+        // Fallback to just updating the fund ID
+        handleChange('professionalFundId', fundCode);
+      }
+    },
+    [handleChange, handleBatchChange]
+  );
 
   // Batch multiple field updates to avoid multiple re-renders
   const handleBatchChange = useCallback((updates: Partial<UserSettings>) => {
@@ -166,6 +167,7 @@ export function useTaxSettings() {
     actions: {
       handleChange,
       handleBatchChange,
+      handleProfessionalFundChange,
       handleSubmit,
       handleRateSelect,
       handleProfessionalFundParametersChange,

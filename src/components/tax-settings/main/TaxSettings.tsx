@@ -81,6 +81,7 @@ const TaxSettings = forwardRef<TaxSettingsRef, TaxSettingsProps>(({
         actions: {
             handleChange,
             handleBatchChange,
+            handleProfessionalFundChange,
             handleSubmit,
             handleRateSelect,
             setShowRateTable,
@@ -191,6 +192,7 @@ const TaxSettings = forwardRef<TaxSettingsRef, TaxSettingsProps>(({
                             settings={settings}
                             handleChange={handleChange}
                             handleBatchChange={handleBatchChange}
+                            handleProfessionalFundChange={handleProfessionalFundChange}
                         />
                     </section>
 

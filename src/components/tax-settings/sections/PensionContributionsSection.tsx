@@ -14,12 +14,14 @@ interface PensionContributionsSectionProps {
   settings: UserSettings;
   handleChange: (field: keyof UserSettings, value: string | number | boolean | undefined) => Promise<void>;
   handleBatchChange: (updates: Partial<UserSettings>) => void;
+  handleProfessionalFundChange: (fundCode: string) => Promise<void>;
 }
 
 export const PensionContributionsSection: React.FC<PensionContributionsSectionProps> = React.memo(({
   settings,
   handleChange,
   handleBatchChange,
+  handleProfessionalFundChange,
 }) => {
   // Memoized callback to prevent infinite loops
   const handleParametersChange = useCallback((params: any) => {
@@ -29,9 +31,9 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
   }, []);
 
   // Memoized onChange for professional fund to prevent infinite loops
-  const handleProfessionalFundChange = useCallback((fundId: string) => {
-    handleChange('professionalFundId', fundId);
-  }, [handleChange]);
+  const handleProfessionalFundSelection = useCallback((fundId: string) => {
+    handleProfessionalFundChange(fundId);
+  }, [handleProfessionalFundChange]);
 
   // Memoized onFundChange to prevent infinite loops
   const handleFundChange = useCallback((fund: any) => {
@@ -94,7 +96,7 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
           <div className="mt-4">
             <ProfessionalFundSelector
               value={settings.professionalFundId}
-              onChange={handleProfessionalFundChange}
+              onChange={handleProfessionalFundSelection}
               onFundChange={handleFundChange}
               onParametersChange={handleParametersChange}
               aria-describedby="professional-fund-description"

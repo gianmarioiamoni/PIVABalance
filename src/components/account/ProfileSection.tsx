@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { UserIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
 
 /**
@@ -16,19 +16,19 @@ import { UserIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
  * - Success feedback
  */
 export const ProfileSection: React.FC = () => {
-  const { data: session, update: updateSession } = useSession();
+  const { user, refetch } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Initialize form with session data
+  // Initialize form with user data
   useEffect(() => {
-    if (session?.user?.name) {
-      setName(session.user.name);
+    if (user?.name) {
+      setName(user.name);
     }
-  }, [session]);
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,14 +51,8 @@ export const ProfileSection: React.FC = () => {
         throw new Error(data.error || 'Failed to update profile');
       }
 
-      // Update session with new data
-      await updateSession({
-        ...session,
-        user: {
-          ...session?.user,
-          name: data.user.name,
-        },
-      });
+      // Refresh user data
+      await refetch();
 
       setSuccess('Profilo aggiornato con successo!');
       setIsEditing(false);
@@ -74,7 +68,7 @@ export const ProfileSection: React.FC = () => {
   };
 
   const handleCancel = () => {
-    setName(session?.user?.name || '');
+    setName(user?.name || '');
     setIsEditing(false);
     setError('');
     setSuccess('');
@@ -112,12 +106,12 @@ export const ProfileSection: React.FC = () => {
               Email
             </label>
             <div className="relative">
-              <input
-                type="email"
-                value={session?.user?.email || ''}
-                disabled
-                className="input-field bg-gray-50 cursor-not-allowed"
-              />
+            <input
+              type="email"
+              value={user?.email || ''}
+              disabled
+              className="input-field bg-gray-50 cursor-not-allowed"
+            />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                 <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                   Non modificabile
@@ -184,8 +178,8 @@ export const ProfileSection: React.FC = () => {
 
             {/* Account Info */}
             <div className="text-right text-sm text-gray-500">
-              <p>Account creato: {new Date(session?.user?.createdAt || '').toLocaleDateString('it-IT')}</p>
-              {session?.user?.googleId && (
+              <p>Account creato: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('it-IT') : 'N/A'}</p>
+              {user?.googleId && (
                 <p className="text-blue-600">
                   <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mr-1"></span>
                   Connesso con Google

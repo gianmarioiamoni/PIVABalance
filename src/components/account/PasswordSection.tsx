@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { 
   KeyIcon, 
   EyeIcon, 
@@ -20,7 +20,7 @@ import {
  * - Security best practices
  */
 export const PasswordSection: React.FC = () => {
-  const { data: session } = useSession();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -45,7 +45,7 @@ export const PasswordSection: React.FC = () => {
   };
 
   const isPasswordValid = Object.values(passwordValidation).every(Boolean);
-  const isGoogleUser = session?.user?.googleId && !session?.user?.hasPassword;
+  const isGoogleUser = user?.googleId && !user?.password;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

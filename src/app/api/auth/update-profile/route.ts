@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { connectDB } from '@/lib/mongodb';
+import { getUserFromRequest } from '@/lib/auth/jwt';
+import { connectDB } from '@/lib/database/mongodb';
 import { User } from '@/models/User';
 import { z } from 'zod';
 
@@ -30,8 +29,8 @@ const updateProfileSchema = z.object({
 export async function PUT(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    const userData = await getUserFromRequest(request);
+    if (!userData) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -58,8 +57,8 @@ export async function PUT(request: NextRequest) {
     await connectDB();
 
     // Find and update user
-    const updatedUser = await User.findOneAndUpdate(
-      { email: session.user.email },
+    const updatedUser = await User.findByIdAndUpdate(
+      userData.userId,
       { name: name },
       { new: true, runValidators: true }
     );

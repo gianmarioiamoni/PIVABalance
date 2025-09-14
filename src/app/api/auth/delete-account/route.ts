@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { connectDB } from '@/lib/mongodb';
+import { getUserFromRequest } from '@/lib/auth/jwt';
+import { connectDB } from '@/lib/database/mongodb';
 import { User } from '@/models/User';
 import { UserSettings } from '@/models/UserSettings';
 import { Invoice } from '@/models/Invoice';
@@ -33,8 +32,8 @@ const deleteAccountSchema = z.object({
 export async function DELETE(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    const userData = await getUserFromRequest(request);
+    if (!userData) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -61,7 +60,7 @@ export async function DELETE(request: NextRequest) {
     await connectDB();
 
     // Find user
-    const user = await User.findOne({ email: session.user.email });
+    const user = await User.findById(userData.userId);
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { useRouter } from 'next/navigation';
 import { 
   ExclamationTriangleIcon,
@@ -20,7 +20,7 @@ import {
  * - Immediate session termination after deletion
  */
 export const DangerZone: React.FC = () => {
-  const { data: session } = useSession();
+  const { user, logout } = useAuth();
   const router = useRouter();
   
   const [isDeleting, setIsDeleting] = useState(false);
@@ -29,7 +29,7 @@ export const DangerZone: React.FC = () => {
   const [confirmationText, setConfirmationText] = useState('');
   const [error, setError] = useState('');
 
-  const isGoogleUser = session?.user?.googleId && !session?.user?.hasPassword;
+  const isGoogleUser = user?.googleId && !user?.password;
   const requiredConfirmationText = 'ELIMINA IL MIO ACCOUNT';
 
   const handleDeleteAccount = async () => {
@@ -54,11 +54,9 @@ export const DangerZone: React.FC = () => {
         throw new Error(data.error || 'Failed to delete account');
       }
 
-      // Account successfully deleted - sign out and redirect
-      await signOut({ 
-        callbackUrl: '/?deleted=true',
-        redirect: true 
-      });
+      // Account successfully deleted - logout and redirect
+      logout();
+      router.push('/?deleted=true');
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore durante l\'eliminazione dell\'account');

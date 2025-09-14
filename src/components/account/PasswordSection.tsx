@@ -71,8 +71,39 @@ export const PasswordSection: React.FC = () => {
       // Clear success message after 5 seconds
       setTimeout(() => setSuccess(''), 5000);
 
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Errore durante il cambio password');
+    } catch (err: any) {
+      console.error('Password change error:', err);
+      
+      // Handle different types of errors with user-friendly messages
+      let errorMessage = 'Errore durante il cambio password';
+      
+      if (err?.data?.details) {
+        // Handle validation errors from Zod
+        const details = err.data.details;
+        if (details.currentPassword) {
+          errorMessage = 'Password attuale non corretta';
+        } else if (details.newPassword) {
+          errorMessage = details.newPassword[0] || 'Nuova password non valida';
+        } else if (details.confirmPassword) {
+          errorMessage = 'Le password non corrispondono';
+        }
+      } else if (err?.data?.error) {
+        // Handle API error messages
+        errorMessage = err.data.error;
+      } else if (err?.message) {
+        // Handle other error messages
+        if (err.message.includes('400')) {
+          errorMessage = 'Dati non validi. Controlla i requisiti della password.';
+        } else if (err.message.includes('401')) {
+          errorMessage = 'Sessione scaduta. Effettua nuovamente il login.';
+        } else if (err.message.includes('500')) {
+          errorMessage = 'Errore del server. Riprova più tardi.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

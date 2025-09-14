@@ -60,8 +60,25 @@ export const DangerZone: React.FC = () => {
       logout();
       router.push('/?deleted=true');
 
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Errore durante l\'eliminazione dell\'account');
+    } catch (err: any) {
+      console.error('Account deletion error:', err);
+      
+      // Handle different types of errors with user-friendly messages
+      let errorMessage = 'Errore durante l\'eliminazione dell\'account';
+      
+      if (err?.message) {
+        if (err.message.includes('400')) {
+          errorMessage = 'Dati di conferma non validi. Controlla password e testo di conferma.';
+        } else if (err.message.includes('401')) {
+          errorMessage = 'Sessione scaduta. Effettua nuovamente il login.';
+        } else if (err.message.includes('500')) {
+          errorMessage = 'Errore del server. Riprova più tardi.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
       setIsDeleting(false);
     }
   };

@@ -23,6 +23,7 @@ export const ProfileSection: React.FC = () => {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [validationError, setValidationError] = useState('');
 
   // Initialize form with user data
   useEffect(() => {
@@ -37,6 +38,33 @@ export const ProfileSection: React.FC = () => {
     setError('');
     setSuccess('');
 
+    // Client-side validation
+    const trimmedName = name.trim();
+    
+    if (!trimmedName) {
+      setError('Il nome è obbligatorio');
+      setIsLoading(false);
+      return;
+    }
+    
+    if (trimmedName.length < 2) {
+      setError('Il nome deve essere di almeno 2 caratteri');
+      setIsLoading(false);
+      return;
+    }
+    
+    if (trimmedName.length > 100) {
+      setError('Il nome non può superare i 100 caratteri');
+      setIsLoading(false);
+      return;
+    }
+    
+    if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(trimmedName)) {
+      setError('Il nome può contenere solo lettere, spazi, apostrofi e trattini');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await api.put('/auth/update-profile', { name: name.trim() });
 
@@ -49,11 +77,74 @@ export const ProfileSection: React.FC = () => {
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(''), 3000);
 
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Errore durante l\'aggiornamento del profilo');
+    } catch (err: any) {
+      console.error('Profile update error:', err);
+      
+      // Handle different types of errors with user-friendly messages
+      let errorMessage = 'Errore durante l\'aggiornamento del profilo';
+      
+      if (err?.data?.details) {
+        // Handle validation errors from Zod
+        const details = err.data.details;
+        if (details.name) {
+          errorMessage = details.name[0] || 'Nome non valido';
+        }
+      } else if (err?.data?.error) {
+        // Handle API error messages
+        errorMessage = err.data.error;
+      } else if (err?.message) {
+        // Handle other error messages
+        if (err.message.includes('400')) {
+          errorMessage = 'Dati non validi. Controlla che il nome contenga solo lettere, spazi, apostrofi e trattini.';
+        } else if (err.message.includes('401')) {
+          errorMessage = 'Sessione scaduta. Effettua nuovamente il login.';
+        } else if (err.message.includes('500')) {
+          errorMessage = 'Errore del server. Riprova più tardi.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Real-time validation
+  const validateName = (value: string) => {
+    const trimmedValue = value.trim();
+    
+    if (!trimmedValue && value.length > 0) {
+      return 'Il nome non può essere vuoto';
+    }
+    
+    if (trimmedValue.length > 0 && trimmedValue.length < 2) {
+      return 'Il nome deve essere di almeno 2 caratteri';
+    }
+    
+    if (trimmedValue.length > 100) {
+      return 'Il nome non può superare i 100 caratteri';
+    }
+    
+    if (trimmedValue && !/^[a-zA-ZÀ-ÿ\s'-]+$/.test(trimmedValue)) {
+      return 'Il nome può contenere solo lettere, spazi, apostrofi e trattini';
+    }
+    
+    return '';
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setName(value);
+    
+    // Clear previous errors when user starts typing
+    if (error) setError('');
+    if (success) setSuccess('');
+    
+    // Real-time validation
+    const validation = validateName(value);
+    setValidationError(validation);
   };
 
   const handleCancel = () => {
@@ -61,6 +152,7 @@ export const ProfileSection: React.FC = () => {
     setIsEditing(false);
     setError('');
     setSuccess('');
+    setValidationError('');
   };
 
   return (
@@ -122,17 +214,25 @@ export const ProfileSection: React.FC = () => {
               type="text"
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={handleNameChange}
               disabled={!isEditing}
-              className={`input-field ${!isEditing ? 'bg-gray-50' : ''}`}
+              className={`input-field ${!isEditing ? 'bg-gray-50' : ''} ${validationError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
               placeholder="Inserisci il tuo nome completo"
               required
               minLength={2}
               maxLength={100}
             />
-            <p className="mt-1 text-sm text-gray-500">
-              Il nome verrà utilizzato nelle fatture e nei documenti generati.
-            </p>
+            {validationError && (
+              <p className="mt-1 text-sm text-red-600 flex items-center">
+                <span className="inline-block w-4 h-4 mr-1">⚠️</span>
+                {validationError}
+              </p>
+            )}
+            {!validationError && (
+              <p className="mt-1 text-sm text-gray-500">
+                Il nome verrà utilizzato nelle fatture e nei documenti generati.
+              </p>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -149,7 +249,7 @@ export const ProfileSection: React.FC = () => {
               <div className="flex space-x-3">
                 <button
                   type="submit"
-                  disabled={isLoading || !name.trim()}
+                  disabled={isLoading || !name.trim() || !!validationError}
                   className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Salvataggio...' : 'Salva Modifiche'}

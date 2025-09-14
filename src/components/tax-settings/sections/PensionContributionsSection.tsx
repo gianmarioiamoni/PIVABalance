@@ -21,16 +21,10 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
 }) => {
   // Memoized callback to prevent infinite loops
   const handleParametersChange = useCallback((params: any) => {
-    if (params) {
-      handleChange('manualContributionRate', params.contributionRate);
-      handleChange('manualMinimumContribution', params.minimumContribution);
-      handleChange('manualFixedAnnualContributions', params.fixedAnnualContributions);
-    } else {
-      handleChange('manualContributionRate', undefined);
-      handleChange('manualMinimumContribution', undefined);
-      handleChange('manualFixedAnnualContributions', undefined);
-    }
-  }, [handleChange]);
+    // Don't call handleChange here to avoid infinite loops
+    // The parameters will be handled directly in the fund selection component
+    console.log('Parameters changed:', params);
+  }, []);
   return (
     <div className="space-y-6">
       <div>

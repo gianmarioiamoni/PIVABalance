@@ -81,40 +81,47 @@ export function useTaxSettings() {
     }
   };
 
-  const handleChange = useCallback(async (
-    field: keyof UserSettings,
-    value: string | number | boolean | undefined
-  ) => {
-    if (field === "professionalFundId" && value && typeof value === "string") {
-      try {
-        const fund = await professionalFundService.getFundByCode(value);
-        const params = professionalFundService.getCurrentParameters(fund);
-        if (params) {
-          setSettings((prev) => ({
-            ...prev,
-            [field]: value,
-            manualContributionRate: params.contributionRate,
-            manualMinimumContribution: params.minimumContribution,
-            manualFixedAnnualContributions: params.fixedAnnualContributions,
-          }));
-          return;
-        }
-      } catch (error) {
-        console.error("Error fetching professional fund parameters:", error);
-      }
-    }
-
-    setSettings((prev) => ({
-      ...prev,
-      [field]: value,
-      ...(field === "taxRegime" && value === "ordinario"
-        ? {
-            substituteRate: undefined,
-            profitabilityRate: undefined,
+  const handleChange = useCallback(
+    async (
+      field: keyof UserSettings,
+      value: string | number | boolean | undefined
+    ) => {
+      if (
+        field === "professionalFundId" &&
+        value &&
+        typeof value === "string"
+      ) {
+        try {
+          const fund = await professionalFundService.getFundByCode(value);
+          const params = professionalFundService.getCurrentParameters(fund);
+          if (params) {
+            setSettings((prev) => ({
+              ...prev,
+              [field]: value,
+              manualContributionRate: params.contributionRate,
+              manualMinimumContribution: params.minimumContribution,
+              manualFixedAnnualContributions: params.fixedAnnualContributions,
+            }));
+            return;
           }
-        : {}),
-    }));
-  }, []);
+        } catch (error) {
+          console.error("Error fetching professional fund parameters:", error);
+        }
+      }
+
+      setSettings((prev) => ({
+        ...prev,
+        [field]: value,
+        ...(field === "taxRegime" && value === "ordinario"
+          ? {
+              substituteRate: undefined,
+              profitabilityRate: undefined,
+            }
+          : {}),
+      }));
+    },
+    []
+  );
 
   const handleRateSelect = (rate: ProfitabilityRate) => {
     handleChange("profitabilityRate", rate.rate);

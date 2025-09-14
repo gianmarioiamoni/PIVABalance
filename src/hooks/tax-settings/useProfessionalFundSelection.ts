@@ -90,13 +90,14 @@ export const useProfessionalFundSelection = ({
   /**
    * Effect to sync external value changes with fund data
    * Ensures component state stays consistent with external updates
+   * REMOVED: This was causing infinite loops with handleChange
    */
-  useEffect(() => {
-    if (selectedFund && onParametersChange) {
-      const params = getCurrentParameters(selectedFund);
-      onParametersChange(params);
-    }
-  }, [selectedFund, getCurrentParameters, onParametersChange]);
+  // useEffect(() => {
+  //   if (selectedFund && onParametersChange) {
+  //     const params = getCurrentParameters(selectedFund);
+  //     onParametersChange(params);
+  //   }
+  // }, [selectedFund, getCurrentParameters, onParametersChange]);
 
   return {
     // Data

@@ -3,6 +3,7 @@
 import React, { Suspense, lazy } from 'react';
 import { LoadingSpinner } from '@/components/ui';
 import { SectionErrorBoundary } from '@/components/error-boundaries';
+import { BusinessProtection } from '@/components/auth/BusinessProtection';
 
 // ✅ Code splitting: Lazy load Costs component
 const Costs = lazy(() => import('@/components/Costs').then(module => ({ default: module.Costs })));
@@ -19,20 +20,22 @@ const Costs = lazy(() => import('@/components/Costs').then(module => ({ default:
  */
 export default function CostsPage() {
     return (
-        <SectionErrorBoundary
-            sectionName="i costi"
-            description="Errore nel caricamento del modulo costi."
-        >
-            <Suspense fallback={
-                <div className="flex items-center justify-center min-h-[400px]">
-                    <div className="text-center">
-                        <LoadingSpinner size="lg" />
-                        <p className="mt-4 text-gray-600">Caricamento gestione costi...</p>
+        <BusinessProtection>
+            <SectionErrorBoundary
+                sectionName="i costi"
+                description="Errore nel caricamento del modulo costi."
+            >
+                <Suspense fallback={
+                    <div className="flex items-center justify-center min-h-[400px]">
+                        <div className="text-center">
+                            <LoadingSpinner size="lg" />
+                            <p className="mt-4 text-gray-600">Caricamento gestione costi...</p>
+                        </div>
                     </div>
-                </div>
-            }>
-                <Costs />
-            </Suspense>
-        </SectionErrorBoundary>
+                }>
+                    <Costs />
+                </Suspense>
+            </SectionErrorBoundary>
+        </BusinessProtection>
     );
 } 

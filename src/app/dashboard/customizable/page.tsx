@@ -4,11 +4,13 @@
  * SRP: Handles ONLY customizable dashboard page routing
  * New widget-based dashboard with full customization capabilities
  * Optimized with lazy loading for better performance
+ * Protected from super admin access - business functionality only
  */
 
 'use client';
 
 import { LazyCustomizableDashboard } from '@/components/common/LazyComponents';
+import { BusinessProtection } from '@/components/auth/BusinessProtection';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,8 +29,10 @@ export const dynamic = 'force-dynamic';
  */
 export default function CustomizableDashboardPage() {
     return (
-        <div className="min-h-screen bg-gray-50">
-            <LazyCustomizableDashboard />
-        </div>
+        <BusinessProtection>
+            <div className="min-h-screen bg-gray-50">
+                <LazyCustomizableDashboard />
+            </div>
+        </BusinessProtection>
     );
 }

@@ -3,6 +3,7 @@
 import React, { Suspense, lazy } from 'react';
 import { LoadingSpinner } from '@/components/ui';
 import { SectionErrorBoundary } from '@/components/error-boundaries';
+import { BusinessProtection } from '@/components/auth/BusinessProtection';
 
 // Disable prerendering for this page to avoid SSR issues with React Query
 export const dynamic = 'force-dynamic';
@@ -32,25 +33,27 @@ export default function SettingsPage() {
     };
 
     return (
-        <SectionErrorBoundary
-            sectionName="le impostazioni fiscali"
-            description="Errore nel caricamento delle impostazioni fiscali."
-        >
-            <Suspense fallback={
-                <div className="flex items-center justify-center min-h-[400px]">
-                    <div className="text-center">
-                        <LoadingSpinner size="lg" />
-                        <p className="mt-4 text-gray-600">Caricamento impostazioni fiscali...</p>
+        <BusinessProtection>
+            <SectionErrorBoundary
+                sectionName="le impostazioni fiscali"
+                description="Errore nel caricamento delle impostazioni fiscali."
+            >
+                <Suspense fallback={
+                    <div className="flex items-center justify-center min-h-[400px]">
+                        <div className="text-center">
+                            <LoadingSpinner size="lg" />
+                            <p className="mt-4 text-gray-600">Caricamento impostazioni fiscali...</p>
+                        </div>
                     </div>
-                </div>
-            }>
-                <TaxSettings
-                    activeTab="settings"
-                    attemptedTab={undefined}
-                    onTabChange={handleTabChange}
-                    onCancelTabChange={handleCancelTabChange}
-                />
-            </Suspense>
-        </SectionErrorBoundary>
+                }>
+                    <TaxSettings
+                        activeTab="settings"
+                        attemptedTab={undefined}
+                        onTabChange={handleTabChange}
+                        onCancelTabChange={handleCancelTabChange}
+                    />
+                </Suspense>
+            </SectionErrorBoundary>
+        </BusinessProtection>
     );
 } 

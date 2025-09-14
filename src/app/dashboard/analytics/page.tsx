@@ -3,11 +3,13 @@
  * 
  * SRP: Handles ONLY analytics page orchestration
  * Advanced business analytics dashboard with KPIs and reporting
+ * Protected from super admin access - business functionality only
  */
 
 import React from 'react';
 import { Metadata } from 'next';
 import { AdvancedAnalyticsView } from './AdvancedAnalyticsView';
+import { BusinessProtection } from '@/components/auth/BusinessProtection';
 
 export const metadata: Metadata = {
     title: 'Analytics Avanzate | P.IVA Balance',
@@ -29,5 +31,9 @@ export const metadata: Metadata = {
  * - User interactions (delegated to client components)
  */
 export default function AdvancedAnalyticsPage() {
-    return <AdvancedAnalyticsView />;
+    return (
+        <BusinessProtection>
+            <AdvancedAnalyticsView />
+        </BusinessProtection>
+    );
 }

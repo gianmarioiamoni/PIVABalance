@@ -20,7 +20,7 @@ SUPER_ADMIN_EMAIL=admin@tuodominio.com
 SUPER_ADMIN_PASSWORD=TuaPasswordSicura123!
 SUPER_ADMIN_NAME=Super Administrator
 
-# Initialization Settings  
+# Initialization Settings
 ALLOW_INIT_API=true
 ENABLE_INIT=false
 ```
@@ -49,17 +49,20 @@ Imposta `ENABLE_INIT=true` nel tuo `.env.local` e riavvia l'applicazione.
 ## 🎯 **Funzionalità Admin**
 
 ### **👥 Gestione Utenti** (`/dashboard/admin`)
+
 - Visualizzazione lista utenti con filtri e ricerca
 - Statistiche utenti (totali, attivi, admin)
 - Paginazione per grandi dataset
 - Azioni: modifica, eliminazione (in sviluppo)
 
 ### **🔍 Monitoring** (`/dashboard/monitoring`)
+
 - Accesso esclusivo per admin
 - Dashboard di monitoraggio performance e sicurezza
 - Metriche di sistema in tempo reale
 
 ### **🛡️ Protezioni Sicurezza**
+
 - Super admin non può eliminare se stesso
 - Gerarchia ruoli: `super_admin > admin > user`
 - Middleware di autorizzazione per tutte le API admin
@@ -68,9 +71,11 @@ Imposta `ENABLE_INIT=true` nel tuo `.env.local` e riavvia l'applicazione.
 ## 📊 **API Endpoints Admin**
 
 ### **GET /api/admin/users**
+
 Lista utenti con filtri e paginazione
 
 **Query Parameters:**
+
 - `page`: Numero pagina (default: 1)
 - `limit`: Elementi per pagina (default: 20)
 - `search`: Ricerca per nome/email
@@ -80,6 +85,7 @@ Lista utenti con filtri e paginazione
 **Autorizzazione:** Richiede ruolo `admin` o superiore
 
 ### **POST /api/admin/init**
+
 Inizializzazione sistema (solo sviluppo)
 
 **Autorizzazione:** Nessuna (protetto da env variables)
@@ -95,7 +101,7 @@ Inizializzazione sistema (solo sviluppo)
 ### **Proteggere Nuove Pagine**
 
 ```tsx
-import { AdminProtection } from '@/components/auth/AdminProtection';
+import { AdminProtection } from "@/components/auth/AdminProtection";
 
 export default function MyAdminPage() {
   return (
@@ -150,12 +156,14 @@ Per cambiare la password del super admin:
 ## 🚀 **Prossimi Sviluppi**
 
 ### **Fase 2 - Funzionalità Avanzate**
+
 - Reset password utenti con email
 - Sospensione/attivazione account
 - Audit log completo delle azioni admin
 - Statistiche avanzate utilizzo sistema
 
 ### **Fase 3 - Enterprise Features**
+
 - Configurazioni globali sistema
 - Template email personalizzati
 - Backup/restore dati
@@ -164,16 +172,19 @@ Per cambiare la password del super admin:
 ## 🆘 **Troubleshooting**
 
 ### **Super Admin Non Creato**
+
 - Verifica variabili ambiente `SUPER_ADMIN_EMAIL` e `SUPER_ADMIN_PASSWORD`
 - Controlla log console per errori di connessione database
 - Assicurati che MongoDB sia in esecuzione
 
 ### **Accesso Negato Pagine Admin**
+
 - Verifica che l'utente abbia ruolo `admin` o `super_admin`
 - Controlla che il token JWT sia valido
 - Verifica che `user.role` sia popolato correttamente
 
 ### **API Admin Errore 403**
+
 - Verifica header `Authorization: Bearer <token>`
 - Controlla che il middleware di autorizzazione sia configurato
 - Verifica che l'endpoint API usi `requireAdmin` middleware

@@ -65,8 +65,8 @@ const userSchema = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: ['user', 'admin', 'super_admin'],
-      default: 'user',
+      enum: ["user", "admin", "super_admin"],
+      default: "user",
       required: [true, "User role is required"],
     },
     isActive: {

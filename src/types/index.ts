@@ -13,7 +13,7 @@ export interface IUser extends BaseDocument {
   password: string;
   name: string;
   googleId?: string;
-  role: 'user' | 'admin' | 'super_admin';
+  role: "user" | "admin" | "super_admin";
   isActive: boolean;
   lastLogin?: Date;
   createdBy?: string;
@@ -24,7 +24,7 @@ export interface UserResponse {
   id: string;
   email: string;
   name: string;
-  role: 'user' | 'admin' | 'super_admin';
+  role: "user" | "admin" | "super_admin";
   isActive: boolean;
   lastLogin?: Date;
   createdAt: Date;

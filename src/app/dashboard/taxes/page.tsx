@@ -3,6 +3,7 @@
 import React, { Suspense, lazy } from 'react';
 import { LoadingSpinner } from '@/components/ui';
 import { SectionErrorBoundary } from '@/components/error-boundaries';
+import { BusinessProtection } from '@/components/auth/BusinessProtection';
 
 // ✅ Code splitting: Lazy load TaxContributions component
 const TaxContributions = lazy(() => import('@/components/tax-settings/tax-calculations/TaxContributions'));
@@ -19,20 +20,22 @@ const TaxContributions = lazy(() => import('@/components/tax-settings/tax-calcul
  */
 export default function TaxesPage() {
     return (
-        <SectionErrorBoundary
-            sectionName="il calcolo delle tasse"
-            description="Errore nel caricamento del modulo calcolo tasse e contributi."
-        >
-            <Suspense fallback={
-                <div className="flex items-center justify-center min-h-[400px]">
-                    <div className="text-center">
-                        <LoadingSpinner size="lg" />
-                        <p className="mt-4 text-gray-600">Caricamento calcoli fiscali...</p>
+        <BusinessProtection>
+            <SectionErrorBoundary
+                sectionName="il calcolo delle tasse"
+                description="Errore nel caricamento del modulo calcolo tasse e contributi."
+            >
+                <Suspense fallback={
+                    <div className="flex items-center justify-center min-h-[400px]">
+                        <div className="text-center">
+                            <LoadingSpinner size="lg" />
+                            <p className="mt-4 text-gray-600">Caricamento calcoli fiscali...</p>
+                        </div>
                     </div>
-                </div>
-            }>
-                <TaxContributions />
-            </Suspense>
-        </SectionErrorBoundary>
+                }>
+                    <TaxContributions />
+                </Suspense>
+            </SectionErrorBoundary>
+        </BusinessProtection>
     );
 } 

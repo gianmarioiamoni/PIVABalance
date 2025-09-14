@@ -13,18 +13,18 @@ import { setupSuperAdmin } from '@/lib/init/setupSuperAdmin';
  * It's used to ensure system initialization happens before serving pages.
  */
 export async function ServerInitializer() {
-  // Only run initialization in production or when explicitly enabled
-  const shouldInitialize = 
-    process.env.NODE_ENV === 'production' || 
-    process.env.ENABLE_INIT === 'true';
+    // Only run initialization in production or when explicitly enabled
+    const shouldInitialize =
+        process.env.NODE_ENV === 'production' ||
+        process.env.ENABLE_INIT === 'true';
 
-  if (shouldInitialize) {
-    // Initialize super admin
-    await setupSuperAdmin();
-  }
+    if (shouldInitialize) {
+        // Initialize super admin
+        await setupSuperAdmin();
+    }
 
-  // This component doesn't render anything
-  return null;
+    // This component doesn't render anything
+    return null;
 }
 
 /**
@@ -32,5 +32,5 @@ export async function ServerInitializer() {
  * This ensures the initialization only runs on server
  */
 export function ClientInitializer() {
-  return null;
+    return null;
 }

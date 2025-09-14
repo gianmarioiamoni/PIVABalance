@@ -43,7 +43,7 @@ function getGroupColors(group: string, current: boolean, disabled: boolean) {
     };
 
     const scheme = colorSchemes[group as keyof typeof colorSchemes] || colorSchemes.core;
-    
+
     if (disabled) {
         return {
             bg: 'bg-gray-100 border-gray-200',
@@ -52,7 +52,7 @@ function getGroupColors(group: string, current: boolean, disabled: boolean) {
             accent: 'bg-gray-400'
         };
     }
-    
+
     return scheme;
 }
 
@@ -130,93 +130,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     // Normalize pathname by removing trailing slash for consistent comparison
     const normalizedPathname = pathname?.replace(/\/$/, '') || '';
 
-    // Base navigation items with role requirements
-    const baseNavigationItems = [
-        { 
-            name: 'Dashboard', 
-            href: '/dashboard', 
-            current: normalizedPathname === '/dashboard',
-            group: 'core',
-            icon: '📊',
-            requiredRole: 'user' as const
-        },
-        { 
-            name: 'Dashboard Personalizzabile', 
-            href: '/dashboard/customizable', 
-            current: normalizedPathname === '/dashboard/customizable',
-            group: 'core',
-            icon: '⚙️',
-            requiredRole: 'user' as const
-        },
-        { 
-            name: 'Analytics Avanzate', 
-            href: '/dashboard/analytics', 
-            current: normalizedPathname === '/dashboard/analytics',
-            group: 'analytics',
-            icon: '📈',
-            requiredRole: 'user' as const
-        },
-        { 
-            name: 'Fatture', 
-            href: '/dashboard/invoices', 
-            current: normalizedPathname === '/dashboard/invoices',
-            group: 'financial',
-            icon: '📄',
-            requiredRole: 'user' as const
-        },
-        { 
-            name: 'Costi', 
-            href: '/dashboard/costs', 
-            current: normalizedPathname === '/dashboard/costs',
-            group: 'financial',
-            icon: '💰',
-            requiredRole: 'user' as const
-        },
-        {
-            name: 'Tasse e Contributi',
-            href: '/dashboard/taxes',
-            current: normalizedPathname === '/dashboard/taxes',
-            disabled: isOrdinaryRegime,
-            tooltip: isOrdinaryRegime ? "Tasse e Contributi disponibili solo per Regime Forfettario" : undefined,
-            group: 'financial',
-            icon: '🏛️',
-            requiredRole: 'user' as const
-        },
-        { 
-            name: 'Impostazioni', 
-            href: '/dashboard/settings', 
-            current: normalizedPathname === '/dashboard/settings',
-            group: 'management',
-            icon: '⚙️',
-            requiredRole: 'user' as const
-        },
-        { 
-            name: 'Account', 
-            href: '/dashboard/account', 
-            current: normalizedPathname === '/dashboard/account',
-            group: 'management',
-            icon: '👤',
-            requiredRole: 'user' as const
-        },
-        // Admin-only items
-        { 
-            name: 'Monitoring', 
-            href: '/dashboard/monitoring', 
-            current: normalizedPathname === '/dashboard/monitoring',
-            group: 'admin',
-            icon: '🔍',
-            requiredRole: 'admin' as const
-        },
-        { 
-            name: 'Amministrazione', 
-            href: '/dashboard/admin', 
-            current: normalizedPathname === '/dashboard/admin',
-            group: 'admin',
-            icon: '👨‍💼',
-            requiredRole: 'admin' as const
-        },
-    ];
-
     // Helper function to check if user has required role
     const hasRole = (userRole: string, requiredRole: string): boolean => {
         const roleHierarchy: Record<string, number> = {
@@ -227,11 +140,123 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         return roleHierarchy[userRole] >= roleHierarchy[requiredRole];
     };
 
-    // Filter navigation items based on user role
-    const navigationItems = baseNavigationItems.filter(item => {
-        if (!item.requiredRole) return true;
-        return hasRole(user.role || 'user', item.requiredRole);
-    });
+    // Navigation items based on user role
+    const getNavigationItems = () => {
+        const currentUserRole = user.role || 'user';
+
+        // Super Admin gets only system management items
+        if (currentUserRole === 'super_admin') {
+            return [
+                { 
+                    name: 'Amministrazione', 
+                    href: '/dashboard/admin', 
+                    current: normalizedPathname === '/dashboard/admin',
+                    group: 'admin',
+                    icon: '👨‍💼'
+                },
+                { 
+                    name: 'Monitoring', 
+                    href: '/dashboard/monitoring', 
+                    current: normalizedPathname === '/dashboard/monitoring',
+                    group: 'admin',
+                    icon: '🔍'
+                },
+                { 
+                    name: 'Account', 
+                    href: '/dashboard/account', 
+                    current: normalizedPathname === '/dashboard/account',
+                    group: 'management',
+                    icon: '👤'
+                },
+            ];
+        }
+
+        // Base items for regular users and admins
+        const baseItems = [
+            { 
+                name: 'Dashboard', 
+                href: '/dashboard', 
+                current: normalizedPathname === '/dashboard',
+                group: 'core',
+                icon: '📊'
+            },
+            { 
+                name: 'Dashboard Personalizzabile', 
+                href: '/dashboard/customizable', 
+                current: normalizedPathname === '/dashboard/customizable',
+                group: 'core',
+                icon: '⚙️'
+            },
+            { 
+                name: 'Analytics Avanzate', 
+                href: '/dashboard/analytics', 
+                current: normalizedPathname === '/dashboard/analytics',
+                group: 'analytics',
+                icon: '📈'
+            },
+            { 
+                name: 'Fatture', 
+                href: '/dashboard/invoices', 
+                current: normalizedPathname === '/dashboard/invoices',
+                group: 'financial',
+                icon: '📄'
+            },
+            { 
+                name: 'Costi', 
+                href: '/dashboard/costs', 
+                current: normalizedPathname === '/dashboard/costs',
+                group: 'financial',
+                icon: '💰'
+            },
+            {
+                name: 'Tasse e Contributi',
+                href: '/dashboard/taxes',
+                current: normalizedPathname === '/dashboard/taxes',
+                disabled: isOrdinaryRegime,
+                tooltip: isOrdinaryRegime ? "Tasse e Contributi disponibili solo per Regime Forfettario" : undefined,
+                group: 'financial',
+                icon: '🏛️'
+            },
+            { 
+                name: 'Impostazioni', 
+                href: '/dashboard/settings', 
+                current: normalizedPathname === '/dashboard/settings',
+                group: 'management',
+                icon: '⚙️'
+            },
+            { 
+                name: 'Account', 
+                href: '/dashboard/account', 
+                current: normalizedPathname === '/dashboard/account',
+                group: 'management',
+                icon: '👤'
+            },
+        ];
+
+        // Add admin-only items for admin users (not super_admin)
+        if (currentUserRole === 'admin') {
+            baseItems.push(
+                { 
+                    name: 'Monitoring', 
+                    href: '/dashboard/monitoring', 
+                    current: normalizedPathname === '/dashboard/monitoring',
+                    group: 'admin',
+                    icon: '🔍'
+                },
+                { 
+                    name: 'Amministrazione', 
+                    href: '/dashboard/admin', 
+                    current: normalizedPathname === '/dashboard/admin',
+                    group: 'admin',
+                    icon: '👨‍💼'
+                }
+            );
+        }
+
+        return baseItems;
+    };
+
+    const navigationItems = getNavigationItems();
 
 
 
@@ -247,12 +272,12 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                         <p className="mt-3 text-xl text-gray-500">
                             Gestisci le tue impostazioni fiscali e monitora le tue performance finanziarie.
                         </p>
-                        
+
                         {/* Logout Button - positioned in top right */}
                         <div className="absolute top-0 right-0">
-                            <LogoutButton 
-                                variant="outline" 
-                                size="sm" 
+                            <LogoutButton
+                                variant="outline"
+                                size="sm"
                                 className="shadow-sm"
                             />
                         </div>
@@ -272,27 +297,27 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                                                 className={classNames(
                                                     // Base styling with enhanced depth
                                                     'group relative min-w-0 flex-1 min-h-[4rem] overflow-hidden rounded-lg border-2 transition-all duration-300 ease-in-out transform',
-                                                    
+
                                                     // 3D depth effects
-                                                    item.current 
-                                                        ? 'shadow-lg scale-105 translate-y-[-2px]' 
+                                                    item.current
+                                                        ? 'shadow-lg scale-105 translate-y-[-2px]'
                                                         : 'shadow-md hover:shadow-lg hover:scale-102 hover:translate-y-[-1px]',
-                                                    
+
                                                     // Group colors
                                                     colors.bg,
                                                     colors.text,
-                                                    
+
                                                     // Interactive states
                                                     item.disabled
                                                         ? 'cursor-not-allowed opacity-50'
                                                         : 'cursor-pointer hover:shadow-xl',
-                                                    
+
                                                     // Focus states
                                                     'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
                                                 )}
                                                 style={{
-                                                    boxShadow: item.current 
-                                                        ? `0 8px 25px -5px ${colors.shadow}, 0 4px 10px -6px ${colors.shadow}` 
+                                                    boxShadow: item.current
+                                                        ? `0 8px 25px -5px ${colors.shadow}, 0 4px 10px -6px ${colors.shadow}`
                                                         : `0 4px 15px -3px ${colors.shadow}, 0 2px 6px -4px ${colors.shadow}`
                                                 }}
                                                 aria-current={item.current ? 'page' : undefined}
@@ -305,7 +330,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                                                     <span className="text-xl mb-1 transform transition-transform group-hover:scale-110">
                                                         {item.icon}
                                                     </span>
-                                                    
+
                                                     {/* Text with perfect vertical centering */}
                                                     <span className={classNames(
                                                         'text-xs font-medium leading-tight',
@@ -314,18 +339,18 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                                                         {item.name}
                                                     </span>
                                                 </div>
-                                                
+
                                                 {/* Enhanced accent bar */}
                                                 <span
                                                     aria-hidden="true"
                                                     className={classNames(
                                                         'absolute inset-x-0 bottom-0 h-1 transition-all duration-300',
-                                                        item.current 
-                                                            ? `${colors.accent} opacity-100 shadow-sm` 
+                                                        item.current
+                                                            ? `${colors.accent} opacity-100 shadow-sm`
                                                             : 'bg-transparent opacity-0 group-hover:opacity-50'
                                                     )}
                                                 />
-                                                
+
                                                 {/* Subtle gradient overlay for depth */}
                                                 <div className={classNames(
                                                     'absolute inset-0 opacity-0 transition-opacity duration-300',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChartBarIcon, TrendingUpIcon, TrendingDownIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, ArrowUpIcon, ArrowDownIcon, CalendarIcon } from '@heroicons/react/24/outline';
 
 interface AnnualSummaryProps {
   annualSummary: {
@@ -78,7 +78,7 @@ export const AnnualSummary: React.FC<AnnualSummaryProps> = ({ annualSummary }) =
                 <p className="text-sm font-medium text-blue-700">Ricavi Totali</p>
                 <p className="text-2xl font-bold text-blue-900">{annualSummary.formattedRevenue}</p>
               </div>
-              <TrendingUpIcon className="h-8 w-8 text-blue-600" />
+              <ArrowUpIcon className="h-8 w-8 text-blue-600" />
             </div>
           </div>
 
@@ -89,7 +89,7 @@ export const AnnualSummary: React.FC<AnnualSummaryProps> = ({ annualSummary }) =
                 <p className="text-sm font-medium text-orange-700">Costi Totali</p>
                 <p className="text-2xl font-bold text-orange-900">{annualSummary.formattedCosts}</p>
               </div>
-              <TrendingDownIcon className="h-8 w-8 text-orange-600" />
+              <ArrowDownIcon className="h-8 w-8 text-orange-600" />
             </div>
           </div>
 

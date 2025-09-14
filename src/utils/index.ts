@@ -15,7 +15,8 @@ export {
 // Existing utility exports (if any)
 
 /**
- * Calculate estimated monthly taxes based on income, costs and user settings
+ * Calculate estimated annual taxes based on current month data and user settings
+ * Projects current month performance to estimate annual tax liability
  * Uses the same logic as the detailed tax calculations page
  */
 export const calculateEstimatedMonthlyTaxes = (
@@ -32,11 +33,14 @@ export const calculateEstimatedMonthlyTaxes = (
   estimatedTaxes: number;
   formattedTaxes: string;
 } => {
-  // If no settings available, use simplified calculation
+  // Project monthly data to annual estimates
+  const projectedAnnualRevenue = monthlyRevenue * 12;
+  const projectedAnnualCosts = monthlyCosts * 12;
+  // If no settings available, use simplified calculation on annual projection
   if (!settings) {
-    const netIncome = monthlyRevenue - monthlyCosts;
+    const annualNetIncome = projectedAnnualRevenue - projectedAnnualCosts;
     const taxRate = 0.25; // 25% fallback rate
-    const estimatedTaxes = Math.max(0, netIncome * taxRate);
+    const estimatedTaxes = Math.max(0, annualNetIncome * taxRate);
     return {
       estimatedTaxes,
       formattedTaxes: `€${estimatedTaxes.toLocaleString("it-IT", {
@@ -46,31 +50,30 @@ export const calculateEstimatedMonthlyTaxes = (
     };
   }
 
-  // Calculate taxable income based on tax regime
-  let taxableIncome = 0;
+  // Calculate annual taxable income based on tax regime
+  let annualTaxableIncome = 0;
   if (settings.taxRegime === "forfettario") {
     // Forfettario: apply profitability coefficient and subtract costs
     const profitabilityIncome =
-      (monthlyRevenue * (settings.profitabilityRate || 0)) / 100;
-    taxableIncome = Math.max(0, profitabilityIncome - monthlyCosts);
+      (projectedAnnualRevenue * (settings.profitabilityRate || 0)) / 100;
+    annualTaxableIncome = Math.max(0, profitabilityIncome - projectedAnnualCosts);
   } else {
     // Ordinario: income minus deductible costs
-    taxableIncome = Math.max(0, monthlyRevenue - monthlyCosts);
+    annualTaxableIncome = Math.max(0, projectedAnnualRevenue - projectedAnnualCosts);
   }
 
-  // Calculate IRPEF/substitute tax
+  // Calculate IRPEF/substitute tax (annual)
   const irpefAmount =
     settings.taxRegime === "forfettario"
-      ? (taxableIncome * (settings.substituteRate || 0)) / 100
-      : taxableIncome * 0.23; // Simplified IRPEF rate for ordinario
+      ? (annualTaxableIncome * (settings.substituteRate || 0)) / 100
+      : annualTaxableIncome * 0.23; // Simplified IRPEF rate for ordinario
 
-  // Calculate pension contributions (monthly portion)
-  const monthlyContributionRate = (settings.manualContributionRate || 0) / 12;
-  const monthlyFixedContributions = (settings.manualFixedAnnualContributions || 0) / 12;
+  // Calculate pension contributions (annual)
   const contributionsAmount = 
-    (taxableIncome * monthlyContributionRate / 100) + monthlyFixedContributions;
+    (annualTaxableIncome * (settings.manualContributionRate || 0) / 100) + 
+    (settings.manualFixedAnnualContributions || 0);
 
-  // Calculate total taxes
+  // Calculate total taxes (annual)
   const estimatedTaxes = irpefAmount + contributionsAmount;
 
   return {

@@ -55,7 +55,7 @@ function applyCorsHeaders(response: NextResponse, origin: string | null): NextRe
 }
 
 /**
- * Main middleware function
+ * Main middleware function (only for API routes)
  */
 export function middleware(request: NextRequest) {
   const origin = request.headers.get('origin');
@@ -67,40 +67,30 @@ export function middleware(request: NextRequest) {
     return applyCorsHeaders(response, origin);
   }
 
-  // Skip middleware for Next.js static files
-  if (pathname.startsWith('/_next/') || pathname.includes('.')) {
-    return NextResponse.next();
+  // This middleware only runs for API routes due to matcher config
+  const response = NextResponse.next();
+  
+  // Apply CORS only in production or for cross-origin requests
+  if (process.env.NODE_ENV === 'production' || (origin && !origin.includes('localhost'))) {
+    applyCorsHeaders(response, origin);
   }
-
-  // Apply security headers for API routes
-  if (pathname.startsWith('/api/')) {
-    const response = NextResponse.next();
-    
-    // Apply CORS only in production or for cross-origin requests
-    if (process.env.NODE_ENV === 'production' || (origin && !origin.includes('localhost'))) {
-      applyCorsHeaders(response, origin);
-    }
-    
-    // Additional API security headers (only in production)
-    if (process.env.NODE_ENV === 'production') {
-      response.headers.set('X-Content-Type-Options', 'nosniff');
-      response.headers.set('X-Frame-Options', 'DENY');
-      response.headers.set('X-XSS-Protection', '1; mode=block');
-      response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-    }
-    
-    // Prevent caching of sensitive API responses
-    if (pathname.includes('/auth/') || pathname.includes('/user/')) {
-      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-      response.headers.set('Pragma', 'no-cache');
-      response.headers.set('Expires', '0');
-    }
-    
-    return response;
+  
+  // Additional API security headers (only in production)
+  if (process.env.NODE_ENV === 'production') {
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   }
-
-  // For non-API routes, just continue
-  return NextResponse.next();
+  
+  // Prevent caching of sensitive API responses
+  if (pathname.includes('/auth/') || pathname.includes('/user/')) {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+  }
+  
+  return response;
 }
 
 /**
@@ -109,12 +99,9 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder files
+     * Match only API routes for security middleware
+     * Exclude all static files, Next.js internals, and assets
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/api/:path*',
   ],
 };

@@ -88,10 +88,12 @@ const nextConfig: NextConfig = {
           ...securityHeaders,
         ],
       },
-      {
-        source: '/(.*)',
-        headers: securityHeaders,
-      },
+      ...(process.env.NODE_ENV === 'production' ? [
+        {
+          source: '/(.*)',
+          headers: securityHeaders,
+        },
+      ] : []),
     ];
   },
 

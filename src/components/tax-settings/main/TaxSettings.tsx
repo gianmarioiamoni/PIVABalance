@@ -80,6 +80,7 @@ const TaxSettings = forwardRef<TaxSettingsRef, TaxSettingsProps>(({
         state: { settings, loading, error, success, showRateTable },
         actions: {
             handleChange,
+            handleBatchChange,
             handleSubmit,
             handleRateSelect,
             setShowRateTable,
@@ -189,6 +190,7 @@ const TaxSettings = forwardRef<TaxSettingsRef, TaxSettingsProps>(({
                         <PensionContributionsSection
                             settings={settings}
                             handleChange={handleChange}
+                            handleBatchChange={handleBatchChange}
                         />
                     </section>
 

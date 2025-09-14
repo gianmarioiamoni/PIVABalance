@@ -13,11 +13,13 @@ import { InpsRateSelector } from '../inps/InpsRateSelector';
 interface PensionContributionsSectionProps {
   settings: UserSettings;
   handleChange: (field: keyof UserSettings, value: string | number | boolean | undefined) => Promise<void>;
+  handleBatchChange: (updates: Partial<UserSettings>) => void;
 }
 
 export const PensionContributionsSection: React.FC<PensionContributionsSectionProps> = React.memo(({
   settings,
   handleChange,
+  handleBatchChange,
 }) => {
   // Memoized callback to prevent infinite loops
   const handleParametersChange = useCallback((params: any) => {
@@ -64,10 +66,13 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
             <InpsRateSelector
               value={settings.inpsRateType}
               onChange={(type, rate, minContribution) => {
-                handleChange('inpsRateType', type);
-                handleChange('manualContributionRate', rate);
-                handleChange('manualMinimumContribution', minContribution);
-                handleChange('manualFixedAnnualContributions', 0);
+                // Use batch change to avoid multiple re-renders and infinite loops
+                handleBatchChange({
+                  inpsRateType: type,
+                  manualContributionRate: rate,
+                  manualMinimumContribution: minContribution,
+                  manualFixedAnnualContributions: 0,
+                });
               }}
             />
           </div>

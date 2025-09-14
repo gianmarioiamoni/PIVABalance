@@ -128,6 +128,14 @@ export function useTaxSettings() {
   // Use ref to maintain stable reference
   const handleChange = handleChangeRef;
 
+  // Batch multiple field updates to avoid multiple re-renders
+  const handleBatchChange = useCallback((updates: Partial<UserSettings>) => {
+    setSettings((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+  }, []);
+
   const handleRateSelect = (rate: ProfitabilityRate) => {
     handleChange("profitabilityRate", rate.rate);
     setShowRateTable(false);
@@ -157,6 +165,7 @@ export function useTaxSettings() {
     },
     actions: {
       handleChange,
+      handleBatchChange,
       handleSubmit,
       handleRateSelect,
       handleProfessionalFundParametersChange,

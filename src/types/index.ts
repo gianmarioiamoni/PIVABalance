@@ -412,3 +412,45 @@ export interface NotificationContextType {
   showWarning: (title: string, message: string, duration?: number) => string;
   showInfo: (title: string, message: string, duration?: number) => string;
 }
+
+// Donation Types
+export interface DonationRequest {
+  amount: number; // In cents
+  donorEmail?: string;
+  donorName?: string;
+  isAnonymous: boolean;
+  message?: string;
+  consentToContact: boolean;
+  source: 'web' | 'mobile';
+}
+
+export interface DonationResponse {
+  id: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'succeeded' | 'failed' | 'canceled';
+  donorName?: string;
+  isAnonymous: boolean;
+  donationType: 'one-time' | 'monthly';
+  message?: string;
+  paymentMethod: string;
+  createdAt: string;
+  processedAt?: string;
+}
+
+export interface StripePaymentIntent {
+  id: string;
+  client_secret: string;
+  amount: number;
+  currency: string;
+  status: string;
+}
+
+export interface DonationStats {
+  totalAmount: number;
+  totalCount: number;
+  averageAmount: number;
+  lastDonation: string | null;
+  monthlyGoal: number;
+  monthlyProgress: number;
+}

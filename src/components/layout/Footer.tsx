@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { DonationButton } from '@/components/donations';
 
 /**
  * Footer Component
@@ -23,7 +24,7 @@ export const Footer: React.FC = () => {
             </p>
           </div>
 
-          {/* Right side - Legal links */}
+          {/* Right side - Legal links and donation */}
           <div className="flex flex-wrap justify-center md:justify-end items-center space-x-6 text-sm">
             <Link 
               href="/privacy-policy"
@@ -37,6 +38,12 @@ export const Footer: React.FC = () => {
             >
               Cookie Policy
             </Link>
+            <span className="text-gray-400">|</span>
+            <DonationButton 
+              variant="link" 
+              size="sm"
+              className="text-gray-600 hover:text-gray-900"
+            />
             <span className="text-gray-400">|</span>
             <span className="text-xs text-gray-500">
               Conforme GDPR

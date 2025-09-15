@@ -4,12 +4,14 @@ import React, { useState } from 'react';
 import { ProfileSection } from './ProfileSection';
 import { PasswordSection } from './PasswordSection';
 import { DangerZone } from './DangerZone';
+import { PrivacyRights } from './PrivacyRights';
 import { CookieSettings } from '@/components/cookies';
 import { 
   UserIcon, 
   KeyIcon, 
   ExclamationTriangleIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline';
 
 /**
@@ -24,7 +26,7 @@ import {
  * Follows SRP by delegating specific functionality to specialized components.
  */
 export const AccountManagement: React.FC = () => {
-  const [activeSection, setActiveSection] = useState<'profile' | 'security' | 'privacy' | 'danger'>('profile');
+  const [activeSection, setActiveSection] = useState<'profile' | 'security' | 'privacy' | 'rights' | 'danger'>('profile');
 
   const sections = [
     {
@@ -50,6 +52,14 @@ export const AccountManagement: React.FC = () => {
       icon: ShieldCheckIcon,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
+    },
+    {
+      id: 'rights' as const,
+      title: 'Diritti Privacy',
+      description: 'Esercita i tuoi diritti GDPR (accesso, portabilità dati)',
+      icon: DocumentTextIcon,
+      color: 'text-indigo-600',
+      bgColor: 'bg-indigo-50',
     },
     {
       id: 'danger' as const,
@@ -116,17 +126,29 @@ export const AccountManagement: React.FC = () => {
           </div>
         )}
 
-        {activeSection === 'privacy' && (
-          <div>
-            <div className="mb-6">
-              <h2 className="heading-md mb-2">Privacy e Cookie</h2>
-              <p className="text-tertiary">
-                Gestisci le tue preferenze sulla privacy e il consenso ai cookie secondo il GDPR.
-              </p>
-            </div>
-            <CookieSettings />
+      {activeSection === 'privacy' && (
+        <div>
+          <div className="mb-6">
+            <h2 className="heading-md mb-2">Privacy e Cookie</h2>
+            <p className="text-tertiary">
+              Gestisci le tue preferenze sulla privacy e il consenso ai cookie secondo il GDPR.
+            </p>
           </div>
-        )}
+          <CookieSettings />
+        </div>
+      )}
+
+      {activeSection === 'rights' && (
+        <div>
+          <div className="mb-6">
+            <h2 className="heading-md mb-2">Diritti Privacy (GDPR)</h2>
+            <p className="text-tertiary">
+              Esercita i tuoi diritti sulla protezione dei dati personali secondo il GDPR.
+            </p>
+          </div>
+          <PrivacyRights />
+        </div>
+      )}
 
         {activeSection === 'danger' && (
           <div>

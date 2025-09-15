@@ -9,3 +9,4 @@ export { AccountManagement } from './AccountManagement';
 export { ProfileSection } from './ProfileSection';
 export { PasswordSection } from './PasswordSection';
 export { DangerZone } from './DangerZone';
+export { PrivacyRights } from './PrivacyRights';

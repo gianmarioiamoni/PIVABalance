@@ -1108,16 +1108,16 @@ npm run build         # Build verification
 ## 📚 **Documentation Links**
 
 ### **🏗️ Architecture & Development**
-- [🎛️ Widget System Architecture](WIDGET_SYSTEM_ARCHITECTURE.md)
-- [📊 Chart Architecture](src/components/charts/ARCHITECTURE.md)
-- [📱 Mobile SSR/CSR](src/components/charts/mobile/SSR_CSR_ARCHITECTURE.md)
-- [🎨 SVG Pre-rendering](src/components/charts/PRERENDERING.md)
-- [🧩 SRP Analysis](SKELETON_SRP_ANALYSIS.md)
-- [⚡ Performance Report](PERFORMANCE_AUDIT_REPORT.md)
-- [🎨 Design System](DESIGN_SYSTEM.md)
-- [📚 Documentation Index](DOCUMENTATION_INDEX.md)
+- [🎛️ Widget System Architecture](docs/architecture/WIDGET_SYSTEM_ARCHITECTURE.md)
+- [📊 Chart Architecture](docs/architecture/ARCHITECTURE.md)
+- [📱 Mobile SSR/CSR](docs/architecture/SSR_CSR_ARCHITECTURE.md)
+- [🎨 SVG Pre-rendering](docs/architecture/PRERENDERING.md)
+- [🧩 SRP Analysis](docs/architecture/SKELETON_SRP_ANALYSIS.md)
+- [⚡ Performance Report](docs/performance/PERFORMANCE_AUDIT_REPORT.md)
+- [🎨 Design System](docs/architecture/DESIGN_SYSTEM.md)
+- [📚 Documentation Index](docs/DOCUMENTATION_INDEX.md)
 
 ### **🔒 GDPR & Privacy Compliance**
-- [🛡️ GDPR Compliance Audit](GDPR_COMPLIANCE_AUDIT.md)
-- [📋 Processing Activities Register](REGISTRO_TRATTAMENTI_GDPR.md)
-- [👨‍💼 Admin System Setup](ADMIN_SETUP.md)
+- [🛡️ GDPR Compliance Audit](docs/gdpr-compliance/GDPR_COMPLIANCE_AUDIT.md)
+- [📋 Processing Activities Register](docs/gdpr-compliance/REGISTRO_TRATTAMENTI_GDPR.md)
+- [👨‍💼 Admin System Setup](docs/gdpr-compliance/ADMIN_SETUP.md)

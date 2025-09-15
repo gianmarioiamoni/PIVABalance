@@ -45,7 +45,6 @@ interface DonationFormProps {
 }
 
 const DonationForm: React.FC<DonationFormProps> = ({
-  clientSecret,
   donationData,
   onSuccess,
   onError
@@ -86,9 +85,9 @@ const DonationForm: React.FC<DonationFormProps> = ({
         throw new Error('Pagamento non completato');
       }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Payment error:', err);
-      onError(err.message || 'Errore durante il pagamento');
+      onError(err instanceof Error ? err.message : 'Errore durante il pagamento');
     } finally {
       setIsProcessing(false);
     }
@@ -171,7 +170,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
     source: 'web',
   });
   const [error, setError] = useState<string>('');
-  const [successDonationId, setSuccessDonationId] = useState<string>('');
+  const [, setSuccessDonationId] = useState<string>('');
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -220,9 +219,9 @@ export const DonationModal: React.FC<DonationModalProps> = ({
       setClientSecret(paymentIntent.client_secret);
       setStep('payment');
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Create payment intent error:', err);
-      setError(err.message || 'Errore durante la creazione del pagamento');
+      setError(err instanceof Error ? err.message : 'Errore durante la creazione del pagamento');
     }
   };
 
@@ -443,7 +442,6 @@ export const DonationModal: React.FC<DonationModalProps> = ({
           {step === 'payment' && clientSecret && (
             <Elements stripe={stripePromise} options={{ clientSecret }}>
               <DonationForm
-                clientSecret={clientSecret}
                 donationData={donationData}
                 onSuccess={handlePaymentSuccess}
                 onError={handlePaymentError}

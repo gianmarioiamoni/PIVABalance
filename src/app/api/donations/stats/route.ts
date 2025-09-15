@@ -8,7 +8,7 @@ import { ApiResponse, DonationStats } from '@/types';
  * Returns anonymized donation statistics for transparency
  * Public endpoint - no authentication required
  */
-export async function GET(request: NextRequest): Promise<NextResponse<ApiResponse<DonationStats>>> {
+export async function GET(_request: NextRequest): Promise<NextResponse<ApiResponse<DonationStats>>> {
   try {
     await connectDB();
 
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
  * GET /api/donations/stats?detailed=true
  * Returns detailed statistics for admin users (future feature)
  */
-export async function GET_DETAILED(request: NextRequest): Promise<NextResponse<ApiResponse<any>>> {
+export async function GET_DETAILED(request: NextRequest): Promise<NextResponse<ApiResponse<unknown>>> {
   try {
     // This would require admin authentication
     // For now, return the same basic stats

@@ -155,7 +155,7 @@ export class DonationService {
    * Check if donation is eligible for tax deduction (Italy)
    * Returns information about tax benefits
    */
-  getTaxDeductionInfo(amountInCents: number): { eligible: boolean; info: string } {
+  getTaxDeductionInfo(_amountInCents: number): { eligible: boolean; info: string } {
     // In Italy, donations to certain organizations can be tax deductible
     // This would need to be configured based on the organization's status
     return {

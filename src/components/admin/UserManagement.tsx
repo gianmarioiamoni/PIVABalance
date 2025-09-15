@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '@/services/api';
 import { UserResponse } from '@/types';
 import {
@@ -9,8 +9,12 @@ import {
     AdjustmentsHorizontalIcon,
     ShieldCheckIcon,
     UserIcon,
-    ExclamationTriangleIcon
+    ExclamationTriangleIcon,
+    PencilIcon,
+    KeyIcon,
+    TrashIcon
 } from '@heroicons/react/24/outline';
+import { EditUserModal, ResetPasswordModal, DeleteUserModal } from './';
 
 /**
  * User Management Component
@@ -46,10 +50,16 @@ export const UserManagement: React.FC = () => {
     const [roleFilter, setRoleFilter] = useState<string>('');
     const [activeFilter, setActiveFilter] = useState<string>('');
 
+    // Modal states
+    const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [resetPasswordModalOpen, setResetPasswordModalOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
     const limit = 10;
 
     // Load users data
-    const loadUsers = async () => {
+    const loadUsers = useCallback(async () => {
         try {
             setLoading(true);
             setError('');
@@ -67,18 +77,21 @@ export const UserManagement: React.FC = () => {
             setUsers(data.users);
             setTotal(data.total);
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Error loading users:', err);
-            setError(err?.data?.error || 'Errore nel caricamento degli utenti');
+            const errorMessage = err && typeof err === 'object' && 'data' in err && err.data && typeof err.data === 'object' && 'error' in err.data
+                ? String(err.data.error)
+                : 'Errore nel caricamento degli utenti';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
-    };
+    }, [page, search, roleFilter, activeFilter, limit]);
 
     // Load users on component mount and filter changes
     useEffect(() => {
         loadUsers();
-    }, [page, search, roleFilter, activeFilter]);
+    }, [loadUsers]);
 
     // Handle search with debounce
     useEffect(() => {
@@ -88,6 +101,56 @@ export const UserManagement: React.FC = () => {
 
         return () => clearTimeout(timeoutId);
     }, [search]);
+
+    // Modal handlers
+    const handleEditUser = (user: UserResponse) => {
+        setSelectedUser(user);
+        setEditModalOpen(true);
+    };
+
+    const handleResetPassword = (user: UserResponse) => {
+        setSelectedUser(user);
+        setResetPasswordModalOpen(true);
+    };
+
+    const handleDeleteUser = (user: UserResponse) => {
+        setSelectedUser(user);
+        setDeleteModalOpen(true);
+    };
+
+    const handleUserUpdated = (updatedUser: UserResponse) => {
+        if (!updatedUser?.id) {
+            console.error('Updated user is missing id');
+            return;
+        }
+
+        setUsers(prevUsers =>
+            prevUsers.map(user =>
+                user.id === updatedUser.id ? updatedUser : user
+            )
+        );
+        setEditModalOpen(false);
+        setSelectedUser(null);
+    };
+
+    const handleUserDeleted = (deletedUserId: string) => {
+        if (!deletedUserId) {
+            console.error('Deleted user ID is missing');
+            return;
+        }
+
+        setUsers(prevUsers => prevUsers.filter(user => user.id !== deletedUserId));
+        setTotal(prev => prev - 1);
+        setDeleteModalOpen(false);
+        setSelectedUser(null);
+    };
+
+    const handleCloseModals = () => {
+        setEditModalOpen(false);
+        setResetPasswordModalOpen(false);
+        setDeleteModalOpen(false);
+        setSelectedUser(null);
+    };
 
     // Role badge styling
     const getRoleBadge = (role: string) => {
@@ -287,8 +350,8 @@ export const UserManagement: React.FC = () => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.isActive
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-red-100 text-red-800'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-red-100 text-red-800'
                                                     }`}>
                                                     {user.isActive ? 'Attivo' : 'Sospeso'}
                                                 </span>
@@ -303,20 +366,36 @@ export const UserManagement: React.FC = () => {
                                                 {new Date(user.createdAt).toLocaleDateString('it-IT')}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button
-                                                    className="text-indigo-600 hover:text-indigo-900 mr-3"
-                                                    onClick={() => {/* TODO: Implement edit user */ }}
-                                                >
-                                                    Modifica
-                                                </button>
-                                                {user.role !== 'super_admin' && (
+                                                <div className="flex items-center justify-end space-x-2">
+                                                    {/* Edit User */}
                                                     <button
-                                                        className="text-red-600 hover:text-red-900"
-                                                        onClick={() => {/* TODO: Implement delete user */ }}
+                                                        onClick={() => handleEditUser(user)}
+                                                        className="p-1 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded"
+                                                        title="Modifica utente"
                                                     >
-                                                        Elimina
+                                                        <PencilIcon className="h-4 w-4" />
                                                     </button>
-                                                )}
+
+                                                    {/* Reset Password */}
+                                                    <button
+                                                        onClick={() => handleResetPassword(user)}
+                                                        className="p-1 text-yellow-600 hover:text-yellow-900 hover:bg-yellow-50 rounded"
+                                                        title="Reset password"
+                                                    >
+                                                        <KeyIcon className="h-4 w-4" />
+                                                    </button>
+
+                                                    {/* Delete User - Only show if not super admin */}
+                                                    {user.role !== 'super_admin' && (
+                                                        <button
+                                                            onClick={() => handleDeleteUser(user)}
+                                                            className="p-1 text-red-600 hover:text-red-900 hover:bg-red-50 rounded"
+                                                            title="Elimina utente"
+                                                        >
+                                                            <TrashIcon className="h-4 w-4" />
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -356,6 +435,31 @@ export const UserManagement: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            {/* Modals */}
+            {selectedUser && (
+                <>
+                    <EditUserModal
+                        user={selectedUser}
+                        isOpen={editModalOpen}
+                        onClose={handleCloseModals}
+                        onUserUpdated={handleUserUpdated}
+                    />
+
+                    <ResetPasswordModal
+                        user={selectedUser}
+                        isOpen={resetPasswordModalOpen}
+                        onClose={handleCloseModals}
+                    />
+
+                    <DeleteUserModal
+                        user={selectedUser}
+                        isOpen={deleteModalOpen}
+                        onClose={handleCloseModals}
+                        onUserDeleted={handleUserDeleted}
+                    />
+                </>
+            )}
         </div>
     );
 };

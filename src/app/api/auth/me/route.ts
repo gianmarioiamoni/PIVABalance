@@ -39,6 +39,51 @@ export async function GET(
       );
     }
 
+    // Get user object for fallback
+    const userObject = user.toObject ? user.toObject() : user;
+
+    // Handle missing fields for existing users
+    let finalRole = user.role || userObject.role;
+    let finalIsActive =
+      user.isActive !== undefined ? user.isActive : userObject.isActive;
+
+    // If still undefined, check if this is the super admin by email
+    if (!finalRole && user.email === "admin@tuodominio.com") {
+      finalRole = "super_admin";
+      finalIsActive = true;
+
+      // Update the document in database
+      await User.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            role: "super_admin",
+            isActive: true,
+            lastLogin: new Date(),
+            createdBy: null,
+          },
+        }
+      );
+      console.log("🔧 Updated super admin fields in database");
+    } else if (!finalRole) {
+      finalRole = "user";
+      finalIsActive = true;
+
+      // Update the document in database
+      await User.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            role: "user",
+            isActive: true,
+            lastLogin: new Date(),
+            createdBy: null,
+          },
+        }
+      );
+      console.log("🔧 Updated user fields in database");
+    }
+
     // Return user information
     return NextResponse.json(
       {
@@ -47,8 +92,8 @@ export async function GET(
           id: user._id.toString(),
           email: user.email,
           name: user.name,
-          role: user.role || "user",
-          isActive: user.isActive !== false,
+          role: finalRole,
+          isActive: finalIsActive !== false,
           lastLogin: user.lastLogin,
           createdAt: user.createdAt,
         },

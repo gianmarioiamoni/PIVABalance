@@ -10,7 +10,7 @@
 'use client';
 
 import { LazyCustomizableDashboard } from '@/components/common/LazyComponents';
-import { BusinessProtection } from '@/components/auth/BusinessProtection';
+import { RoleBasedAccess } from '@/components/auth/RoleBasedAccess';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,10 +29,10 @@ export const dynamic = 'force-dynamic';
  */
 export default function CustomizableDashboardPage() {
     return (
-        <BusinessProtection>
+        <RoleBasedAccess allowedRoles={['user', 'admin']} redirectSuperAdminTo="/dashboard/admin">
             <div className="min-h-screen bg-gray-50">
                 <LazyCustomizableDashboard />
             </div>
-        </BusinessProtection>
+        </RoleBasedAccess>
     );
 }

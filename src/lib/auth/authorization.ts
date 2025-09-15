@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getUserFromRequest } from "./jwt";
 import { User } from "@/models/User";
 import { connectDB } from "@/lib/database/mongodb";
@@ -121,8 +121,57 @@ export function requireRole(requiredRole: UserRole) {
 /**
  * Specific middleware functions for common use cases
  */
-export const requireAdmin = requireRole("admin");
-export const requireSuperAdmin = requireRole("super_admin");
+export async function requireAdmin(request: NextRequest): Promise<{
+  success: boolean;
+  user?: IUser;
+  response?: NextResponse;
+}> {
+  const result = await requireRole("admin")(request);
+
+  if ("error" in result) {
+    return {
+      success: false,
+      response: NextResponse.json(
+        {
+          success: false,
+          message: result.error,
+        },
+        { status: result.status }
+      ),
+    };
+  }
+
+  return {
+    success: true,
+    user: result.user,
+  };
+}
+
+export async function requireSuperAdmin(request: NextRequest): Promise<{
+  success: boolean;
+  user?: IUser;
+  response?: NextResponse;
+}> {
+  const result = await requireRole("super_admin")(request);
+
+  if ("error" in result) {
+    return {
+      success: false,
+      response: NextResponse.json(
+        {
+          success: false,
+          message: result.error,
+        },
+        { status: result.status }
+      ),
+    };
+  }
+
+  return {
+    success: true,
+    user: result.user,
+  };
+}
 
 /**
  * Check if there are any super admins in the system

@@ -9,7 +9,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { AdvancedAnalyticsView } from './AdvancedAnalyticsView';
-import { BusinessProtection } from '@/components/auth/BusinessProtection';
+import { RoleBasedAccess } from '@/components/auth/RoleBasedAccess';
 
 export const metadata: Metadata = {
     title: 'Analytics Avanzate | P.IVA Balance',
@@ -32,8 +32,8 @@ export const metadata: Metadata = {
  */
 export default function AdvancedAnalyticsPage() {
     return (
-        <BusinessProtection>
+        <RoleBasedAccess allowedRoles={['user', 'admin']} redirectSuperAdminTo="/dashboard/admin">
             <AdvancedAnalyticsView />
-        </BusinessProtection>
+        </RoleBasedAccess>
     );
 }

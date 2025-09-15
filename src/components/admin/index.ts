@@ -7,3 +7,6 @@
 
 export { AdminDashboard } from "./AdminDashboard";
 export { UserManagement } from "./UserManagement";
+export { EditUserModal } from "./EditUserModal";
+export { ResetPasswordModal } from "./ResetPasswordModal";
+export { DeleteUserModal } from "./DeleteUserModal";

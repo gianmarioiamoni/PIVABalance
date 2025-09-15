@@ -57,41 +57,57 @@ export const useCookieConsent = () => {
     preferences: DEFAULT_PREFERENCES,
   });
 
-  // Load consent from localStorage on mount
+  // Load consent from localStorage on mount (client-side only)
   useEffect(() => {
+    // Ensure we're on the client side
+    if (typeof window === 'undefined') return;
+    
     try {
       const stored = localStorage.getItem(CONSENT_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
         
-        // Check if consent is still valid (1 year) and version matches
-        const consentDate = new Date(parsed.consentDate);
-        const oneYearAgo = new Date();
-        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-        
-        const isValid = consentDate > oneYearAgo && parsed.version === CONSENT_VERSION;
-        
-        if (isValid) {
-          setState({
-            hasConsent: true,
-            showBanner: false,
-            preferences: {
-              necessary: true, // Always true
-              functional: parsed.preferences?.functional || false,
-              analytics: parsed.preferences?.analytics || false,
-              marketing: parsed.preferences?.marketing || false,
-            },
-            consentDate: consentDate,
-          });
-        } else {
-          // Clear expired or outdated consent
+        // Validate parsed data
+        if (!parsed || typeof parsed !== 'object') {
           localStorage.removeItem(CONSENT_STORAGE_KEY);
+          return;
         }
+        
+        // Check if consent is still valid (1 year) and version matches
+        if (parsed.consentDate && parsed.version === CONSENT_VERSION) {
+          const consentDate = new Date(parsed.consentDate);
+          const oneYearAgo = new Date();
+          oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+          
+          const isValid = consentDate > oneYearAgo;
+          
+          if (isValid && parsed.preferences) {
+            setState({
+              hasConsent: true,
+              showBanner: false,
+              preferences: {
+                necessary: true, // Always true
+                functional: parsed.preferences?.functional || false,
+                analytics: parsed.preferences?.analytics || false,
+                marketing: parsed.preferences?.marketing || false,
+              },
+              consentDate: consentDate,
+            });
+            return;
+          }
+        }
+        
+        // Clear expired or invalid consent
+        localStorage.removeItem(CONSENT_STORAGE_KEY);
       }
     } catch (error) {
       console.error('Error loading cookie consent:', error);
       // Clear corrupted data
-      localStorage.removeItem(CONSENT_STORAGE_KEY);
+      try {
+        localStorage.removeItem(CONSENT_STORAGE_KEY);
+      } catch (clearError) {
+        console.error('Error clearing corrupted consent data:', clearError);
+      }
     }
   }, []);
 
@@ -99,7 +115,6 @@ export const useCookieConsent = () => {
    * Accept all cookies
    */
   const acceptAll = () => {
-    console.log('🍪 useCookieConsent: acceptAll called');
     const newPreferences: CookieConsent = {
       necessary: true,
       functional: true,
@@ -114,7 +129,6 @@ export const useCookieConsent = () => {
    * Accept only necessary cookies
    */
   const acceptNecessaryOnly = () => {
-    console.log('🍪 useCookieConsent: acceptNecessaryOnly called');
     saveConsent(DEFAULT_PREFERENCES);
   };
 
@@ -122,7 +136,6 @@ export const useCookieConsent = () => {
    * Save custom preferences
    */
   const savePreferences = (preferences: Partial<CookieConsent>) => {
-    console.log('🍪 useCookieConsent: savePreferences called with', preferences);
     const newPreferences: CookieConsent = {
       necessary: true, // Always true
       functional: preferences.functional ?? false,
@@ -130,7 +143,6 @@ export const useCookieConsent = () => {
       marketing: preferences.marketing ?? false,
     };
     
-    console.log('🍪 useCookieConsent: processed preferences', newPreferences);
     saveConsent(newPreferences);
   };
 
@@ -170,7 +182,11 @@ export const useCookieConsent = () => {
    * Save consent to localStorage and update state
    */
   const saveConsent = (preferences: CookieConsent) => {
-    console.log('🍪 useCookieConsent: saveConsent called with', preferences);
+    // Ensure we're on the client side
+    if (typeof window === 'undefined') {
+      return;
+    }
+    
     const consentDate = new Date();
     const consentData = {
       version: CONSENT_VERSION,
@@ -180,14 +196,12 @@ export const useCookieConsent = () => {
 
     try {
       localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(consentData));
-      console.log('🍪 useCookieConsent: consent saved to localStorage', consentData);
       setState({
         hasConsent: true,
         showBanner: false,
         preferences,
         consentDate,
       });
-      console.log('🍪 useCookieConsent: state updated, banner should be hidden');
     } catch (error) {
       console.error('Error saving cookie consent:', error);
     }

@@ -54,17 +54,14 @@ export const CookieBanner: React.FC = () => {
     };
 
     const handleSavePreferences = () => {
-        console.log('🍪 CookieBanner: Saving preferences', tempPreferences);
         savePreferences(tempPreferences);
     };
 
     const handleAcceptAll = () => {
-        console.log('🍪 CookieBanner: Accepting all cookies');
         acceptAll();
     };
 
     const handleAcceptNecessary = () => {
-        console.log('🍪 CookieBanner: Accepting necessary only');
         acceptNecessaryOnly();
     };
 

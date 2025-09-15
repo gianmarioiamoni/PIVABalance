@@ -4,7 +4,7 @@ import { QueryProvider } from '@/providers/QueryProvider';
 import { NotificationProvider } from '@/providers/NotificationProvider';
 import { ThemeProvider } from '@/components/ui';
 import { ServiceWorkerProvider } from '@/providers/ServiceWorkerProvider';
-import { CookieBanner } from '@/components/cookies';
+import { CookieBanner } from '@/components/cookies/CookieBanner';
 // import { PWAInstallPrompt } from '@/components/pwa';
 import './globals.css';
 

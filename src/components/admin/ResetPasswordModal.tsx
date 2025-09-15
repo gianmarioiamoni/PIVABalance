@@ -32,15 +32,6 @@ interface ResetPasswordModalProps {
     onClose: () => void;
 }
 
-interface ResetPasswordResponse {
-    success: boolean;
-    message: string;
-    data: {
-        temporaryPassword: string;
-        userEmail: string;
-        userName: string;
-    };
-}
 
 export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
     user,
@@ -73,12 +64,13 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
             setLoading(true);
             setError('');
 
-            const response = await api.post<ResetPasswordResponse>(
-                `/admin/users/${user.id}/reset-password`,
-                {}
-            );
+            const response = await api.post<{
+                temporaryPassword: string;
+                userEmail: string;
+                userName: string;
+            }>(`/admin/users/${user.id}/reset-password`, {});
 
-            setTemporaryPassword(response.data.temporaryPassword);
+            setTemporaryPassword(response.temporaryPassword);
             setSuccess('Password resettata con successo');
             setStep('result');
 

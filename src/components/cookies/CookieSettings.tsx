@@ -8,7 +8,9 @@ import {
     MegaphoneIcon,
     WrenchScrewdriverIcon,
     TrashIcon,
-    EyeIcon
+    EyeIcon,
+    DocumentArrowDownIcon,
+    ClockIcon
 } from '@heroicons/react/24/outline';
 
 /**
@@ -25,15 +27,19 @@ export const CookieSettings: React.FC = () => {
         savePreferences,
         clearConsent,
         reopenBanner,
+        getConsentAuditTrail,
+        exportConsentAudit,
     } = useCookieConsent();
 
     const [tempPreferences, setTempPreferences] = useState<CookieConsent>(preferences);
     const [showDetails, setShowDetails] = useState(false);
+    const [showAuditTrail, setShowAuditTrail] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [auditTrail, setAuditTrail] = useState<any[]>([]);
 
     const handleToggleCategory = (category: keyof CookieConsent) => {
         if (category === 'necessary') return; // Cannot disable necessary cookies
-        
+
         setTempPreferences(prev => ({
             ...prev,
             [category]: !prev[category]
@@ -59,6 +65,36 @@ export const CookieSettings: React.FC = () => {
 
     const handleShowBanner = () => {
         reopenBanner();
+    };
+
+    const handleLoadAuditTrail = () => {
+        const trail = getConsentAuditTrail();
+        setAuditTrail(trail);
+        setShowAuditTrail(true);
+    };
+
+    const handleExportAudit = () => {
+        exportConsentAudit();
+    };
+
+    const formatTimestamp = (timestamp: string) => {
+        return new Date(timestamp).toLocaleString('it-IT', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    };
+
+    const getActionLabel = (action: string) => {
+        switch (action) {
+            case 'consent_given': return 'Consenso dato';
+            case 'consent_updated': return 'Consenso aggiornato';
+            case 'consent_revoked': return 'Consenso revocato';
+            default: return action;
+        }
     };
 
     const cookieCategories = [
@@ -195,21 +231,19 @@ export const CookieSettings: React.FC = () => {
                     {cookieCategories.map((category) => {
                         const Icon = category.icon;
                         const isEnabled = tempPreferences[category.key];
-                        
+
                         return (
                             <div
                                 key={category.key}
-                                className={`p-4 rounded-lg border-2 transition-all ${
-                                    isEnabled 
+                                className={`p-4 rounded-lg border-2 transition-all ${isEnabled
                                         ? category.color
                                         : 'bg-gray-50 border-gray-200'
-                                }`}
+                                    }`}
                             >
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-start gap-3 flex-1">
-                                        <Icon className={`h-5 w-5 mt-1 flex-shrink-0 ${
-                                            isEnabled ? category.color.split(' ')[0] : 'text-gray-400'
-                                        }`} />
+                                        <Icon className={`h-5 w-5 mt-1 flex-shrink-0 ${isEnabled ? category.color.split(' ')[0] : 'text-gray-400'
+                                            }`} />
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2 mb-2">
                                                 <h4 className="font-medium text-gray-900">
@@ -224,7 +258,7 @@ export const CookieSettings: React.FC = () => {
                                             <p className="text-sm text-gray-600 mb-2">
                                                 {category.description}
                                             </p>
-                                            
+
                                             {showDetails && (
                                                 <div className="mt-3 p-3 bg-white bg-opacity-50 rounded border">
                                                     <h5 className="text-xs font-medium text-gray-700 mb-2">
@@ -242,26 +276,23 @@ export const CookieSettings: React.FC = () => {
                                             )}
                                         </div>
                                     </div>
-                                    
+
                                     <div className="flex-shrink-0 ml-4">
                                         <button
                                             onClick={() => handleToggleCategory(category.key)}
                                             disabled={category.required}
-                                            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                                                isEnabled
+                                            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isEnabled
                                                     ? 'bg-blue-600'
                                                     : 'bg-gray-200'
-                                            } ${
-                                                category.required ? 'opacity-50 cursor-not-allowed' : ''
-                                            }`}
+                                                } ${category.required ? 'opacity-50 cursor-not-allowed' : ''
+                                                }`}
                                             role="switch"
                                             aria-checked={isEnabled}
                                             aria-label={`${isEnabled ? 'Disabilita' : 'Abilita'} ${category.title}`}
                                         >
                                             <span
-                                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                    isEnabled ? 'translate-x-5' : 'translate-x-0'
-                                                }`}
+                                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isEnabled ? 'translate-x-5' : 'translate-x-0'
+                                                    }`}
                                             />
                                         </button>
                                     </div>
@@ -311,13 +342,82 @@ export const CookieSettings: React.FC = () => {
                 </div>
             )}
 
+            {/* Audit Trail Section */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="flex items-center justify-between mb-4">
+                    <div>
+                        <h4 className="font-medium text-gray-900 flex items-center">
+                            <ClockIcon className="h-5 w-5 text-gray-600 mr-2" />
+                            Cronologia Consensi (Audit Trail)
+                        </h4>
+                        <p className="text-sm text-gray-600 mt-1">
+                            Registro delle tue azioni sui cookie per conformità GDPR
+                        </p>
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleLoadAuditTrail}
+                            className="btn-secondary text-sm flex items-center"
+                        >
+                            <EyeIcon className="h-4 w-4 mr-2" />
+                            {showAuditTrail ? 'Nascondi' : 'Visualizza'}
+                        </button>
+                        <button
+                            onClick={handleExportAudit}
+                            className="btn-primary text-sm flex items-center"
+                        >
+                            <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
+                            Export
+                        </button>
+                    </div>
+                </div>
+
+                {showAuditTrail && (
+                    <div className="border-t border-gray-200 pt-4">
+                        {auditTrail.length > 0 ? (
+                            <div className="space-y-2 max-h-64 overflow-y-auto">
+                                {auditTrail.slice().reverse().map((entry, index) => (
+                                    <div key={entry.id || index} className="bg-gray-50 rounded p-3 text-sm">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                                <div className="font-medium text-gray-900">
+                                                    {getActionLabel(entry.action)}
+                                                </div>
+                                                <div className="text-gray-600 mt-1">
+                                                    {formatTimestamp(entry.timestamp)}
+                                                </div>
+                                                <div className="text-xs text-gray-500 mt-1">
+                                                    Necessari: ✓ |
+                                                    Funzionali: {entry.preferences?.functional ? '✓' : '✗'} |
+                                                    Analytics: {entry.preferences?.analytics ? '✓' : '✗'} |
+                                                    Marketing: {entry.preferences?.marketing ? '✓' : '✗'}
+                                                </div>
+                                            </div>
+                                            <div className="text-xs text-gray-400 ml-4">
+                                                v{entry.version}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center text-gray-500 py-8">
+                                <ClockIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                                <p>Nessuna azione registrata</p>
+                                <p className="text-xs mt-1">Le azioni sui cookie verranno registrate qui</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
             {/* Legal Information */}
             <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
                 <h4 className="font-medium text-gray-900 mb-2">
                     Informazioni Legali
                 </h4>
                 <p className="mb-2">
-                    Questo sito è conforme al Regolamento Generale sulla Protezione dei Dati (GDPR) 
+                    Questo sito è conforme al Regolamento Generale sulla Protezione dei Dati (GDPR)
                     e alla normativa italiana sui cookie (D.Lgs. 196/2003 e successive modifiche).
                 </p>
                 <p>

@@ -27,14 +27,14 @@ PIVABalance è **completamente conforme** al Regolamento Generale sulla Protezio
 
 ### **2. Data Subject Rights (Art. 12-23 GDPR)**
 
-| Diritto                     | Implementazione                  | Modalità   | Status             |
-| --------------------------- | -------------------------------- | ---------- | ------------------ |
-| **Accesso (Art. 15)**       | 📧 Email privacy@pivabalance.com | Manuale    | ✅ CONFORME        |
-| **Rettifica (Art. 16)**     | 🔧 Account Settings → Profilo    | Automatica | ✅ CONFORME        |
-| **Cancellazione (Art. 17)** | 🗑️ Account → Zona Pericolosa     | Automatica | ✅ CONFORME        |
-| **Portabilità (Art. 20)**   | 🔄 Account → Diritti Privacy     | Automatica | ✅ CONFORME        |
-| **Opposizione (Art. 21)**   | 🍪 Cookie Settings               | Automatica | ✅ CONFORME        |
-| **Revoca Consenso**         | 🍪 Banner + Settings             | Automatica | ✅ CONFORME        |
+| Diritto                     | Implementazione                  | Modalità   | Status      |
+| --------------------------- | -------------------------------- | ---------- | ----------- |
+| **Accesso (Art. 15)**       | 📧 Email privacy@pivabalance.com | Manuale    | ✅ CONFORME |
+| **Rettifica (Art. 16)**     | 🔧 Account Settings → Profilo    | Automatica | ✅ CONFORME |
+| **Cancellazione (Art. 17)** | 🗑️ Account → Zona Pericolosa     | Automatica | ✅ CONFORME |
+| **Portabilità (Art. 20)**   | 🔄 Account → Diritti Privacy     | Automatica | ✅ CONFORME |
+| **Opposizione (Art. 21)**   | 🍪 Cookie Settings               | Automatica | ✅ CONFORME |
+| **Revoca Consenso**         | 🍪 Banner + Settings             | Automatica | ✅ CONFORME |
 
 ### **3. Privacy by Design (Art. 25 GDPR)**
 
@@ -188,16 +188,19 @@ PIVABalance è **completamente conforme** al Regolamento Generale sulla Protezio
 ### **💡 Future Enhancements (Miglioramenti futuri)**
 
 2. **Data Processing Register (Art. 30 GDPR)**
+
    - **Enhancement**: Registro trattamenti interno
    - **Beneficio**: Compliance amministrativa
    - **Timeline**: 1 giorno
 
 3. **Cookie Audit Trail**
+
    - **Enhancement**: Log consensi per audit
    - **Beneficio**: Prova consenso rafforzata
    - **Timeline**: 1 giorno
 
 4. **Automated Privacy Requests**
+
    - **Enhancement**: Form automatico richieste privacy
    - **Beneficio**: UX migliorata per diritti utente
    - **Timeline**: 2 giorni
@@ -211,14 +214,14 @@ PIVABalance è **completamente conforme** al Regolamento Generale sulla Protezio
 
 ## 📊 **Compliance Metrics**
 
-| Area                   | Score   | Details                    |
-| ---------------------- | ------- | -------------------------- |
-| **Consent Management** | 100/100 | ✅ Completo                |
-| **User Rights**        | 100/100 | ✅ Completo                |
-| **Data Security**      | 95/100  | ✅ Quasi perfetto          |
-| **Documentation**      | 100/100 | ✅ Completa                |
-| **Technical Measures** | 90/100  | ✅ Ottimo                  |
-| **Legal Compliance**   | 100/100 | ✅ Completo                |
+| Area                   | Score   | Details           |
+| ---------------------- | ------- | ----------------- |
+| **Consent Management** | 100/100 | ✅ Completo       |
+| **User Rights**        | 100/100 | ✅ Completo       |
+| **Data Security**      | 95/100  | ✅ Quasi perfetto |
+| **Documentation**      | 100/100 | ✅ Completa       |
+| **Technical Measures** | 90/100  | ✅ Ottimo         |
+| **Legal Compliance**   | 100/100 | ✅ Completo       |
 
 **Overall Score: 100/100** 🏆🎉
 

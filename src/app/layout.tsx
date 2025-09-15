@@ -5,6 +5,7 @@ import { NotificationProvider } from '@/providers/NotificationProvider';
 import { ThemeProvider } from '@/components/ui';
 import { ServiceWorkerProvider } from '@/providers/ServiceWorkerProvider';
 import { CookieBanner } from '@/components/cookies/CookieBanner';
+import { Footer } from '@/components/layout/Footer';
 // import { PWAInstallPrompt } from '@/components/pwa';
 import './globals.css';
 
@@ -85,13 +86,16 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} flex flex-col min-h-screen`}>
         <ThemeProvider>
           <ServiceWorkerProvider>
             <QueryProvider>
               <AuthProvider>
                 <NotificationProvider>
-                  {children}
+                  <div className="flex-grow">
+                    {children}
+                  </div>
+                  <Footer />
                   <CookieBanner />
                   {/* <PWAInstallPrompt autoShow={true} showDelay={5000} /> */}
                 </NotificationProvider>

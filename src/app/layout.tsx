@@ -4,6 +4,7 @@ import { QueryProvider } from '@/providers/QueryProvider';
 import { NotificationProvider } from '@/providers/NotificationProvider';
 import { ThemeProvider } from '@/components/ui';
 import { ServiceWorkerProvider } from '@/providers/ServiceWorkerProvider';
+import { CookieBanner } from '@/components/cookies';
 // import { PWAInstallPrompt } from '@/components/pwa';
 import './globals.css';
 
@@ -91,6 +92,7 @@ export default function RootLayout({
               <AuthProvider>
                 <NotificationProvider>
                   {children}
+                  <CookieBanner />
                   {/* <PWAInstallPrompt autoShow={true} showDelay={5000} /> */}
                 </NotificationProvider>
               </AuthProvider>

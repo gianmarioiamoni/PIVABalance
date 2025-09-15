@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import { ProfileSection } from './ProfileSection';
 import { PasswordSection } from './PasswordSection';
 import { DangerZone } from './DangerZone';
+import { CookieSettings } from '@/components/cookies';
 import { 
   UserIcon, 
   KeyIcon, 
-  ExclamationTriangleIcon 
+  ExclamationTriangleIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 
 /**
@@ -22,7 +24,7 @@ import {
  * Follows SRP by delegating specific functionality to specialized components.
  */
 export const AccountManagement: React.FC = () => {
-  const [activeSection, setActiveSection] = useState<'profile' | 'security' | 'danger'>('profile');
+  const [activeSection, setActiveSection] = useState<'profile' | 'security' | 'privacy' | 'danger'>('profile');
 
   const sections = [
     {
@@ -40,6 +42,14 @@ export const AccountManagement: React.FC = () => {
       icon: KeyIcon,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
+    },
+    {
+      id: 'privacy' as const,
+      title: 'Privacy e Cookie',
+      description: 'Gestisci le tue preferenze su privacy e cookie',
+      icon: ShieldCheckIcon,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50',
     },
     {
       id: 'danger' as const,
@@ -103,6 +113,18 @@ export const AccountManagement: React.FC = () => {
               </p>
             </div>
             <PasswordSection />
+          </div>
+        )}
+
+        {activeSection === 'privacy' && (
+          <div>
+            <div className="mb-6">
+              <h2 className="heading-md mb-2">Privacy e Cookie</h2>
+              <p className="text-tertiary">
+                Gestisci le tue preferenze sulla privacy e il consenso ai cookie secondo il GDPR.
+              </p>
+            </div>
+            <CookieSettings />
           </div>
         )}
 

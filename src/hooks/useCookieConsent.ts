@@ -99,6 +99,7 @@ export const useCookieConsent = () => {
    * Accept all cookies
    */
   const acceptAll = () => {
+    console.log('🍪 useCookieConsent: acceptAll called');
     const newPreferences: CookieConsent = {
       necessary: true,
       functional: true,
@@ -113,6 +114,7 @@ export const useCookieConsent = () => {
    * Accept only necessary cookies
    */
   const acceptNecessaryOnly = () => {
+    console.log('🍪 useCookieConsent: acceptNecessaryOnly called');
     saveConsent(DEFAULT_PREFERENCES);
   };
 
@@ -120,6 +122,7 @@ export const useCookieConsent = () => {
    * Save custom preferences
    */
   const savePreferences = (preferences: Partial<CookieConsent>) => {
+    console.log('🍪 useCookieConsent: savePreferences called with', preferences);
     const newPreferences: CookieConsent = {
       necessary: true, // Always true
       functional: preferences.functional ?? false,
@@ -127,13 +130,14 @@ export const useCookieConsent = () => {
       marketing: preferences.marketing ?? false,
     };
     
+    console.log('🍪 useCookieConsent: processed preferences', newPreferences);
     saveConsent(newPreferences);
   };
 
   /**
    * Show banner again (for settings)
    */
-  const showBanner = () => {
+  const reopenBanner = () => {
     setState(prev => ({
       ...prev,
       showBanner: true,
@@ -166,6 +170,7 @@ export const useCookieConsent = () => {
    * Save consent to localStorage and update state
    */
   const saveConsent = (preferences: CookieConsent) => {
+    console.log('🍪 useCookieConsent: saveConsent called with', preferences);
     const consentDate = new Date();
     const consentData = {
       version: CONSENT_VERSION,
@@ -175,12 +180,14 @@ export const useCookieConsent = () => {
 
     try {
       localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(consentData));
+      console.log('🍪 useCookieConsent: consent saved to localStorage', consentData);
       setState({
         hasConsent: true,
         showBanner: false,
         preferences,
         consentDate,
       });
+      console.log('🍪 useCookieConsent: state updated, banner should be hidden');
     } catch (error) {
       console.error('Error saving cookie consent:', error);
     }
@@ -225,7 +232,7 @@ export const useCookieConsent = () => {
     acceptAll,
     acceptNecessaryOnly,
     savePreferences,
-    showBanner: showBanner,
+    reopenBanner,
     hideBanner,
     clearConsent,
     

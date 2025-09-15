@@ -24,7 +24,7 @@ export const CookieSettings: React.FC = () => {
         consentDate,
         savePreferences,
         clearConsent,
-        showBanner: showBannerFn,
+        reopenBanner,
     } = useCookieConsent();
 
     const [tempPreferences, setTempPreferences] = useState<CookieConsent>(preferences);
@@ -58,7 +58,7 @@ export const CookieSettings: React.FC = () => {
     };
 
     const handleShowBanner = () => {
-        showBannerFn();
+        reopenBanner();
     };
 
     const cookieCategories = [

@@ -36,6 +36,11 @@ export const CookieBanner: React.FC = () => {
     const [showDetails, setShowDetails] = useState(false);
     const [tempPreferences, setTempPreferences] = useState<CookieConsent>(preferences);
 
+    // Sync tempPreferences with preferences when they change
+    React.useEffect(() => {
+        setTempPreferences(preferences);
+    }, [preferences]);
+
     // Don't render if banner should not be shown
     if (!shouldShow) return null;
 
@@ -49,14 +54,17 @@ export const CookieBanner: React.FC = () => {
     };
 
     const handleSavePreferences = () => {
+        console.log('🍪 CookieBanner: Saving preferences', tempPreferences);
         savePreferences(tempPreferences);
     };
 
     const handleAcceptAll = () => {
+        console.log('🍪 CookieBanner: Accepting all cookies');
         acceptAll();
     };
 
     const handleAcceptNecessary = () => {
+        console.log('🍪 CookieBanner: Accepting necessary only');
         acceptNecessaryOnly();
     };
 

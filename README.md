@@ -58,6 +58,18 @@ Una soluzione **production-ready** per la gestione fiscale di partite IVA, costr
 - 💡 **Business Insights Engine** - Suggerimenti actionable basati sui dati
 - 📈 **Chart Export Service** - Export multi-formato (PNG, SVG, PDF, Excel)
 
+### **✅ GDPR Compliance & Privacy Management**
+
+- 🔒 **100% GDPR Compliance** - Conformità completa al Regolamento Generale sulla Protezione dei Dati
+- 🍪 **Cookie Consent Management** - Sistema completo gestione consensi con audit trail
+- 📋 **Data Portability (Art. 20)** - Export automatico dati utente in formato JSON machine-readable
+- 📝 **Privacy Request System** - Form automatico per esercitare tutti i diritti GDPR (Art. 12-23)
+- 📊 **Consent Audit Trail** - Log completo delle azioni sui cookie per compliance
+- 🔐 **Account Management** - Modifica password, eliminazione account, gestione profilo
+- 👨‍💼 **Admin Authorization System** - Gestione ruoli (user/admin/super_admin) con protezioni
+- 📋 **Processing Activities Register** - Registro trattamenti interno (Art. 30 GDPR)
+- 🛡️ **Privacy by Design** - Principi privacy integrati nell'architettura del sistema
+
 ---
 
 ## 🛠 **Tech Stack**
@@ -73,6 +85,8 @@ Una soluzione **production-ready** per la gestione fiscale di partite IVA, costr
 - **Export**: html2canvas + jsPDF for multi-format chart export
 - **State**: React Query + Context API
 - **PWA**: Service Worker + App Manifest
+- **Privacy**: GDPR-compliant cookie management + audit trail
+- **Security**: Role-based access control (RBAC) + JWT authentication
 
 ### **Backend**
 
@@ -129,10 +143,29 @@ src/
 │   │   └── 💡 BusinessAnalytics # Complete BI dashboard
 │   ├── 📄 reports/            # Report generation system
 │   │   └── 🏗️ ReportGenerator # PDF/Excel export with config
+│   ├── 🔒 account/            # Account management & privacy
+│   │   ├── 📝 ProfileSection  # User profile management
+│   │   ├── 🔑 PasswordSection # Password management
+│   │   ├── 🛡️ PrivacyRights   # GDPR rights management
+│   │   └── ⚠️ DangerZone      # Account deletion
+│   ├── 🍪 cookies/            # Cookie consent management
+│   │   ├── 🎯 CookieBanner    # GDPR consent banner
+│   │   └── ⚙️ CookieSettings  # Cookie preferences + audit
+│   ├── 🔐 privacy/            # Privacy & GDPR compliance
+│   │   └── 📝 PrivacyRequestForm # Automated privacy requests
+│   ├── 👨‍💼 admin/              # Admin management system
+│   │   ├── 🏠 AdminDashboard  # Admin control panel
+│   │   ├── 👥 UserManagement  # User administration
+│   │   └── 🔧 AdminModals     # User edit/delete/reset
+│   ├── 🛡️ auth/               # Authentication & authorization
+│   │   ├── 🔒 AdminProtection # Admin route protection
+│   │   ├── 🏢 BusinessProtection # Business page protection
+│   │   └── 🎯 RoleBasedAccess # Role-based component access
 │   ├── 🧾 invoices/           # Invoice management UI
 │   ├── 💰 costs/              # Cost management UI
 │   ├── ⚙️ tax-settings/       # Tax configuration UI
 │   ├── 🎨 ui/                 # Design system components
+│   ├── 🏗️ layout/             # Layout components (Footer, etc.)
 │   └── 📱 pwa/                # PWA components
 ├── 🪝 hooks/                  # Custom hooks (specialized)
 │   ├── 🔐 auth/               # Authentication hooks
@@ -143,6 +176,8 @@ src/
 │   ├── 🎛️ widgets/            # Widget data hooks
 │   ├── 🧠 analytics/          # Business Intelligence hooks
 │   ├── 📄 reports/            # Report generation hooks
+│   ├── 🍪 cookies/            # Cookie consent management hooks
+│   │   └── useCookieConsent   # GDPR cookie consent + audit trail
 │   └── 📱 mobile/             # Mobile interaction hooks
 ├── 🗃️ models/                 # MongoDB models (functional)
 ├── 🔧 services/               # Business logic services
@@ -197,6 +232,100 @@ Il progetto segue rigorosamente l'SRP con **100/100 compliance**:
 - **userCalculations.ts** → User business logic ONLY
 - **userQueries.ts** → User data queries ONLY
 - **Separation complete** tra persistenza e logica business
+
+---
+
+## 🔒 **GDPR Compliance & Privacy Management**
+
+### **🛡️ Privacy by Design Architecture**
+
+PIVABalance implementa **Privacy by Design** con conformità GDPR al **100%**:
+
+```tsx
+// ✅ Cookie Consent Management with Audit Trail
+import { useCookieConsent, CookieBanner, CookieSettings } from "@/components/cookies";
+
+const { 
+  hasConsent, 
+  preferences, 
+  savePreferences, 
+  getConsentAuditTrail,
+  exportConsentAudit 
+} = useCookieConsent();
+
+<CookieBanner 
+  onAcceptAll={acceptAll}
+  onAcceptNecessaryOnly={acceptNecessaryOnly}
+  onCustomize={openSettings}
+/>
+```
+
+### **📋 Data Subject Rights (Art. 12-23 GDPR)**
+
+```tsx
+// ✅ Automated Privacy Request System
+import { PrivacyRequestForm } from "@/components/privacy";
+
+<PrivacyRequestForm />
+// Supports all 9 GDPR rights:
+// - Access (Art. 15)
+// - Rectification (Art. 16) 
+// - Erasure (Art. 17)
+// - Restriction (Art. 18)
+// - Portability (Art. 20)
+// - Objection (Art. 21)
+// - Withdraw Consent
+// - Complaint
+// - Other requests
+```
+
+### **📊 Data Portability & Export (Art. 20)**
+
+```tsx
+// ✅ Complete User Data Export
+import { PrivacyRights } from "@/components/account";
+
+// Automatic JSON export with:
+// - Personal data (profile, settings)
+// - Business data (invoices, costs)
+// - System metadata (roles, access logs)
+// - GDPR-compliant machine-readable format
+```
+
+### **🍪 Cookie Audit Trail**
+
+- **Comprehensive Logging**: Tutte le azioni sui cookie (consenso dato/aggiornato/revocato)
+- **Audit Export**: Export completo cronologia consensi in formato JSON
+- **GDPR Compliance**: Tracking per dimostrare conformità in caso di audit
+- **User Transparency**: Visualizzazione completa delle proprie azioni sui cookie
+
+### **👨‍💼 Role-Based Access Control (RBAC)**
+
+```tsx
+// ✅ Multi-level Authorization System
+import { AdminProtection, BusinessProtection, RoleBasedAccess } from "@/components/auth";
+
+// Three role levels:
+// - user: Standard business functionality
+// - admin: User management + monitoring
+// - super_admin: System administration only
+
+<AdminProtection>
+  <UserManagement />
+</AdminProtection>
+
+<BusinessProtection>
+  <Dashboard />
+</BusinessProtection>
+```
+
+### **📋 GDPR Documentation & Compliance**
+
+- **📄 Privacy Policy** - Informativa completa sui trattamenti
+- **🍪 Cookie Policy** - Dettagli su tipologie e finalità cookie
+- **📋 Processing Register** - Registro Art. 30 GDPR con 6 trattamenti documentati
+- **🔒 Security Measures** - Crittografia, hashing, controllo accessi
+- **⚖️ Legal Basis** - Base giuridica per ogni trattamento (consenso, contratto, interesse legittimo)
 
 ---
 
@@ -339,6 +468,12 @@ JWT_EXPIRES_IN=7d
 NODE_ENV=development
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 BCRYPT_SALT_ROUNDS=12
+
+# Super Admin Configuration (GDPR & Security)
+SUPER_ADMIN_EMAIL=admin@yourdomain.com
+SUPER_ADMIN_PASSWORD=your-super-secure-admin-password
+SUPER_ADMIN_NAME=System Administrator
+ALLOW_INIT_API=true
 ```
 
 ### **3. Avvio Sviluppo**
@@ -506,6 +641,9 @@ npm test -- mobile         # Mobile optimization
 - **Input Validation**: Validazione server-side con Zod
 - **XSS Prevention**: Sanitizzazione input completa
 - **Type Safety**: Zero `any` types, validazione stricta
+- **RBAC Authorization**: Role-based access control (user/admin/super_admin)
+- **GDPR Compliance**: Privacy by design, consent management, audit trail
+- **Data Protection**: Encryption at rest and in transit, secure data export
 
 ### **⚡ Performance Optimizations**
 
@@ -569,12 +707,15 @@ import {
 
 ## 🔄 **API Documentation**
 
-### **Authentication**
+### **Authentication & Account Management**
 
 ```bash
-POST /api/auth/register     # User registration
-POST /api/auth/login        # User login
-GET  /api/auth/me           # Current user info
+POST /api/auth/register           # User registration
+POST /api/auth/login              # User login
+GET  /api/auth/me                 # Current user info
+POST /api/auth/change-password    # Change user password
+POST /api/auth/update-profile     # Update user profile
+DELETE /api/auth/delete-account   # Delete user account
 ```
 
 ### **Business Logic**
@@ -602,6 +743,16 @@ DELETE /api/dashboard/layout # Reset to default
 GET    /api/settings        # User settings
 POST   /api/settings        # Update settings
 GET    /api/professional-funds # Available funds
+
+# Admin Management (Role-based Access)
+GET    /api/admin/users              # List all users (admin only)
+PUT    /api/admin/users/[userId]     # Update user details (admin only)
+DELETE /api/admin/users/[userId]     # Delete user (admin only)
+POST   /api/admin/users/[userId]/reset-password # Reset user password (admin only)
+POST   /api/admin/init               # Initialize super admin (system)
+
+# Privacy & GDPR Compliance
+GET    /api/user/export-data         # Export user data (Art. 20 GDPR)
 
 # Advanced Analytics (Future API Extensions)
 GET    /api/analytics/kpis           # Business KPIs calculation
@@ -839,10 +990,21 @@ npm run start
 - ✅ KPI calculator service con 6 metriche automatiche
 - ✅ Business insights engine con suggerimenti actionable
 
-#### **🚀 Step 3: Final Production Optimization (NEXT)**
+#### **✅ Step 3: GDPR Compliance & Admin System (COMPLETATA)**
+
+- ✅ 100% GDPR compliance con Privacy by Design
+- ✅ Cookie consent management con audit trail completo
+- ✅ Sistema automatico richieste privacy (Art. 12-23)
+- ✅ Export automatico dati utente (Art. 20 GDPR)
+- ✅ Role-based access control (user/admin/super_admin)
+- ✅ Admin dashboard con gestione utenti
+- ✅ Registro trattamenti interno (Art. 30 GDPR)
+- ✅ Account management completo con sicurezza avanzata
+
+#### **🚀 Step 4: Final Production Optimization (NEXT)**
 
 - 🔧 Performance monitoring e optimizations
-- 🔒 Security audit e hardening
+- 🔒 Security audit e hardening  
 - 📱 Mobile UX final refinements
 - 🚀 Production deployment preparation
 
@@ -914,6 +1076,9 @@ npm run build         # Build verification
 - 📊 **Features**: Dashboard completa con charting avanzato
 - 🧠 **Analytics**: Business Intelligence con KPI automatici
 - 📄 **Reports**: Export system multi-formato
+- 🛡️ **GDPR**: 100% compliance con Privacy by Design
+- 👨‍💼 **Admin**: Sistema completo gestione utenti e ruoli
+- 🍪 **Privacy**: Cookie management con audit trail completo
 
 ### **🚀 Key Achievements**
 
@@ -942,6 +1107,7 @@ npm run build         # Build verification
 
 ## 📚 **Documentation Links**
 
+### **🏗️ Architecture & Development**
 - [🎛️ Widget System Architecture](WIDGET_SYSTEM_ARCHITECTURE.md)
 - [📊 Chart Architecture](src/components/charts/ARCHITECTURE.md)
 - [📱 Mobile SSR/CSR](src/components/charts/mobile/SSR_CSR_ARCHITECTURE.md)
@@ -950,3 +1116,8 @@ npm run build         # Build verification
 - [⚡ Performance Report](PERFORMANCE_AUDIT_REPORT.md)
 - [🎨 Design System](DESIGN_SYSTEM.md)
 - [📚 Documentation Index](DOCUMENTATION_INDEX.md)
+
+### **🔒 GDPR & Privacy Compliance**
+- [🛡️ GDPR Compliance Audit](GDPR_COMPLIANCE_AUDIT.md)
+- [📋 Processing Activities Register](REGISTRO_TRATTAMENTI_GDPR.md)
+- [👨‍💼 Admin System Setup](ADMIN_SETUP.md)

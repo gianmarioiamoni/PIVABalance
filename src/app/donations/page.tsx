@@ -379,65 +379,6 @@ export default function DonationsPage() {
                     </p>
                 </div>
 
-                {/* Stats Section */}
-                {!isLoadingStats && stats && (
-                    <div className="bg-white rounded-xl shadow-lg p-8 mb-12">
-                        <h2 className="text-2xl font-semibold text-gray-900 text-center mb-8">
-                            Trasparenza e Impatto
-                        </h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                            <div className="text-center">
-                                <div className="bg-green-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                                    <CurrencyEuroIcon className="h-8 w-8 text-green-600" />
-                                </div>
-                                <div className="text-2xl font-bold text-gray-900">
-                                    €{(stats.totalAmount / 100).toFixed(2)}
-                                </div>
-                                <div className="text-sm text-gray-600">Totale Raccolto</div>
-                            </div>
-
-                            <div className="text-center">
-                                <div className="bg-blue-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                                    <UsersIcon className="h-8 w-8 text-blue-600" />
-                                </div>
-                                <div className="text-2xl font-bold text-gray-900">
-                                    {stats.totalCount}
-                                </div>
-                                <div className="text-sm text-gray-600">Sostenitori</div>
-                            </div>
-
-                            <div className="text-center">
-                                <div className="bg-purple-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                                    <SparklesIcon className="h-8 w-8 text-purple-600" />
-                                </div>
-                                <div className="text-2xl font-bold text-gray-900">
-                                    €{(stats.averageAmount / 100).toFixed(2)}
-                                </div>
-                                <div className="text-sm text-gray-600">Donazione Media</div>
-                            </div>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div className="bg-gray-100 rounded-lg p-6">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-sm font-medium text-gray-700">Obiettivo Mensile</span>
-                                <span className="text-sm text-gray-600">
-                                    {stats.monthlyProgress.toFixed(1)}%
-                                </span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
-                                <div
-                                    className="bg-gradient-to-r from-pink-500 to-red-500 h-3 rounded-full transition-all duration-300"
-                                    style={{ width: `${Math.min(100, stats.monthlyProgress)}%` }}
-                                />
-                            </div>
-                            <div className="text-xs text-gray-500 text-center">
-                                Obiettivo: €{(stats.monthlyGoal / 100).toFixed(2)} al mese
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 {/* Main Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -542,6 +483,66 @@ export default function DonationsPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Stats Section */}
+                {!isLoadingStats && stats && (
+                    <div className="bg-white rounded-xl shadow-lg p-8 mb-12 mt-20">
+                        <h2 className="text-2xl font-semibold text-gray-900 text-center mb-8">
+                            Trasparenza e Impatto
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div className="text-center">
+                                <div className="bg-green-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                    <CurrencyEuroIcon className="h-8 w-8 text-green-600" />
+                                </div>
+                                <div className="text-2xl font-bold text-gray-900">
+                                    €{(stats.totalAmount / 100).toFixed(2)}
+                                </div>
+                                <div className="text-sm text-gray-600">Totale Raccolto</div>
+                            </div>
+
+                            <div className="text-center">
+                                <div className="bg-blue-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                    <UsersIcon className="h-8 w-8 text-blue-600" />
+                                </div>
+                                <div className="text-2xl font-bold text-gray-900">
+                                    {stats.totalCount}
+                                </div>
+                                <div className="text-sm text-gray-600">Sostenitori</div>
+                            </div>
+
+                            <div className="text-center">
+                                <div className="bg-purple-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                    <SparklesIcon className="h-8 w-8 text-purple-600" />
+                                </div>
+                                <div className="text-2xl font-bold text-gray-900">
+                                    €{(stats.averageAmount / 100).toFixed(2)}
+                                </div>
+                                <div className="text-sm text-gray-600">Donazione Media</div>
+                            </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="bg-gray-100 rounded-lg p-6">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-sm font-medium text-gray-700">Obiettivo Mensile</span>
+                                <span className="text-sm text-gray-600">
+                                    {stats.monthlyProgress.toFixed(1)}%
+                                </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                                <div
+                                    className="bg-gradient-to-r from-pink-500 to-red-500 h-3 rounded-full transition-all duration-300"
+                                    style={{ width: `${Math.min(100, stats.monthlyProgress)}%` }}
+                                />
+                            </div>
+                            <div className="text-xs text-gray-500 text-center">
+                                Obiettivo: €{(stats.monthlyGoal / 100).toFixed(2)} al mese
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Footer */}
                 <div className="text-center mt-12 p-6 bg-white rounded-lg shadow-sm">

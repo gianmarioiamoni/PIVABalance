@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { DonationButton } from '@/components/donations';
+import { HeartIcon } from '@heroicons/react/24/outline';
 
 /**
  * Footer Component
@@ -26,24 +26,26 @@ export const Footer: React.FC = () => {
 
           {/* Right side - Legal links and donation */}
           <div className="flex flex-wrap justify-center md:justify-end items-center space-x-6 text-sm">
-            <Link 
+            <Link
               href="/privacy-policy"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               Privacy Policy
             </Link>
-            <Link 
+            <Link
               href="/cookie-policy"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               Cookie Policy
             </Link>
             <span className="text-gray-400">|</span>
-            <DonationButton 
-              variant="link" 
-              size="sm"
-              className="text-gray-600 hover:text-gray-900"
-            />
+            <Link
+              href="/donations"
+              className="text-gray-600 hover:text-gray-900 transition-colors inline-flex items-center"
+            >
+              <HeartIcon className="h-4 w-4 mr-1" />
+              Supporta il progetto
+            </Link>
             <span className="text-gray-400">|</span>
             <span className="text-xs text-gray-500">
               Conforme GDPR

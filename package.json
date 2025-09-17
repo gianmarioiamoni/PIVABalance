@@ -29,7 +29,8 @@
     "perf:monitor": "node scripts/performance-monitor.js",
     "security:scan": "node scripts/security-scan.js",
     "production:check": "node scripts/production-readiness.js",
-    "production:deploy": "npm run test:ci && npm run build:production && npm run production:check"
+    "production:deploy": "npm run test:ci && npm run build:production && npm run production:check",
+    "setup:stripe": "node scripts/setup-stripe.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

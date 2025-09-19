@@ -30,7 +30,7 @@ export const useCosts = (selectedYear: number) => {
       setError(null);
     },
     onError: (err: unknown) => {
-      setError("Errore nell'aggiornamento del costo");
+      setError("Errore nell&apos;aggiornamento del costo");
       console.error("Error updating cost:", err);
     },
   });

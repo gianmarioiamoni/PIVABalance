@@ -62,7 +62,7 @@ export const BusinessProtection: React.FC<BusinessProtectionProps> = ({
   }
 
   // Block super admin from business pages
-  if (user.role === 'super_admin') {
+  if ((user as { role?: string }).role === 'super_admin') {
     // Show custom fallback if provided
     if (fallback) {
       return <>{fallback}</>;

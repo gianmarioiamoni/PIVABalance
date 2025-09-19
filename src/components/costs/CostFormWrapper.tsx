@@ -90,7 +90,6 @@ export const CostFormWrapper: React.FC<CostFormWrapperProps> = ({
         }
     };
 
-    console.log('🔍 DEBUG: CostFormWrapper rendering with isOpen=true');
 
     return (
         <CostForm

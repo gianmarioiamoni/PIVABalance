@@ -36,7 +36,7 @@ export async function PUT(
   try {
     // Verify admin authentication
     const authResult = await requireAdmin(request);
-    if (!authResult.success) {
+    if (!authResult.success || !authResult.user) {
       return authResult.response;
     }
 
@@ -128,6 +128,16 @@ export async function PUT(
       { new: true, runValidators: true }
     ).select("-password");
 
+    if (!updatedUser) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Utente non trovato dopo l'aggiornamento",
+        },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json(
       {
         success: true,
@@ -145,7 +155,7 @@ export async function PUT(
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating user:", error);
     return NextResponse.json(
       {
@@ -165,7 +175,7 @@ export async function DELETE(
   try {
     // Verify admin authentication
     const authResult = await requireAdmin(request);
-    if (!authResult.success) {
+    if (!authResult.success || !authResult.user) {
       return authResult.response;
     }
 
@@ -248,7 +258,7 @@ export async function DELETE(
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting user:", error);
     return NextResponse.json(
       {

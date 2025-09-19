@@ -240,7 +240,7 @@ export const TaxWidget: React.FC<TaxWidgetProps> = ({
     const widgetData = {
         id: config.id,
         data: taxData,
-        lastUpdated,
+        lastUpdated: lastUpdated || new Date(),
         isLoading,
         error: error || undefined
     };

@@ -71,7 +71,7 @@ export const useDashboard = (): UseDashboardReturn => {
     loading: costsLoading,
     error: costsError,
   } = useCosts(currentYear);
-  
+
   // Load user tax settings for accurate calculations
   const {
     state: { settings: taxSettings, loading: settingsLoading },
@@ -98,21 +98,27 @@ export const useDashboard = (): UseDashboardReturn => {
 
     // Calculate year-to-date statistics for current year
     const currentYear = new Date().getFullYear();
-    const yearToDateInvoices = invoices.filter(inv => {
-      const invoiceDate = new Date(inv.issueDate || inv.date);
+    const yearToDateInvoices = invoices.filter((inv) => {
+      const invoiceDate = new Date(inv.issueDate);
       return invoiceDate.getFullYear() === currentYear;
     });
-    const yearToDateCosts = costsWithDates.filter(cost => {
+    const yearToDateCosts = costsWithDates.filter((cost) => {
       return cost.date.getFullYear() === currentYear;
     });
-    
-    const yearToDateRevenue = yearToDateInvoices.reduce((sum, inv) => sum + inv.amount, 0);
-    const yearToDateCostsTotal = yearToDateCosts.reduce((sum, cost) => sum + cost.amount, 0);
-    
+
+    const yearToDateRevenue = yearToDateInvoices.reduce(
+      (sum, inv) => sum + inv.amount,
+      0
+    );
+    const yearToDateCostsTotal = yearToDateCosts.reduce(
+      (sum, cost) => sum + cost.amount,
+      0
+    );
+
     // Calculate current month statistics for display
     const invoiceStats = getCurrentMonthStats(invoices);
     const costStats = getCurrentMonthCostStats(costsWithDates);
-    
+
     // Use year-to-date data for accurate tax calculation
     const taxStats = calculateEstimatedMonthlyTaxes(
       yearToDateRevenue,
@@ -126,7 +132,14 @@ export const useDashboard = (): UseDashboardReturn => {
       monthlyCosts: costStats.formattedTotal,
       estimatedTaxes: taxStats.formattedTaxes,
     };
-  }, [invoices, costsWithDates, invoicesLoading, costsLoading, settingsLoading, taxSettings]);
+  }, [
+    invoices,
+    costsWithDates,
+    invoicesLoading,
+    costsLoading,
+    settingsLoading,
+    taxSettings,
+  ]);
 
   // Calculate annual summary with cash flow analysis
   const annualSummary: AnnualSummary = useMemo(() => {
@@ -148,29 +161,39 @@ export const useDashboard = (): UseDashboardReturn => {
 
     // Calculate year-to-date statistics for current year
     const currentYear = new Date().getFullYear();
-    const yearToDateInvoices = invoices.filter(inv => {
-      const invoiceDate = new Date(inv.issueDate || inv.date);
+    const yearToDateInvoices = invoices.filter((inv) => {
+      const invoiceDate = new Date(inv.issueDate);
       return invoiceDate.getFullYear() === currentYear;
     });
-    const yearToDateCosts = costsWithDates.filter(cost => {
+    const yearToDateCosts = costsWithDates.filter((cost) => {
       return cost.date.getFullYear() === currentYear;
     });
-    
-    const totalRevenue = yearToDateInvoices.reduce((sum, inv) => sum + inv.amount, 0);
-    const totalCosts = yearToDateCosts.reduce((sum, cost) => sum + cost.amount, 0);
+
+    const totalRevenue = yearToDateInvoices.reduce(
+      (sum, inv) => sum + inv.amount,
+      0
+    );
+    const totalCosts = yearToDateCosts.reduce(
+      (sum, cost) => sum + cost.amount,
+      0
+    );
     const grossCashFlow = totalRevenue - totalCosts;
-    
+
     // Get taxes from our calculation
-    const totalTaxes = parseFloat(stats.estimatedTaxes.replace(/[€.,]/g, '')) || 0;
+    const totalTaxes =
+      parseFloat(stats.estimatedTaxes.replace(/[€.,]/g, "")) || 0;
     const netCashFlow = grossCashFlow - totalTaxes;
-    
+
     // Calculate year progress (percentage of year completed)
     const now = new Date();
     const startOfYear = new Date(currentYear, 0, 1);
     const endOfYear = new Date(currentYear + 1, 0, 1);
-    const yearProgress = ((now.getTime() - startOfYear.getTime()) / (endOfYear.getTime() - startOfYear.getTime())) * 100;
+    const yearProgress =
+      ((now.getTime() - startOfYear.getTime()) /
+        (endOfYear.getTime() - startOfYear.getTime())) *
+      100;
 
-    const formatCurrency = (amount: number) => 
+    const formatCurrency = (amount: number) =>
       `€${amount.toLocaleString("it-IT", {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
@@ -189,7 +212,14 @@ export const useDashboard = (): UseDashboardReturn => {
       formattedTaxes: formatCurrency(totalTaxes),
       formattedNetCashFlow: formatCurrency(netCashFlow),
     };
-  }, [invoices, costsWithDates, stats.estimatedTaxes, invoicesLoading, costsLoading, settingsLoading]);
+  }, [
+    invoices,
+    costsWithDates,
+    stats.estimatedTaxes,
+    invoicesLoading,
+    costsLoading,
+    settingsLoading,
+  ]);
 
   // Create recent activities from real data
   const activities: Activity[] = useMemo(() => {

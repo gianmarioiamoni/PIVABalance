@@ -22,7 +22,7 @@ import {
 /**
  * Stripe Promise - Initialize once
  */
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
 /**
  * Donation Modal Props
@@ -110,7 +110,7 @@ const DonationForm: React.FC<DonationFormProps> = ({
       </div>
 
       <div className="space-y-4">
-        <PaymentElement 
+        <PaymentElement
           options={{
             layout: 'tabs',
             defaultValues: {
@@ -142,7 +142,7 @@ const DonationForm: React.FC<DonationFormProps> = ({
       </button>
 
       <p className="text-xs text-gray-500 text-center">
-        I pagamenti sono elaborati in modo sicuro da Stripe. 
+        I pagamenti sono elaborati in modo sicuro da Stripe.
         Non memorizziamo i dati della tua carta di credito.
       </p>
     </form>
@@ -203,14 +203,14 @@ export const DonationModal: React.FC<DonationModalProps> = ({
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setError('');
-      
+
       // Validate amount
       const validation = donationService.validateDonationAmount(donationData.amount);
       if (!validation.isValid) {
-        setError(validation.error!);
+        setError(validation.error || 'Importo non valido');
         return;
       }
 
@@ -246,7 +246,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
-        <div 
+        <div
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           onClick={handleClose}
         />
@@ -275,9 +275,9 @@ export const DonationModal: React.FC<DonationModalProps> = ({
               {/* Amount Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Scegli l'importo della donazione
+                  Scegli l&apos;importo della donazione
                 </label>
-                
+
                 {/* Suggested amounts */}
                 <div className="grid grid-cols-3 gap-2 mb-4">
                   {suggestedAmounts.map((suggestion) => (
@@ -325,8 +325,8 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                     type="checkbox"
                     id="anonymous"
                     checked={donationData.isAnonymous}
-                    onChange={(e) => setDonationData(prev => ({ 
-                      ...prev, 
+                    onChange={(e) => setDonationData(prev => ({
+                      ...prev,
                       isAnonymous: e.target.checked,
                       consentToContact: e.target.checked ? false : prev.consentToContact
                     }))}
@@ -346,9 +346,9 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                       <input
                         type="text"
                         value={donationData.donorName}
-                        onChange={(e) => setDonationData(prev => ({ 
-                          ...prev, 
-                          donorName: e.target.value 
+                        onChange={(e) => setDonationData(prev => ({
+                          ...prev,
+                          donorName: e.target.value
                         }))}
                         className="input-field w-full"
                         placeholder="Il tuo nome"
@@ -362,9 +362,9 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                       <input
                         type="email"
                         value={donationData.donorEmail}
-                        onChange={(e) => setDonationData(prev => ({ 
-                          ...prev, 
-                          donorEmail: e.target.value 
+                        onChange={(e) => setDonationData(prev => ({
+                          ...prev,
+                          donorEmail: e.target.value
                         }))}
                         className="input-field w-full"
                         placeholder="tua-email@esempio.com"
@@ -376,9 +376,9 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                         type="checkbox"
                         id="consent"
                         checked={donationData.consentToContact}
-                        onChange={(e) => setDonationData(prev => ({ 
-                          ...prev, 
-                          consentToContact: e.target.checked 
+                        onChange={(e) => setDonationData(prev => ({
+                          ...prev,
+                          consentToContact: e.target.checked
                         }))}
                         className="rounded border-gray-300"
                       />
@@ -397,9 +397,9 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                 </label>
                 <textarea
                   value={donationData.message}
-                  onChange={(e) => setDonationData(prev => ({ 
-                    ...prev, 
-                    message: e.target.value 
+                  onChange={(e) => setDonationData(prev => ({
+                    ...prev,
+                    message: e.target.value
                   }))}
                   className="input-field w-full resize-none"
                   rows={3}
@@ -433,7 +433,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
               </button>
 
               <p className="text-xs text-gray-500 text-center">
-                Utilizzando Stripe per i pagamenti, garantiamo la massima sicurezza 
+                Utilizzando Stripe per i pagamenti, garantiamo la massima sicurezza
                 per i tuoi dati. Non memorizziamo informazioni sulla carta di credito.
               </p>
             </form>
@@ -442,6 +442,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
           {step === 'payment' && clientSecret && (
             <Elements stripe={stripePromise} options={{ clientSecret }}>
               <DonationForm
+                clientSecret={clientSecret}
                 donationData={donationData}
                 onSuccess={handlePaymentSuccess}
                 onError={handlePaymentError}

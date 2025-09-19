@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/auth/useAuth';
-import { api } from '@/services/api';
+// // // import { api } from '@/services/api'; // TODO: Will be used for account operations
 import { useRouter } from 'next/navigation';
-import { 
+import {
   ExclamationTriangleIcon,
   TrashIcon,
   ShieldExclamationIcon
@@ -23,14 +23,14 @@ import {
 export const DangerZone: React.FC = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
-  
+
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmationText, setConfirmationText] = useState('');
   const [error, setError] = useState('');
 
-  const isGoogleUser = user?.googleId && !user?.password;
+  const isGoogleUser = !!user?.googleId;
   const requiredConfirmationText = 'ELIMINA IL MIO ACCOUNT';
 
   const handleDeleteAccount = async () => {
@@ -60,13 +60,13 @@ export const DangerZone: React.FC = () => {
       logout();
       router.push('/?deleted=true');
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Account deletion error:', err);
-      
+
       // Handle different types of errors with user-friendly messages
       let errorMessage = 'Errore durante l\'eliminazione dell\'account';
-      
-      if (err?.message) {
+
+      if (err instanceof Error) {
         if (err.message.includes('400')) {
           errorMessage = 'Dati di conferma non validi. Controlla password e testo di conferma.';
         } else if (err.message.includes('401')) {
@@ -77,7 +77,7 @@ export const DangerZone: React.FC = () => {
           errorMessage = err.message;
         }
       }
-      
+
       setError(errorMessage);
       setIsDeleting(false);
     }
@@ -109,7 +109,7 @@ export const DangerZone: React.FC = () => {
                 Attenzione: Operazione Irreversibile
               </h4>
               <div className="text-sm text-red-700">
-                <p className="mb-2">L'eliminazione dell'account comporterà:</p>
+                <p className="mb-2">L&apos;eliminazione dell&apos;account comporterà:</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li>Cancellazione permanente di tutti i tuoi dati</li>
                   <li>Rimozione di tutte le fatture e documenti</li>
@@ -193,8 +193,8 @@ export const DangerZone: React.FC = () => {
                     Vuoi salvare i tuoi dati?
                   </h4>
                   <p className="text-sm text-blue-700 mt-1">
-                    Se desideri conservare una copia dei tuoi dati, ti consigliamo di esportarli 
-                    prima di eliminare l'account. Vai alla sezione Impostazioni per esportare i dati.
+                    Se desideri conservare una copia dei tuoi dati, ti consigliamo di esportarli
+                    prima di eliminare l&apos;account. Vai alla sezione Impostazioni per esportare i dati.
                   </p>
                 </div>
               </div>
@@ -213,8 +213,8 @@ export const DangerZone: React.FC = () => {
               <button
                 onClick={handleDeleteAccount}
                 disabled={
-                  isDeleting || 
-                  (!isGoogleUser && !password) || 
+                  isDeleting ||
+                  (!isGoogleUser && !password) ||
                   confirmationText !== requiredConfirmationText
                 }
                 className="btn-danger disabled:opacity-50 disabled:cursor-not-allowed"

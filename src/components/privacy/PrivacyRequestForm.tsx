@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import {
     DocumentTextIcon,
     EnvelopeIcon,
-    UserIcon,
+    // UserIcon,
     ExclamationTriangleIcon,
     CheckCircleIcon,
     ClockIcon
@@ -152,16 +152,38 @@ export const PrivacyRequestForm: React.FC = () => {
 
             setSubmitStatus('success');
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Privacy request error:', err);
-            setError(err.message || 'Errore durante l\'invio della richiesta');
+
+            let errorMessage = 'Errore durante l\'invio della richiesta';
+            if (err instanceof Error) {
+                errorMessage = err.message;
+            } else if (typeof err === 'object' && err !== null) {
+                const errorObj = err as { message?: string };
+                if (errorObj.message) {
+                    errorMessage = errorObj.message;
+                }
+            }
+
+            setError(errorMessage);
             setSubmitStatus('error');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const generateEmailBody = (requestData: any): string => {
+    const generateEmailBody = (requestData: {
+        requestId: string;
+        userId?: string;
+        userEmail?: string;
+        userName?: string;
+        type: string;
+        subject: string;
+        description: string;
+        contactDetails: string;
+        timestamp: string;
+        status: string;
+    }): string => {
         const selectedType = requestTypes.find(t => t.value === request.type);
 
         return `RICHIESTA PRIVACY - GDPR
@@ -265,7 +287,7 @@ Tempo di risposta previsto: 30 giorni lavorativi (come previsto dal GDPR Art. 12
                         <ExclamationTriangleIcon className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                         <div className="ml-3">
                             <h4 className="text-sm font-medium text-red-800">
-                                Errore nell'invio della richiesta
+                                Errore nell&apos;invio della richiesta
                             </h4>
                             <p className="text-sm text-red-700 mt-1">{error}</p>
                         </div>

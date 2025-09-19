@@ -3,52 +3,52 @@
  * SRP: Handles service worker lifecycle and registration
  */
 
-'use client';
+"use client";
 
 /**
  * Register service worker for caching and offline support
  */
-export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
-  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
-    console.log('Service Worker not supported');
-    return null;
-  }
+export const registerServiceWorker =
+  async (): Promise<ServiceWorkerRegistration | null> => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
+      return null;
+    }
 
-  try {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
-    });
+    try {
+      const registration = await navigator.serviceWorker.register("/sw.js", {
+        scope: "/",
+      });
 
-    console.log('Service Worker registered successfully:', registration);
+      // Handle updates
+      registration.addEventListener("updatefound", () => {
+        const newWorker = registration.installing;
+        if (newWorker) {
+          newWorker.addEventListener("statechange", () => {
+            if (
+              newWorker.state === "installed" &&
+              navigator.serviceWorker.controller
+            ) {
+              // New version available
 
-    // Handle updates
-    registration.addEventListener('updatefound', () => {
-      const newWorker = registration.installing;
-      if (newWorker) {
-        newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // New version available
-            console.log('New version available! Refresh to update.');
-            
-            // You could show a notification to the user here
-            showUpdateNotification();
-          }
-        });
-      }
-    });
+              // You could show a notification to the user here
+              showUpdateNotification();
+            }
+          });
+        }
+      });
 
-    return registration;
-  } catch (error) {
-    console.error('Service Worker registration failed:', error);
-    return null;
-  }
-};
+      return registration;
+    } catch (error) {
+      console.error("Service Worker registration failed:", error);
+      return null;
+    }
+  };
 
 /**
  * Unregister service worker
  */
 export const unregisterServiceWorker = async (): Promise<boolean> => {
-  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+  if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
     return false;
   }
 
@@ -56,12 +56,11 @@ export const unregisterServiceWorker = async (): Promise<boolean> => {
     const registration = await navigator.serviceWorker.getRegistration();
     if (registration) {
       const result = await registration.unregister();
-      console.log('Service Worker unregistered:', result);
       return result;
     }
     return false;
   } catch (error) {
-    console.error('Service Worker unregistration failed:', error);
+    console.error("Service Worker unregistration failed:", error);
     return false;
   }
 };
@@ -70,11 +69,11 @@ export const unregisterServiceWorker = async (): Promise<boolean> => {
  * Check if app is running in standalone mode (PWA)
  */
 export const isStandalone = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  
+  if (typeof window === "undefined") return false;
+
   return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as any).standalone === true
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (window.navigator as { standalone?: boolean }).standalone === true
   );
 };
 
@@ -83,12 +82,12 @@ export const isStandalone = (): boolean => {
  */
 const showUpdateNotification = () => {
   // Create a simple notification
-  const notification = document.createElement('div');
+  const notification = document.createElement("div");
   notification.className = `
     fixed top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50
     flex items-center space-x-3 animate-slide-in-right
   `;
-  
+
   notification.innerHTML = `
     <div>
       <p class="font-medium">Aggiornamento disponibile!</p>
@@ -121,19 +120,24 @@ const showUpdateNotification = () => {
 /**
  * Request background sync for offline actions
  */
-export const requestBackgroundSync = async (tag: string = 'background-sync'): Promise<void> => {
-  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+export const requestBackgroundSync = async (
+  tag: string = "background-sync"
+): Promise<void> => {
+  if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
     return;
   }
 
   try {
     const registration = await navigator.serviceWorker.ready;
-    if ('sync' in registration) {
-      await (registration as any).sync.register(tag);
-      console.log('Background sync requested:', tag);
+    if ("sync" in registration) {
+      await (
+        registration as ServiceWorkerRegistration & {
+          sync?: { register: (tag: string) => Promise<void> };
+        }
+      ).sync?.register(tag);
     }
   } catch (error) {
-    console.error('Background sync request failed:', error);
+    console.error("Background sync request failed:", error);
   }
 };
 
@@ -141,24 +145,30 @@ export const requestBackgroundSync = async (tag: string = 'background-sync'): Pr
  * Clear all caches
  */
 export const clearAllCaches = async (): Promise<void> => {
-  if (typeof window === 'undefined' || !('caches' in window)) {
+  if (typeof window === "undefined" || !("caches" in window)) {
     return;
   }
 
   try {
     const cacheNames = await caches.keys();
-    await Promise.all(cacheNames.map(name => caches.delete(name)));
-    console.log('All caches cleared');
+    await Promise.all(cacheNames.map((name) => caches.delete(name)));
   } catch (error) {
-    console.error('Failed to clear caches:', error);
+    console.error("Failed to clear caches:", error);
   }
 };
 
 /**
  * Get cache storage usage
  */
-export const getCacheStorageUsage = async (): Promise<{ used: number; quota: number } | null> => {
-  if (typeof window === 'undefined' || !('navigator' in window) || !('storage' in navigator)) {
+export const getCacheStorageUsage = async (): Promise<{
+  used: number;
+  quota: number;
+} | null> => {
+  if (
+    typeof window === "undefined" ||
+    !("navigator" in window) ||
+    !("storage" in navigator)
+  ) {
     return null;
   }
 
@@ -169,7 +179,7 @@ export const getCacheStorageUsage = async (): Promise<{ used: number; quota: num
       quota: estimate.quota || 0,
     };
   } catch (error) {
-    console.error('Failed to get storage usage:', error);
+    console.error("Failed to get storage usage:", error);
     return null;
   }
 };
@@ -177,15 +187,17 @@ export const getCacheStorageUsage = async (): Promise<{ used: number; quota: num
 /**
  * Preload critical routes
  */
-export const preloadCriticalRoutes = async (routes: string[]): Promise<void> => {
-  if (typeof window === 'undefined' || !('caches' in window)) {
+export const preloadCriticalRoutes = async (
+  routes: string[]
+): Promise<void> => {
+  if (typeof window === "undefined" || !("caches" in window)) {
     return;
   }
 
   try {
-    const cache = await caches.open('piva-balance-preload-v1');
-    const requests = routes.map(route => new Request(route));
-    
+    const cache = await caches.open("piva-balance-preload-v1");
+    const requests = routes.map((route) => new Request(route));
+
     await Promise.all(
       requests.map(async (request) => {
         try {
@@ -198,9 +210,9 @@ export const preloadCriticalRoutes = async (routes: string[]): Promise<void> => 
         }
       })
     );
-    
-    console.log('Critical routes preloaded:', routes);
+
+    // Debug: Critical routes preloaded
   } catch (error) {
-    console.error('Failed to preload critical routes:', error);
+    console.error("Failed to preload critical routes:", error);
   }
 };

@@ -37,13 +37,11 @@ export const CostForm: React.FC<CostFormProps> = ({
   touched,
   isSubmitting
 }) => {
-  console.log('🔍 DEBUG: CostForm called with isOpen:', isOpen);
 
   if (!isOpen) return null;
 
   const fieldErrors = errors || {};
 
-  console.log('🔍 DEBUG: CostForm rendering modal');
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

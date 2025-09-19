@@ -47,14 +47,8 @@ export function useAuth() {
    */
   const checkAuth = useCallback(async () => {
     try {
-      console.log("🔍 checkAuth - invalidating queries...");
       await queryClient.invalidateQueries({ queryKey: ["auth"] });
-      console.log("🔍 checkAuth - calling refetch...");
       const result = await refetch();
-      console.log("🔍 checkAuth - refetch result:", {
-        data: result.data,
-        error: result.error,
-      });
       return result.data;
     } catch (error) {
       console.error("Auth check failed:", error);
@@ -97,11 +91,6 @@ export function useAuth() {
    */
   const updateToken = useCallback(
     async (newToken: string) => {
-      console.log(
-        "🔍 updateToken - starting with token:",
-        newToken ? "EXISTS" : "NULL"
-      );
-
       // Set token and wait for it to be available
       setToken(newToken);
 
@@ -112,9 +101,8 @@ export function useAuth() {
       queryClient.setQueryData(["auth"], null);
       await queryClient.invalidateQueries({ queryKey: ["auth"] });
 
-      console.log("🔍 updateToken - calling checkAuth...");
       const userData = await checkAuth();
-      console.log("🔍 updateToken - checkAuth result:", userData);
+      // Debug: updateToken - checkAuth result
       return userData;
     },
     [setToken, queryClient, checkAuth]
@@ -126,20 +114,11 @@ export function useAuth() {
   const signIn = useCallback(
     async (credentials: { email: string; password: string }) => {
       try {
-        console.log("🔍 useAuth.signIn - starting authentication");
+        // Debug: useAuth.signIn - starting authentication
         const authResponse = await authService.signIn(credentials);
-        console.log("🔍 useAuth.signIn - authService response:", {
-          hasToken: !!authResponse.token,
-          hasUser: !!authResponse.user,
-        });
 
-        const userData = await updateToken(authResponse.token);
-        console.log("🔍 useAuth.signIn - updateToken result:", { userData });
-
-        console.log("✅ useAuth.signIn - returning authResponse:", {
-          hasToken: !!authResponse.token,
-          hasUser: !!authResponse.user,
-        });
+        await updateToken(authResponse.token);
+        // Debug: useAuth.signIn - updateToken result
         return authResponse;
       } catch (error) {
         console.error("Sign in failed:", error);

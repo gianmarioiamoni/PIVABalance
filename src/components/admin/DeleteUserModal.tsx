@@ -66,9 +66,22 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
             onUserDeleted(user.id);
             onClose();
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Error deleting user:', err);
-            setError(err?.data?.message || 'Errore durante l\'eliminazione');
+
+            let errorMessage = 'Errore durante l\'eliminazione';
+            if (err instanceof Error) {
+                errorMessage = err.message;
+            } else if (typeof err === 'object' && err !== null) {
+                const errorObj = err as { data?: { message?: string }; message?: string };
+                if (errorObj.data?.message) {
+                    errorMessage = errorObj.data.message;
+                } else if (errorObj.message) {
+                    errorMessage = errorObj.message;
+                }
+            }
+
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -109,8 +122,8 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
                     <div className="text-sm text-gray-500">{user.email}</div>
                     <div className="mt-2 flex items-center space-x-2">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.role === 'super_admin' ? 'bg-red-100 text-red-800' :
-                                user.role === 'admin' ? 'bg-blue-100 text-blue-800' :
-                                    'bg-gray-100 text-gray-800'
+                            user.role === 'admin' ? 'bg-blue-100 text-blue-800' :
+                                'bg-gray-100 text-gray-800'
                             }`}>
                             {user.role === 'super_admin' ? 'Super Admin' :
                                 user.role === 'admin' ? 'Admin' : 'Utente'}
@@ -135,10 +148,10 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
                                     Stai per eliminare definitivamente questo utente. Questa azione:
                                 </p>
                                 <ul className="list-disc list-inside space-y-1">
-                                    <li>Rimuoverà permanentemente l'account utente</li>
+                                    <li>Rimuoverà permanentemente l&apos;account utente</li>
                                     <li>Eliminerà tutti i dati associati</li>
                                     <li>Non potrà essere annullata</li>
-                                    <li>L'utente perderà immediatamente l'accesso</li>
+                                    <li>L&apos;utente perderà immediatamente l&apos;accesso</li>
                                 </ul>
                             </div>
                         </div>

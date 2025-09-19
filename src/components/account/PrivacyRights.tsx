@@ -37,7 +37,7 @@ export const PrivacyRights: React.FC = () => {
             setExportStatus('idle');
 
             // Call the export API
-            const response = await api.get<any>('/user/export-data');
+            const response = await api.get<{ data: Record<string, unknown> }>('/user/export-data');
 
             // Create and trigger download
             const dataStr = JSON.stringify(response, null, 2);
@@ -54,14 +54,19 @@ export const PrivacyRights: React.FC = () => {
 
             setExportStatus('success');
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Data export error:', err);
 
             let errorMessage = 'Errore durante l\'export dei dati';
-            if (err?.data?.message) {
-                errorMessage = err.data.message;
-            } else if (err?.message) {
+            if (err instanceof Error) {
                 errorMessage = err.message;
+            } else if (typeof err === 'object' && err !== null) {
+                const errorObj = err as { data?: { message?: string }; message?: string };
+                if (errorObj.data?.message) {
+                    errorMessage = errorObj.data.message;
+                } else if (errorObj.message) {
+                    errorMessage = errorObj.message;
+                }
             }
 
             setError(errorMessage);
@@ -170,7 +175,7 @@ export const PrivacyRights: React.FC = () => {
                                     <ExclamationTriangleIcon className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                                     <div className="ml-3">
                                         <h4 className="text-sm font-medium text-red-800">
-                                            Errore durante l'export
+                                            Errore durante l&apos;export
                                         </h4>
                                         <p className="text-sm text-red-700 mt-1">{error}</p>
                                     </div>
@@ -228,13 +233,13 @@ export const PrivacyRights: React.FC = () => {
                                 <InformationCircleIcon className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                 <div className="ml-3">
                                     <h4 className="text-sm font-medium text-blue-800 mb-2">
-                                        Cosa include l'export dei dati?
+                                        Cosa include l&apos;export dei dati?
                                     </h4>
                                     <ul className="text-sm text-blue-700 space-y-1">
                                         <li>• <strong>Dati Profilo:</strong> Email, nome, impostazioni account</li>
                                         <li>• <strong>Dati Finanziari:</strong> Tutte le fatture e costi inseriti</li>
                                         <li>• <strong>Impostazioni:</strong> Regime fiscale, aliquote, preferenze</li>
-                                        <li>• <strong>Statistiche:</strong> Riassunto dell'attività del tuo account</li>
+                                        <li>• <strong>Statistiche:</strong> Riassunto dell&apos;attività del tuo account</li>
                                         <li>• <strong>Metadati:</strong> Date di creazione, ultimo accesso, ruolo</li>
                                     </ul>
                                     <p className="text-sm text-blue-700 mt-2">
@@ -252,19 +257,19 @@ export const PrivacyRights: React.FC = () => {
                             <div className="space-y-2 text-sm text-gray-700">
                                 <div className="flex items-start">
                                     <span className="font-medium w-32 flex-shrink-0">Rettifica:</span>
-                                    <span>Modifica i tuoi dati nella sezione "Profilo"</span>
+                                    <span>Modifica i tuoi dati nella sezione &quot;Profilo&quot;</span>
                                 </div>
                                 <div className="flex items-start">
                                     <span className="font-medium w-32 flex-shrink-0">Cancellazione:</span>
-                                    <span>Elimina il tuo account nella "Zona Pericolosa"</span>
+                                    <span>Elimina il tuo account nella &quot;Zona Pericolosa&quot;</span>
                                 </div>
                                 <div className="flex items-start">
                                     <span className="font-medium w-32 flex-shrink-0">Opposizione:</span>
-                                    <span>Gestisci i cookie nella sezione "Privacy e Cookie"</span>
+                                    <span>Gestisci i cookie nella sezione &quot;Privacy e Cookie&quot;</span>
                                 </div>
                                 <div className="flex items-start">
                                     <span className="font-medium w-32 flex-shrink-0">Altre richieste:</span>
-                                    <span>Usa il tab "Richiesta Formale" o contatta <a href="mailto:privacy@pivabalance.com" className="text-blue-600 hover:text-blue-800 underline">privacy@pivabalance.com</a></span>
+                                    <span>Usa il tab &quot;Richiesta Formale&quot; o contatta <a href="mailto:privacy@pivabalance.com" className="text-blue-600 hover:text-blue-800 underline">privacy@pivabalance.com</a></span>
                                 </div>
                             </div>
                         </div>

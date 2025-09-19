@@ -65,11 +65,12 @@ export const AdminProtection: React.FC<AdminProtectionProps> = ({
 
     // Check role authorization
     const hasRequiredRole = () => {
+        const userRole = (user as { role?: string }).role;
         if (requiredRole === 'super_admin') {
-            return user.role === 'super_admin';
+            return userRole === 'super_admin';
         }
         if (requiredRole === 'admin') {
-            return user.role === 'admin' || user.role === 'super_admin';
+            return userRole === 'admin' || userRole === 'super_admin';
         }
         return true;
     };
@@ -94,8 +95,8 @@ export const AdminProtection: React.FC<AdminProtectionProps> = ({
                             <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
                                 <p className="text-sm text-orange-700">
                                     <strong>Il tuo ruolo:</strong> {
-                                        user.role === 'user' ? 'Utente' :
-                                            user.role === 'admin' ? 'Amministratore' :
+                                        (user as { role?: string }).role === 'user' ? 'Utente' :
+                                            (user as { role?: string }).role === 'admin' ? 'Amministratore' :
                                                 'Super Amministratore'
                                     }
                                 </p>

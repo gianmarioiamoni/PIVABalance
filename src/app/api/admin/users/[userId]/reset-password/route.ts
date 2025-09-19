@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/auth/authorization";
 import { User } from "@/models/User";
 import { connectDB } from "@/lib/database/mongodb";
 import { hashPassword } from "@/utils/userCalculations";
-import crypto from "crypto";
+// // // import crypto from "crypto"; // TODO: Will be used for secure password generation
 
 /**
  * Admin Password Reset API
@@ -25,7 +25,7 @@ export async function POST(
   try {
     // Verify admin authentication
     const authResult = await requireAdmin(request);
-    if (!authResult.success) {
+    if (!authResult.success || !authResult.user) {
       return authResult.response;
     }
 
@@ -94,7 +94,8 @@ export async function POST(
     );
 
     // Log the action (in a real app, use proper audit logging)
-    console.log(
+    // TODO: Replace with proper audit logging system
+    console.warn(
       `🔐 Admin ${currentUser.email} reset password for user ${targetUser.email}`
     );
 
@@ -110,7 +111,7 @@ export async function POST(
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error resetting password:", error);
     return NextResponse.json(
       {

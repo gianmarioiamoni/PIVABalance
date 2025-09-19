@@ -172,8 +172,10 @@ export class SecurityAuditService {
         severity: "medium",
         category: "authentication",
         title: "Account Lockout Not Implemented",
-        description: "No protection against brute force attacks through account lockout",
-        recommendation: "Implement account lockout after multiple failed login attempts",
+        description:
+          "No protection against brute force attacks through account lockout",
+        recommendation:
+          "Implement account lockout after multiple failed login attempts",
         affectedComponents: ["Login", "User accounts"],
         cweId: "CWE-307",
       });
@@ -188,12 +190,8 @@ export class SecurityAuditService {
   private static checkRateLimitingImplementation(): boolean {
     // In a real implementation, this would check if rate limiting middleware/logic exists
     // For now, we return true since we know it's implemented
-    try {
-      // We know rate limiting is implemented in our codebase
-      return true;
-    } catch (error) {
-      return false;
-    }
+    // We know rate limiting is implemented in our codebase
+    return true;
   }
 
   /**
@@ -202,12 +200,8 @@ export class SecurityAuditService {
   private static checkAccountLockoutImplementation(): boolean {
     // In a real implementation, this would check if account lockout logic exists
     // For now, we return true since we know it's implemented
-    try {
-      // We know account lockout is implemented in our codebase
-      return true;
-    } catch (error) {
-      return false;
-    }
+    // We know account lockout is implemented in our codebase
+    return true;
   }
 
   /**
@@ -220,7 +214,7 @@ export class SecurityAuditService {
       // We know it's implemented in next.config.ts redirects
       return true;
     }
-    
+
     // In production, check if HTTPS is actually enforced
     return process.env.NODE_ENV === "production";
   }
@@ -502,18 +496,10 @@ export class SecurityComplianceChecker {
     score: number;
   } {
     // OWASP categories for reference (not currently used in implementation)
-    const _owaspCategories = [
-      "broken-access-control",
-      "cryptographic-failures",
-      "injection",
-      "insecure-design",
-      "security-misconfiguration",
-      "vulnerable-components",
-      "identification-failures",
-      "software-integrity-failures",
-      "logging-failures",
-      "server-side-request-forgery",
-    ];
+    // Categories: broken-access-control, cryptographic-failures, injection,
+    // insecure-design, security-misconfiguration, vulnerable-components,
+    // identification-failures, software-integrity-failures, logging-failures,
+    // server-side-request-forgery
 
     const violations = vulnerabilities
       .filter((v) => v.severity === "critical" || v.severity === "high")

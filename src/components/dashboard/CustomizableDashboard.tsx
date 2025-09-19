@@ -135,7 +135,7 @@ const getWidgetGridStyle = (widget: WidgetConfig): React.CSSProperties => {
 const WidgetRenderer: React.FC<{
     widget: WidgetConfig;
     isEditing: boolean;
-    onWidgetChange: (id: string, updates: Partial<WidgetConfig>) => void;
+    onWidgetChange: (_id: string, updates: Partial<WidgetConfig>) => void;
     onWidgetRemove: (id: string) => void;
     onWidgetRefresh: (id: string) => void;
 }> = ({ widget, isEditing, onWidgetChange, onWidgetRemove, onWidgetRefresh }) => {
@@ -178,7 +178,7 @@ const WidgetRenderer: React.FC<{
 const WidgetGrid: React.FC<{
     widgets: WidgetConfig[];
     isEditing: boolean;
-    onWidgetChange: (id: string, updates: Partial<WidgetConfig>) => void;
+    onWidgetChange: (_id: string, updates: Partial<WidgetConfig>) => void;
     onWidgetRemove: (id: string) => void;
     onWidgetRefresh: (id: string) => void;
     onWidgetMove?: (widgetId: string, position: WidgetPosition) => void;

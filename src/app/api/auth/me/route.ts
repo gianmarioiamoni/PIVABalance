@@ -64,7 +64,7 @@ export async function GET(
           },
         }
       );
-      console.log("🔧 Updated super admin fields in database");
+      // Debug: Updated super admin fields in database
     } else if (!finalRole) {
       finalRole = "user";
       finalIsActive = true;
@@ -81,7 +81,7 @@ export async function GET(
           },
         }
       );
-      console.log("🔧 Updated user fields in database");
+      // Debug: Updated user fields in database
     }
 
     // Return user information

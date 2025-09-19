@@ -263,7 +263,7 @@ export const ProfitWidget: React.FC<ProfitWidgetProps> = ({
     const widgetData = {
         id: config.id,
         data: profitData,
-        lastUpdated,
+        lastUpdated: lastUpdated || new Date(),
         isLoading,
         error: error || undefined
     };

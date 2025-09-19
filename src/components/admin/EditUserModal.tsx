@@ -103,23 +103,43 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                 onClose();
             }, 1500);
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Error updating user:', err);
 
-            if (err?.data?.errors && Array.isArray(err.data.errors)) {
-                // Handle validation errors
-                const errorMessages = err.data.errors.map((e: any) => e.message).join(', ');
-                setError(errorMessages);
-            } else {
-                setError(err?.data?.message || 'Errore durante l\'aggiornamento');
+            let errorMessage = 'Errore durante l\'aggiornamento';
+
+            if (err instanceof Error) {
+                errorMessage = err.message;
+            } else if (typeof err === 'object' && err !== null) {
+                const errorObj = err as {
+                    data?: {
+                        errors?: Array<{ message?: string }>;
+                        message?: string
+                    };
+                    message?: string
+                };
+
+                if (errorObj.data?.errors && Array.isArray(errorObj.data.errors)) {
+                    // Handle validation errors
+                    const errorMessages = errorObj.data.errors
+                        .map((e) => e.message || 'Errore di validazione')
+                        .join(', ');
+                    errorMessage = errorMessages;
+                } else if (errorObj.data?.message) {
+                    errorMessage = errorObj.data.message;
+                } else if (errorObj.message) {
+                    errorMessage = errorObj.message;
+                }
             }
+
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
     };
 
     // Handle input changes
-    const handleInputChange = (field: keyof FormData, value: any) => {
+    const handleInputChange = (field: keyof FormData, value: unknown) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -199,7 +219,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                                             name="role"
                                             value={option.value}
                                             checked={formData.role === option.value}
-                                            onChange={(e) => handleInputChange('role', e.target.value as any)}
+                                            onChange={(e) => handleInputChange('role', e.target.value as 'user' | 'admin' | 'super_admin')}
                                             className="mt-1 mr-3 text-blue-600 focus:ring-blue-500"
                                             disabled={loading}
                                         />

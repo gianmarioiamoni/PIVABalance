@@ -84,17 +84,21 @@ export class PerformanceMonitor {
         // Page Load Time - Use modern Navigation Timing API
         try {
           if (performance.getEntriesByType) {
-            const navigationEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+            const navigationEntries = performance.getEntriesByType(
+              "navigation"
+            ) as PerformanceNavigationTiming[];
             if (navigationEntries.length > 0) {
               const nav = navigationEntries[0];
               metrics.pageLoad = nav.loadEventEnd - nav.fetchStart;
             }
           } else if (performance.timing) {
             // Fallback to deprecated API
-            metrics.pageLoad = performance.timing.loadEventEnd - performance.timing.navigationStart;
+            metrics.pageLoad =
+              performance.timing.loadEventEnd -
+              performance.timing.navigationStart;
           }
         } catch (error) {
-          console.warn('Failed to collect page load metrics:', error);
+          console.warn("Failed to collect page load metrics:", error);
         }
 
         // Core Web Vitals - with error handling
@@ -113,7 +117,7 @@ export class PerformanceMonitor {
                   }
                 });
               } catch (error) {
-                console.warn('Paint observer error:', error);
+                console.warn("Paint observer error:", error);
               }
             });
             paintObserver.observe({ entryTypes: ["paint"] });
@@ -127,7 +131,7 @@ export class PerformanceMonitor {
                   metrics.largestContentfulPaint = lastEntry.startTime;
                 }
               } catch (error) {
-                console.warn('LCP observer error:', error);
+                console.warn("LCP observer error:", error);
               }
             });
             lcpObserver.observe({ entryTypes: ["largest-contentful-paint"] });
@@ -147,7 +151,7 @@ export class PerformanceMonitor {
                 }
                 metrics.cumulativeLayoutShift = clsValue;
               } catch (error) {
-                console.warn('CLS observer error:', error);
+                console.warn("CLS observer error:", error);
               }
             });
             clsObserver.observe({ entryTypes: ["layout-shift"] });
@@ -160,10 +164,11 @@ export class PerformanceMonitor {
                   const firstInput = entries[0] as PerformanceEntry & {
                     processingStart: number;
                   };
-                  metrics.firstInputDelay = firstInput.processingStart - firstInput.startTime;
+                  metrics.firstInputDelay =
+                    firstInput.processingStart - firstInput.startTime;
                 }
               } catch (error) {
-                console.warn('FID observer error:', error);
+                console.warn("FID observer error:", error);
               }
             });
             fidObserver.observe({ entryTypes: ["first-input"] });
@@ -176,12 +181,11 @@ export class PerformanceMonitor {
                 clsObserver.disconnect();
                 fidObserver.disconnect();
               } catch (error) {
-                console.warn('Observer disconnect error:', error);
+                console.warn("Observer disconnect error:", error);
               }
             }, 4000);
-
           } catch (error) {
-            console.warn('PerformanceObserver not supported or failed:', error);
+            console.warn("PerformanceObserver not supported or failed:", error);
           }
         }
 
@@ -194,16 +198,15 @@ export class PerformanceMonitor {
             metrics.memoryUsage = perfWithMemory.memory?.usedJSHeapSize;
           }
         } catch (error) {
-          console.warn('Memory usage collection failed:', error);
+          console.warn("Memory usage collection failed:", error);
         }
 
         // Wait for all metrics to be collected, then resolve
         setTimeout(() => {
           resolve(metrics as PerformanceMetrics);
         }, 3000);
-
       } catch (error) {
-        console.error('Performance metrics collection failed:', error);
+        console.error("Performance metrics collection failed:", error);
         // Return default metrics on error
         resolve({
           id: this.generateMetricId(),
@@ -215,7 +218,8 @@ export class PerformanceMonitor {
           cumulativeLayoutShift: 0,
           firstInputDelay: 0,
           url: typeof window !== "undefined" ? window.location.href : "",
-          userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+          userAgent:
+            typeof navigator !== "undefined" ? navigator.userAgent : "",
         });
       }
     });
@@ -310,20 +314,8 @@ export class PerformanceMonitor {
       // eslint-disable-next-line no-console
       console.group("🚀 Performance Metrics");
       // eslint-disable-next-line no-console
-      console.log("Page Load:", `${metrics.pageLoad}ms`);
-      // eslint-disable-next-line no-console
-      console.log("First Paint:", `${metrics.firstPaint}ms`);
-      // eslint-disable-next-line no-console
-      console.log("FCP:", `${metrics.firstContentfulPaint}ms`);
-      // eslint-disable-next-line no-console
-      console.log("LCP:", `${metrics.largestContentfulPaint}ms`);
-      // eslint-disable-next-line no-console
-      console.log("CLS:", metrics.cumulativeLayoutShift);
-      // eslint-disable-next-line no-console
-      console.log("FID:", `${metrics.firstInputDelay}ms`);
-      // eslint-disable-next-line no-console
-      console.log(
-        "Memory:",
+      console.info(
+        "Memory Usage:",
         metrics.memoryUsage
           ? `${(metrics.memoryUsage / 1024 / 1024).toFixed(2)}MB`
           : "N/A"
@@ -342,8 +334,6 @@ export class PerformanceMonitor {
 
         // eslint-disable-next-line no-console
         console.group("💡 Recommendations");
-        // eslint-disable-next-line no-console
-        analysis.recommendations.forEach((rec) => console.info(rec));
         // eslint-disable-next-line no-console
         console.groupEnd();
       }

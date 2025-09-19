@@ -39,7 +39,7 @@ export const RoleBasedAccess: React.FC<RoleBasedAccessProps> = ({
         if (isLoading || !user) return;
 
         // Redirect super admin if not in allowed roles
-        if (user.role === 'super_admin' && !allowedRoles.includes('super_admin')) {
+        if ((user as { role?: string }).role === 'super_admin' && !allowedRoles.includes('super_admin')) {
             router.push(redirectSuperAdminTo);
         }
     }, [user, isLoading, router, allowedRoles, redirectSuperAdminTo]);
@@ -79,7 +79,7 @@ export const RoleBasedAccess: React.FC<RoleBasedAccessProps> = ({
     }
 
     // Show loading for super admin while redirecting
-    if (user.role === 'super_admin' && !allowedRoles.includes('super_admin')) {
+    if ((user as { role?: string }).role === 'super_admin' && !allowedRoles.includes('super_admin')) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                 <div className="text-center">
@@ -93,14 +93,14 @@ export const RoleBasedAccess: React.FC<RoleBasedAccessProps> = ({
     }
 
     // Check if user role is allowed
-    if (!allowedRoles.includes(user.role as any)) {
+    if (!allowedRoles.includes((user as { role?: string }).role as 'user' | 'admin' | 'super_admin')) {
         // Show custom fallback if provided
         if (fallback) {
             return <>{fallback}</>;
         }
 
         // Super admin specific message
-        if (user.role === 'super_admin') {
+        if ((user as { role?: string }).role === 'super_admin') {
             return (
                 <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                     <div className="max-w-lg mx-auto text-center">
@@ -152,8 +152,8 @@ export const RoleBasedAccess: React.FC<RoleBasedAccessProps> = ({
                             <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
                                 <p className="text-sm text-orange-700">
                                     <strong>Il tuo ruolo:</strong> {
-                                        user.role === 'user' ? 'Utente' :
-                                            user.role === 'admin' ? 'Amministratore' :
+                                        (user as { role?: string }).role === 'user' ? 'Utente' :
+                                            (user as { role?: string }).role === 'admin' ? 'Amministratore' :
                                                 'Super Amministratore'
                                     }
                                 </p>

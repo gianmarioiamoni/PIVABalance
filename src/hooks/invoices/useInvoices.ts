@@ -109,7 +109,7 @@ export const useInvoices = ({
       const errorMessage =
         err instanceof Error
           ? err.message
-          : "Errore nell'aggiornamento della data di pagamento";
+          : "Errore nell&apos;aggiornamento della data di pagamento";
       setError(errorMessage);
     },
   });
@@ -125,7 +125,7 @@ export const useInvoices = ({
       const errorMessage =
         err instanceof Error
           ? err.message
-          : "Errore nell'eliminazione della fattura";
+          : "Errore nell&apos;eliminazione della fattura";
       setError(errorMessage);
     },
   });

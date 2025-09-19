@@ -187,7 +187,7 @@ export const RevenueWidget: React.FC<RevenueWidgetProps> = ({
     const widgetData = {
         id: config.id,
         data: revenueData,
-        lastUpdated,
+        lastUpdated: lastUpdated || new Date(),
         isLoading,
         error: error || undefined
     };

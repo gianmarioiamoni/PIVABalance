@@ -11,7 +11,7 @@ import { CostFormWrapper } from './CostFormWrapper';
 
 interface CostListProps {
   costs: Cost[];
-  onUpdate: (id: string, cost: Omit<Cost, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onUpdate: (_id: string, cost: Omit<Cost, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onDelete: (id: string) => void;
   loading?: boolean;
   error?: string | null;

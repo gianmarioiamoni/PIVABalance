@@ -78,9 +78,22 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
             setSuccess('Password resettata con successo');
             setStep('result');
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Error resetting password:', err);
-            setError(err?.data?.message || 'Errore durante il reset della password');
+
+            let errorMessage = 'Errore durante il reset della password';
+            if (err instanceof Error) {
+                errorMessage = err.message;
+            } else if (typeof err === 'object' && err !== null) {
+                const errorObj = err as { data?: { message?: string }; message?: string };
+                if (errorObj.data?.message) {
+                    errorMessage = errorObj.data.message;
+                } else if (errorObj.message) {
+                    errorMessage = errorObj.message;
+                }
+            }
+
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -109,7 +122,7 @@ Password Temporanea: ${temporaryPassword}
 IMPORTANTE:
 - Questa password è temporanea e deve essere cambiata al primo accesso
 - Conserva questo file in modo sicuro
-- Elimina questo file dopo aver comunicato le credenziali all'utente
+- Elimina questo file dopo aver comunicato le credenziali all&apos;utente
 
 Generato il: ${new Date().toLocaleString('it-IT')}
 Generato da: Sistema Admin PIVABalance
@@ -184,7 +197,7 @@ Generato da: Sistema Admin PIVABalance
                                             La password temporanea sarà visibile SOLO UNA VOLTA:
                                         </div>
                                         <ul className="list-disc list-inside space-y-1 ml-2">
-                                            <li>La password attuale dell'utente verrà <strong>sostituita immediatamente</strong></li>
+                                            <li>La password attuale dell&apos;utente verrà <strong>sostituita immediatamente</strong></li>
                                             <li>La password temporanea sarà mostrata <strong>solo in questo modal</strong></li>
                                             <li>Una volta chiuso il modal, <strong>non sarà più possibile recuperarla</strong></li>
                                             <li>Potrai scaricare un file con le credenziali o copiarle</li>
@@ -259,7 +272,7 @@ Generato da: Sistema Admin PIVABalance
                                         🚨 Password Temporanea Generata
                                     </h4>
                                     <p className="text-sm text-red-700 mt-1">
-                                        <strong>IMPORTANTE:</strong> Questa password non sarà più visibile dopo aver chiuso questo modal. 
+                                        <strong>IMPORTANTE:</strong> Questa password non sarà più visibile dopo aver chiuso questo modal.
                                         Assicurati di copiarla o scaricare il file delle credenziali prima di continuare.
                                     </p>
                                 </div>
@@ -294,11 +307,10 @@ Generato da: Sistema Admin PIVABalance
                                     <button
                                         type="button"
                                         onClick={copyToClipboard}
-                                        className={`p-1 focus:outline-none transition-colors ${
-                                            copied 
-                                                ? 'text-green-600 hover:text-green-700' 
-                                                : 'text-gray-400 hover:text-gray-600'
-                                        }`}
+                                        className={`p-1 focus:outline-none transition-colors ${copied
+                                            ? 'text-green-600 hover:text-green-700'
+                                            : 'text-gray-400 hover:text-gray-600'
+                                            }`}
                                         title={copied ? 'Copiato!' : 'Copia negli appunti'}
                                     >
                                         <ClipboardDocumentIcon className="h-4 w-4" />
@@ -349,10 +361,10 @@ Generato da: Sistema Admin PIVABalance
                             </h4>
                             <div className="text-sm text-blue-700 space-y-1">
                                 <p><strong>1.</strong> Scarica il file delle credenziali o copia la password</p>
-                                <p><strong>2.</strong> Comunica le credenziali all'utente tramite canale sicuro</p>
-                                <p><strong>3.</strong> L'utente potrà accedere immediatamente con la nuova password</p>
-                                <p><strong>4.</strong> Consiglia all'utente di cambiarla dalla sezione Account</p>
-                                <p><strong>5.</strong> Elimina il file delle credenziali dopo l'uso</p>
+                                <p><strong>2.</strong> Comunica le credenziali all&apos;utente tramite canale sicuro</p>
+                                <p><strong>3.</strong> L&apos;utente potrà accedere immediatamente con la nuova password</p>
+                                <p><strong>4.</strong> Consiglia all&apos;utente di cambiarla dalla sezione Account</p>
+                                <p><strong>5.</strong> Elimina il file delle credenziali dopo l&apos;uso</p>
                             </div>
                         </div>
 

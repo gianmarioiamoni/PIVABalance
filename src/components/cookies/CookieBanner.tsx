@@ -30,7 +30,7 @@ export const CookieBanner: React.FC = () => {
         acceptAll,
         acceptNecessaryOnly,
         savePreferences,
-        hideBanner,
+        hideBanner: _hideBanner,
     } = useCookieConsent();
 
     const [showDetails, setShowDetails] = useState(false);
@@ -46,7 +46,7 @@ export const CookieBanner: React.FC = () => {
 
     const handleToggleCategory = (category: keyof CookieConsent) => {
         if (category === 'necessary') return; // Cannot disable necessary cookies
-        
+
         setTempPreferences(prev => ({
             ...prev,
             [category]: !prev[category]
@@ -118,8 +118,8 @@ export const CookieBanner: React.FC = () => {
                                         🍪 Utilizziamo i cookies
                                     </h3>
                                     <p className="text-sm text-gray-600 leading-relaxed">
-                                        Utilizziamo cookie e tecnologie simili per migliorare la tua esperienza, 
-                                        personalizzare i contenuti, analizzare il traffico e supportare le nostre 
+                                        Utilizziamo cookie e tecnologie simili per migliorare la tua esperienza,
+                                        personalizzare i contenuti, analizzare il traffico e supportare le nostre
                                         attività di marketing. Puoi scegliere quali categorie di cookie accettare.
                                     </p>
                                     <p className="text-xs text-gray-500 mt-2">
@@ -128,7 +128,7 @@ export const CookieBanner: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="flex flex-col sm:flex-row gap-2 lg:ml-6">
                             <button
                                 onClick={() => setShowDetails(true)}
@@ -176,21 +176,19 @@ export const CookieBanner: React.FC = () => {
                             {cookieCategories.map((category) => {
                                 const Icon = category.icon;
                                 const isEnabled = tempPreferences[category.key];
-                                
+
                                 return (
                                     <div
                                         key={category.key}
-                                        className={`p-4 rounded-lg border-2 transition-all ${
-                                            isEnabled 
-                                                ? category.color
-                                                : 'bg-gray-50 border-gray-200'
-                                        }`}
+                                        className={`p-4 rounded-lg border-2 transition-all ${isEnabled
+                                            ? category.color
+                                            : 'bg-gray-50 border-gray-200'
+                                            }`}
                                     >
                                         <div className="flex items-start justify-between">
                                             <div className="flex items-start gap-3 flex-1">
-                                                <Icon className={`h-5 w-5 mt-1 flex-shrink-0 ${
-                                                    isEnabled ? category.color.split(' ')[0] : 'text-gray-400'
-                                                }`} />
+                                                <Icon className={`h-5 w-5 mt-1 flex-shrink-0 ${isEnabled ? category.color.split(' ')[0] : 'text-gray-400'
+                                                    }`} />
                                                 <div className="flex-1">
                                                     <div className="flex items-center gap-2 mb-2">
                                                         <h4 className="font-medium text-gray-900">
@@ -210,26 +208,23 @@ export const CookieBanner: React.FC = () => {
                                                     </p>
                                                 </div>
                                             </div>
-                                            
+
                                             <div className="flex-shrink-0 ml-4">
                                                 <button
                                                     onClick={() => handleToggleCategory(category.key)}
                                                     disabled={category.required}
-                                                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                                                        isEnabled
-                                                            ? 'bg-blue-600'
-                                                            : 'bg-gray-200'
-                                                    } ${
-                                                        category.required ? 'opacity-50 cursor-not-allowed' : ''
-                                                    }`}
+                                                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isEnabled
+                                                        ? 'bg-blue-600'
+                                                        : 'bg-gray-200'
+                                                        } ${category.required ? 'opacity-50 cursor-not-allowed' : ''
+                                                        }`}
                                                     role="switch"
                                                     aria-checked={isEnabled}
                                                     aria-label={`${isEnabled ? 'Disabilita' : 'Abilita'} ${category.title}`}
                                                 >
                                                     <span
-                                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                            isEnabled ? 'translate-x-5' : 'translate-x-0'
-                                                        }`}
+                                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isEnabled ? 'translate-x-5' : 'translate-x-0'
+                                                            }`}
                                                     />
                                                 </button>
                                             </div>

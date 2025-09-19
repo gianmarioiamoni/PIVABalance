@@ -3,7 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { api } from '@/services/api';
-import { UserIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
+import {
+  UserIcon,
+  EnvelopeIcon
+} from '@heroicons/react/24/outline';
 
 /**
  * Profile Section Component
@@ -40,25 +43,25 @@ export const ProfileSection: React.FC = () => {
 
     // Client-side validation
     const trimmedName = name.trim();
-    
+
     if (!trimmedName) {
       setError('Il nome è obbligatorio');
       setIsLoading(false);
       return;
     }
-    
+
     if (trimmedName.length < 2) {
       setError('Il nome deve essere di almeno 2 caratteri');
       setIsLoading(false);
       return;
     }
-    
+
     if (trimmedName.length > 100) {
       setError('Il nome non può superare i 100 caratteri');
       setIsLoading(false);
       return;
     }
-    
+
     if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(trimmedName)) {
       setError('Il nome può contenere solo lettere, spazi, apostrofi e trattini');
       setIsLoading(false);
@@ -77,23 +80,14 @@ export const ProfileSection: React.FC = () => {
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(''), 3000);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Profile update error:', err);
-      
+
       // Handle different types of errors with user-friendly messages
       let errorMessage = 'Errore durante l\'aggiornamento del profilo';
-      
-      if (err?.data?.details) {
-        // Handle validation errors from Zod
-        const details = err.data.details;
-        if (details.name) {
-          errorMessage = details.name[0] || 'Nome non valido';
-        }
-      } else if (err?.data?.error) {
-        // Handle API error messages
-        errorMessage = err.data.error;
-      } else if (err?.message) {
-        // Handle other error messages
+
+      if (err instanceof Error) {
+        // Handle standard Error objects
         if (err.message.includes('400')) {
           errorMessage = 'Dati non validi. Controlla che il nome contenga solo lettere, spazi, apostrofi e trattini.';
         } else if (err.message.includes('401')) {
@@ -103,8 +97,23 @@ export const ProfileSection: React.FC = () => {
         } else {
           errorMessage = err.message;
         }
+      } else if (typeof err === 'object' && err !== null) {
+        // Handle API error objects
+        const errorObj = err as { data?: { details?: Record<string, string[]>; error?: string }; message?: string };
+        if (errorObj.data?.details) {
+          // Handle validation errors from Zod
+          const details = errorObj.data.details;
+          if (details.name) {
+            errorMessage = details.name[0] || 'Nome non valido';
+          }
+        } else if (errorObj.data?.error) {
+          // Handle API error messages
+          errorMessage = errorObj.data.error;
+        } else if (errorObj.message) {
+          errorMessage = errorObj.message;
+        }
       }
-      
+
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -114,34 +123,34 @@ export const ProfileSection: React.FC = () => {
   // Real-time validation
   const validateName = (value: string) => {
     const trimmedValue = value.trim();
-    
+
     if (!trimmedValue && value.length > 0) {
       return 'Il nome non può essere vuoto';
     }
-    
+
     if (trimmedValue.length > 0 && trimmedValue.length < 2) {
       return 'Il nome deve essere di almeno 2 caratteri';
     }
-    
+
     if (trimmedValue.length > 100) {
       return 'Il nome non può superare i 100 caratteri';
     }
-    
+
     if (trimmedValue && !/^[a-zA-ZÀ-ÿ\s'-]+$/.test(trimmedValue)) {
       return 'Il nome può contenere solo lettere, spazi, apostrofi e trattini';
     }
-    
+
     return '';
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setName(value);
-    
+
     // Clear previous errors when user starts typing
     if (error) setError('');
     if (success) setSuccess('');
-    
+
     // Real-time validation
     const validation = validateName(value);
     setValidationError(validation);
@@ -187,12 +196,12 @@ export const ProfileSection: React.FC = () => {
               Email
             </label>
             <div className="relative">
-            <input
-              type="email"
-              value={user?.email || ''}
-              disabled
-              className="input-field bg-gray-50 cursor-not-allowed"
-            />
+              <input
+                type="email"
+                value={user?.email || ''}
+                disabled
+                className="input-field bg-gray-50 cursor-not-allowed"
+              />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                 <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                   Non modificabile
@@ -200,7 +209,7 @@ export const ProfileSection: React.FC = () => {
               </div>
             </div>
             <p className="mt-1 text-sm text-gray-500">
-              L'email non può essere modificata per motivi di sicurezza.
+              L&apos;email non può essere modificata per motivi di sicurezza.
             </p>
           </div>
 
@@ -267,7 +276,6 @@ export const ProfileSection: React.FC = () => {
 
             {/* Account Info */}
             <div className="text-right text-sm text-gray-500">
-              <p>Account creato: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('it-IT') : 'N/A'}</p>
               {user?.googleId && (
                 <p className="text-blue-600">
                   <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mr-1"></span>

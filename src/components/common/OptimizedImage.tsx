@@ -6,7 +6,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface OptimizedImageProps {
   src: string;
@@ -48,6 +48,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const blurDataURLRef = useRef(blurDataURL || '');
 
   const handleLoad = () => {
     setIsLoaded(true);
@@ -73,12 +74,12 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   };
 
   useEffect(() => {
-    if (placeholder === 'blur' && !blurDataURL) {
+    if (placeholder === 'blur' && !blurDataURLRef.current) {
       // Auto-generate blur placeholder if not provided
       const autoBlurDataURL = generateBlurDataURL(20, 20);
-      blurDataURL = autoBlurDataURL;
+      blurDataURLRef.current = autoBlurDataURL;
     }
-  }, [placeholder, blurDataURL]);
+  }, [placeholder]);
 
   if (hasError) {
     return (
@@ -97,7 +98,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     quality,
     priority,
     placeholder,
-    ...(blurDataURL && { blurDataURL }),
+    ...(blurDataURLRef.current && { blurDataURL: blurDataURLRef.current }),
     sizes,
     onLoad: handleLoad,
     onError: handleError,
@@ -108,8 +109,8 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
   return (
     <div className="relative overflow-hidden">
-      <Image {...imageProps} />
-      
+      <Image {...imageProps} alt={alt} />
+
       {/* Loading skeleton */}
       {!isLoaded && !hasError && (
         <div
@@ -198,6 +199,7 @@ export const useImagePreload = (sources: string[]) => {
   useEffect(() => {
     const preloadImages = sources.map(src => {
       const img = new window.Image();
+      img.alt = '';
       img.src = src;
       return img;
     });

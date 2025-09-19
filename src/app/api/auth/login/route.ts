@@ -22,8 +22,9 @@ export async function POST(
   try {
     // Apply rate limiting
     const clientIP = getClientIP(request);
-    const { allowed, resetTime, remaining } = authRateLimiter.isAllowed(clientIP);
-    
+    const { allowed, resetTime, remaining } =
+      authRateLimiter.isAllowed(clientIP);
+
     if (!allowed) {
       return NextResponse.json(
         {
@@ -31,14 +32,16 @@ export async function POST(
           error: "Rate limit exceeded",
           message: "Too many login attempts. Please try again later.",
         },
-        { 
+        {
           status: 429,
           headers: {
-            'X-RateLimit-Limit': '5',
-            'X-RateLimit-Remaining': remaining.toString(),
-            'X-RateLimit-Reset': resetTime.toString(),
-            'Retry-After': Math.ceil((resetTime - Date.now()) / 1000).toString(),
-          }
+            "X-RateLimit-Limit": "5",
+            "X-RateLimit-Remaining": remaining.toString(),
+            "X-RateLimit-Reset": resetTime.toString(),
+            "Retry-After": Math.ceil(
+              (resetTime - Date.now()) / 1000
+            ).toString(),
+          },
         }
       );
     }
@@ -51,7 +54,7 @@ export async function POST(
     try {
       body = await request.json();
     } catch (error) {
-      console.error('JSON parsing error:', error);
+      console.error("JSON parsing error:", error);
       return NextResponse.json(
         {
           success: false,
@@ -60,13 +63,15 @@ export async function POST(
         { status: 400 }
       );
     }
-    
+
     const validatedData: SignInCredentials = validateSchema(signInSchema, body);
 
     // Check account lockout
     const lockStatus = accountLockout.isAccountLocked(validatedData.email);
     if (lockStatus.isLocked) {
-      const remainingMinutes = Math.ceil((lockStatus.remainingTime || 0) / (60 * 1000));
+      const remainingMinutes = Math.ceil(
+        (lockStatus.remainingTime || 0) / (60 * 1000)
+      );
       return NextResponse.json(
         {
           success: false,
@@ -125,6 +130,9 @@ export async function POST(
             id: user._id.toString(),
             email: user.email,
             name: user.name,
+            role: user.role || "user",
+            isActive: user.isActive ?? true,
+            createdAt: user.createdAt,
           },
         },
       },

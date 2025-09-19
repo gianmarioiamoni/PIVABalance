@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import {
     Elements,
@@ -24,15 +24,41 @@ import {
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
+// Types
+interface DonationData {
+    amount: string;
+    donorEmail: string;
+    donorName: string;
+    isAnonymous: boolean;
+    message: string;
+    consentToContact: boolean;
+}
+
+interface DonationStats {
+    totalAmount: number;
+    totalCount: number;
+    averageAmount: number;
+    lastDonation: string | null;
+    monthlyGoal: number;
+    monthlyProgress: number;
+}
+
+interface PaymentFormProps {
+    donationData: DonationData;
+    onSuccess: (message: string) => void;
+    onError: (error: string) => void;
+    onBack: () => void;
+}
+
 /**
  * Stripe Payment Form Component
  */
-function StripePaymentForm({ donationData, onSuccess, onError, onBack }) {
+function StripePaymentForm({ donationData, onSuccess, onError, onBack }: PaymentFormProps) {
     const stripe = useStripe();
     const elements = useElements();
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!stripe || !elements) {
@@ -61,9 +87,9 @@ function StripePaymentForm({ donationData, onSuccess, onError, onBack }) {
                 throw new Error('Pagamento non completato');
             }
 
-        } catch (err) {
+        } catch (err: unknown) {
             console.error('Payment error:', err);
-            onError(err.message || 'Errore durante il pagamento');
+            onError(err instanceof Error ? err.message : 'Errore durante il pagamento');
         } finally {
             setIsProcessing(false);
         }
@@ -164,15 +190,11 @@ function StripePaymentForm({ donationData, onSuccess, onError, onBack }) {
 /**
  * Donation Form with Payment Intent Creation
  */
-function DonationFormWithStripe({ donationData, onSuccess, onError, onBack }) {
+function DonationFormWithStripe({ donationData, onSuccess, onError, onBack }: PaymentFormProps) {
     const [clientSecret, setClientSecret] = useState('');
     const [paymentReady, setPaymentReady] = useState(false);
 
-    useEffect(() => {
-        createPaymentIntent();
-    }, []);
-
-    const createPaymentIntent = async () => {
+    const createPaymentIntent = useCallback(async () => {
         try {
             const response = await fetch('/api/donations/create-payment-intent', {
                 method: 'POST',
@@ -202,7 +224,11 @@ function DonationFormWithStripe({ donationData, onSuccess, onError, onBack }) {
             console.error('Error creating payment intent:', error);
             onError('Errore nella creazione del pagamento. Riprova più tardi.');
         }
-    };
+    }, [donationData, onError]);
+
+    useEffect(() => {
+        createPaymentIntent();
+    }, [createPaymentIntent]);
 
     if (!paymentReady) {
         return (
@@ -257,7 +283,7 @@ export default function DonationsPage() {
     const { user } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [step, setStep] = useState('form'); // 'form', 'payment', 'success', 'error'
-    const [stats, setStats] = useState(null);
+    const [stats, setStats] = useState<DonationStats | null>(null);
     const [isLoadingStats, setIsLoadingStats] = useState(true);
     const [donationData, setDonationData] = useState({
         amount: '10',
@@ -324,7 +350,7 @@ export default function DonationsPage() {
         { amount: 2500, label: '€25', description: 'Contributo' }
     ];
 
-    const handleFormSubmit = (e) => {
+    const handleFormSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         const amount = parseInt(donationData.amount) * 100;
@@ -340,14 +366,14 @@ export default function DonationsPage() {
         setStep('payment');
     };
 
-    const handlePaymentSuccess = (message) => {
+    const handlePaymentSuccess = (message: string) => {
         setStatusMessage(message);
         setStep('success');
         // Refresh stats after successful donation
         setTimeout(loadStats, 1000);
     };
 
-    const handlePaymentError = (error) => {
+    const handlePaymentError = (error: string) => {
         setStatusMessage(error);
         setStep('error');
     };
@@ -637,7 +663,7 @@ export default function DonationsPage() {
                                             color: '#374151',
                                             marginBottom: '0.75rem'
                                         }}>
-                                            Scegli l'importo della donazione
+                                            Scegli l&apos;importo della donazione
                                         </label>
 
                                         <div style={{

@@ -9,7 +9,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/database/mongodb";
 import { DashboardLayout } from "@/models/DashboardLayout";
 import { getUserFromRequest } from "@/lib/auth/jwt";
-// import { ApiResponse } from "@/types"; // Not used in this file
 import { validateSchema } from "@/lib/validations/schemas";
 import { z } from "zod";
 
@@ -140,7 +139,12 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: layouts.length === 0 ? null : (layouts.length === 1 ? layouts[0] : layouts),
+      data:
+        layouts.length === 0
+          ? null
+          : layouts.length === 1
+          ? layouts[0]
+          : layouts,
     });
   } catch (error) {
     console.error("Dashboard layout GET error:", error);

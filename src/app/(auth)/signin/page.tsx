@@ -40,13 +40,11 @@ function SignInContent() {
         mutationFn: (credentials: SignInCredentials) => authSignIn(credentials),
         onSuccess: async (data) => {
             try {
-                console.log('🔍 SignIn onSuccess - data received:', data);
+                // Debug: console.info('🔍 SignIn onSuccess - data received:', data);
                 // authSignIn already handles token setting and user data fetching
                 if (data && data.token && data.user) {
-                    console.log('✅ SignIn success - redirecting to:', redirect);
                     // Clean URL and redirect immediately - don't wait for updateToken
                     window.history.replaceState({}, '', '/signin');
-                    console.log('🔍 SignIn - calling router.push with:', redirect);
 
                     // Force redirect using window.location as fallback
                     router.push(redirect);
@@ -54,12 +52,11 @@ function SignInContent() {
                     // Fallback redirect after a short delay if router.push fails
                     setTimeout(() => {
                         if (window.location.pathname === '/signin') {
-                            console.log('🔍 SignIn - router.push may have failed, using window.location');
+                            // Debug: console.info('🔍 SignIn - router.push may have failed, using window.location');
                             window.location.href = redirect;
                         }
                     }, 500);
 
-                    console.log('🔍 SignIn - router.push called');
                 } else {
                     console.error('❌ SignIn failed - missing data:', { data, hasToken: !!data?.token, hasUser: !!data?.user });
                     throw new Error('Failed to authenticate user');

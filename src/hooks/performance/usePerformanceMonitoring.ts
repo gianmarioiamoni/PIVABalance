@@ -180,7 +180,7 @@ export const useComponentPerformance = (componentName: string) => {
 
       if (process.env.NODE_ENV === "development") {
         // eslint-disable-next-line no-console
-        console.log(
+        console.info(
           `🎨 ${componentName} render time: ${renderTime.toFixed(2)}ms`
         );
       }

@@ -83,10 +83,10 @@ export function useTaxSettings() {
 
   // Simple, stable handleChange without professional fund logic
   const handleChange = useCallback(
-    (
+    async (
       field: keyof UserSettings,
       value: string | number | boolean | undefined
-    ) => {
+    ): Promise<void> => {
       setSettings((prev) => ({
         ...prev,
         [field]: value,

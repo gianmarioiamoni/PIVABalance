@@ -35,7 +35,7 @@ export const CookieSettings: React.FC = () => {
     const [showDetails, setShowDetails] = useState(false);
     const [showAuditTrail, setShowAuditTrail] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const [auditTrail, setAuditTrail] = useState<any[]>([]);
+    const [auditTrail, setAuditTrail] = useState<Array<Record<string, unknown>>>([]);
 
     const handleToggleCategory = (category: keyof CookieConsent) => {
         if (category === 'necessary') return; // Cannot disable necessary cookies
@@ -236,8 +236,8 @@ export const CookieSettings: React.FC = () => {
                             <div
                                 key={category.key}
                                 className={`p-4 rounded-lg border-2 transition-all ${isEnabled
-                                        ? category.color
-                                        : 'bg-gray-50 border-gray-200'
+                                    ? category.color
+                                    : 'bg-gray-50 border-gray-200'
                                     }`}
                             >
                                 <div className="flex items-start justify-between">
@@ -282,8 +282,8 @@ export const CookieSettings: React.FC = () => {
                                             onClick={() => handleToggleCategory(category.key)}
                                             disabled={category.required}
                                             className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isEnabled
-                                                    ? 'bg-blue-600'
-                                                    : 'bg-gray-200'
+                                                ? 'bg-blue-600'
+                                                : 'bg-gray-200'
                                                 } ${category.required ? 'opacity-50 cursor-not-allowed' : ''
                                                 }`}
                                             role="switch"
@@ -376,29 +376,37 @@ export const CookieSettings: React.FC = () => {
                     <div className="border-t border-gray-200 pt-4">
                         {auditTrail.length > 0 ? (
                             <div className="space-y-2 max-h-64 overflow-y-auto">
-                                {auditTrail.slice().reverse().map((entry, index) => (
-                                    <div key={entry.id || index} className="bg-gray-50 rounded p-3 text-sm">
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1">
-                                                <div className="font-medium text-gray-900">
-                                                    {getActionLabel(entry.action)}
+                                {auditTrail.slice().reverse().map((entry, index) => {
+                                    const entryId = (entry as { id?: string }).id;
+                                    const action = (entry as { action?: string }).action || '';
+                                    const timestamp = (entry as { timestamp?: string }).timestamp || '';
+                                    const preferences = (entry as { preferences?: { functional?: boolean; analytics?: boolean; marketing?: boolean } }).preferences;
+                                    const version = (entry as { version?: string }).version || '1.0';
+
+                                    return (
+                                        <div key={entryId || index} className="bg-gray-50 rounded p-3 text-sm">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <div className="font-medium text-gray-900">
+                                                        {getActionLabel(action)}
+                                                    </div>
+                                                    <div className="text-gray-600 mt-1">
+                                                        {formatTimestamp(timestamp)}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 mt-1">
+                                                        Necessari: ✓ |
+                                                        Funzionali: {preferences?.functional ? '✓' : '✗'} |
+                                                        Analytics: {preferences?.analytics ? '✓' : '✗'} |
+                                                        Marketing: {preferences?.marketing ? '✓' : '✗'}
+                                                    </div>
                                                 </div>
-                                                <div className="text-gray-600 mt-1">
-                                                    {formatTimestamp(entry.timestamp)}
+                                                <div className="text-xs text-gray-400 ml-4">
+                                                    v{version}
                                                 </div>
-                                                <div className="text-xs text-gray-500 mt-1">
-                                                    Necessari: ✓ |
-                                                    Funzionali: {entry.preferences?.functional ? '✓' : '✗'} |
-                                                    Analytics: {entry.preferences?.analytics ? '✓' : '✗'} |
-                                                    Marketing: {entry.preferences?.marketing ? '✓' : '✗'}
-                                                </div>
-                                            </div>
-                                            <div className="text-xs text-gray-400 ml-4">
-                                                v{entry.version}
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         ) : (
                             <div className="text-center text-gray-500 py-8">

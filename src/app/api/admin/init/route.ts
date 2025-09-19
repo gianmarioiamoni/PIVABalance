@@ -17,7 +17,7 @@ import { ApiResponse } from "@/types";
  */
 
 export async function POST(
-  request: NextRequest
+  _request: NextRequest
 ): Promise<NextResponse<ApiResponse<{ message: string }>>> {
   try {
     // Check if initialization is allowed

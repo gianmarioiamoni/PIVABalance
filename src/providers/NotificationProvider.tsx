@@ -40,15 +40,14 @@ export function NotificationProvider({
     const addNotification = useCallback((
         notification: Omit<Notification, 'id' | 'createdAt'>
     ): string => {
-        const id = generateId();
         const newNotification: Notification = {
             ...notification,
-            id,
+            id: generateId(),
             createdAt: new Date()
         };
 
         setNotifications(prev => [newNotification, ...prev]);
-        return id;
+        return newNotification.id;
     }, [generateId]);
 
     // Remove notification

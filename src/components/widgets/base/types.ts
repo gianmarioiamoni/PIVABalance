@@ -99,8 +99,8 @@ export interface WidgetContextType {
   isEditing: boolean;
   addWidget: (type: string, position?: Partial<WidgetPosition>) => void;
   removeWidget: (id: string) => void;
-  updateWidget: (id: string, updates: Partial<WidgetConfig>) => void;
-  moveWidget: (id: string, position: WidgetPosition) => void;
+  updateWidget: (_id: string, updates: Partial<WidgetConfig>) => void;
+  moveWidget: (_id: string, position: WidgetPosition) => void;
   saveLayout: () => Promise<void>;
   loadLayout: (layoutId?: string) => Promise<void>;
   toggleEditing: () => void;

@@ -18,9 +18,9 @@ import { ensureSuperAdmin } from "@/lib/auth/authorization";
  */
 export async function setupSuperAdmin(): Promise<void> {
   try {
-    console.log("🔧 Initializing super admin...");
+    // Debug: Initializing super admin...
     await ensureSuperAdmin();
-    console.log("✅ Super admin initialization complete");
+    // Debug: Super admin initialization complete
   } catch (error) {
     console.error("❌ Super admin initialization failed:", error);
   }

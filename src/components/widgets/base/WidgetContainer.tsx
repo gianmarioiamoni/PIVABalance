@@ -93,13 +93,7 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
 
     const handleSettings = () => {
         // Show widget settings modal with current configuration
-        const _currentSettings = {
-            title: config.title,
-            size: config.size,
-            refreshInterval: config.refreshInterval,
-            isVisible: config.isVisible,
-            ...config.customSettings
-        };
+        // Current settings: title, size, refreshInterval, isVisible, customSettings
 
         // For now, show current settings and allow title change
         const newTitle = prompt(

@@ -1,4 +1,4 @@
-'use client';
+'uuse client';
 
 import React, { useState } from 'react';
 import { useCosts, useCostForm } from '@/hooks/costs';
@@ -112,7 +112,6 @@ export const Costs: React.FC = () => {
             {/* New Cost Form */}
             {showNewCostForm && (
                 <>
-                    {console.log('🔍 DEBUG: Rendering CostFormWrapper, showNewCostForm:', showNewCostForm)}
                     <CostFormWrapper
                         onSubmit={submitNewCost}
                         onCancel={closeNewCostForm}

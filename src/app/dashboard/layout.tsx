@@ -130,40 +130,30 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     // Normalize pathname by removing trailing slash for consistent comparison
     const normalizedPathname = pathname?.replace(/\/$/, '') || '';
 
-    // Helper function to check if user has required role
-    const hasRole = (userRole: string, requiredRole: string): boolean => {
-        const roleHierarchy: Record<string, number> = {
-            user: 1,
-            admin: 2,
-            super_admin: 3,
-        };
-        return roleHierarchy[userRole] >= roleHierarchy[requiredRole];
-    };
-
     // Navigation items based on user role
     const getNavigationItems = () => {
-        const currentUserRole = user.role || 'user';
+        const currentUserRole = (user as { role?: string }).role || 'user';
 
         // Super Admin gets only system management items
         if (currentUserRole === 'super_admin') {
             return [
-                { 
-                    name: 'Amministrazione', 
-                    href: '/dashboard/admin', 
+                {
+                    name: 'Amministrazione',
+                    href: '/dashboard/admin',
                     current: normalizedPathname === '/dashboard/admin',
                     group: 'admin',
                     icon: '👨‍💼'
                 },
-                { 
-                    name: 'Monitoring', 
-                    href: '/dashboard/monitoring', 
+                {
+                    name: 'Monitoring',
+                    href: '/dashboard/monitoring',
                     current: normalizedPathname === '/dashboard/monitoring',
                     group: 'admin',
                     icon: '🔍'
                 },
-                { 
-                    name: 'Account', 
-                    href: '/dashboard/account', 
+                {
+                    name: 'Account',
+                    href: '/dashboard/account',
                     current: normalizedPathname === '/dashboard/account',
                     group: 'management',
                     icon: '👤'
@@ -173,37 +163,37 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
         // Base items for regular users and admins
         const baseItems = [
-            { 
-                name: 'Dashboard', 
-                href: '/dashboard', 
+            {
+                name: 'Dashboard',
+                href: '/dashboard',
                 current: normalizedPathname === '/dashboard',
                 group: 'core',
                 icon: '📊'
             },
-            { 
-                name: 'Dashboard Personalizzabile', 
-                href: '/dashboard/customizable', 
+            {
+                name: 'Dashboard Personalizzabile',
+                href: '/dashboard/customizable',
                 current: normalizedPathname === '/dashboard/customizable',
                 group: 'core',
                 icon: '⚙️'
             },
-            { 
-                name: 'Analytics Avanzate', 
-                href: '/dashboard/analytics', 
+            {
+                name: 'Analytics Avanzate',
+                href: '/dashboard/analytics',
                 current: normalizedPathname === '/dashboard/analytics',
                 group: 'analytics',
                 icon: '📈'
             },
-            { 
-                name: 'Fatture', 
-                href: '/dashboard/invoices', 
+            {
+                name: 'Fatture',
+                href: '/dashboard/invoices',
                 current: normalizedPathname === '/dashboard/invoices',
                 group: 'financial',
                 icon: '📄'
             },
-            { 
-                name: 'Costi', 
-                href: '/dashboard/costs', 
+            {
+                name: 'Costi',
+                href: '/dashboard/costs',
                 current: normalizedPathname === '/dashboard/costs',
                 group: 'financial',
                 icon: '💰'
@@ -217,16 +207,16 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 group: 'financial',
                 icon: '🏛️'
             },
-            { 
-                name: 'Impostazioni', 
-                href: '/dashboard/settings', 
+            {
+                name: 'Impostazioni',
+                href: '/dashboard/settings',
                 current: normalizedPathname === '/dashboard/settings',
                 group: 'management',
                 icon: '⚙️'
             },
-            { 
-                name: 'Account', 
-                href: '/dashboard/account', 
+            {
+                name: 'Account',
+                href: '/dashboard/account',
                 current: normalizedPathname === '/dashboard/account',
                 group: 'management',
                 icon: '👤'
@@ -236,16 +226,16 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         // Add admin-only items for admin users (not super_admin)
         if (currentUserRole === 'admin') {
             baseItems.push(
-                { 
-                    name: 'Monitoring', 
-                    href: '/dashboard/monitoring', 
+                {
+                    name: 'Monitoring',
+                    href: '/dashboard/monitoring',
                     current: normalizedPathname === '/dashboard/monitoring',
                     group: 'admin',
                     icon: '🔍'
                 },
-                { 
-                    name: 'Amministrazione', 
-                    href: '/dashboard/admin', 
+                {
+                    name: 'Amministrazione',
+                    href: '/dashboard/admin',
                     current: normalizedPathname === '/dashboard/admin',
                     group: 'admin',
                     icon: '👨‍💼'

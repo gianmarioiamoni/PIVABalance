@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
             <h1 className="text-3xl font-bold text-gray-900">
               Informativa sulla Privacy
             </h1>
-            <Link 
+            <Link
               href="/"
               className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
             >
@@ -31,10 +31,10 @@ export default function PrivacyPolicyPage() {
             Informazioni su come PIVABalance raccoglie, utilizza e protegge i tuoi dati personali
           </p>
           <div className="mt-4 text-sm text-gray-500">
-            <p><strong>Ultimo aggiornamento:</strong> {new Date().toLocaleDateString('it-IT', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            <p><strong>Ultimo aggiornamento:</strong> {new Date().toLocaleDateString('it-IT', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
             })}</p>
             <p><strong>Versione:</strong> 1.0</p>
           </div>
@@ -72,7 +72,7 @@ export default function PrivacyPolicyPage() {
                 <li>Password (crittografata)</li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Dati finanziari
@@ -92,7 +92,7 @@ export default function PrivacyPolicyPage() {
               <ul className="list-disc list-inside text-gray-700 space-y-1 ml-4">
                 <li>Indirizzo IP</li>
                 <li>Informazioni sul browser</li>
-                <li>Dati di utilizzo dell'applicazione</li>
+                <li>Dati di utilizzo dell&apos;applicazione</li>
                 <li>Log di accesso e attività</li>
               </ul>
             </div>
@@ -133,7 +133,7 @@ export default function PrivacyPolicyPage() {
                 Interesse legittimo (Art. 6.1.f GDPR)
               </h3>
               <ul className="list-disc list-inside text-purple-800 space-y-1 ml-4">
-                <li>Sicurezza dell'applicazione e prevenzione frodi</li>
+                <li>Sicurezza dell&apos;applicazione e prevenzione frodi</li>
                 <li>Miglioramento del servizio e sviluppo nuove funzionalità</li>
                 <li>Analisi statistiche anonime</li>
               </ul>
@@ -162,11 +162,11 @@ export default function PrivacyPolicyPage() {
               </h2>
             </div>
           </div>
-          
+
           <p className="text-gray-700 mb-4">
             In conformità al GDPR, hai i seguenti diritti sui tuoi dati personali:
           </p>
-          
+
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-3">
               <div className="p-3 bg-gray-50 rounded-lg">
@@ -179,7 +179,7 @@ export default function PrivacyPolicyPage() {
               </div>
               <div className="p-3 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold text-gray-900">Diritto alla cancellazione</h3>
-                <p className="text-sm text-gray-600">Richiedere l'eliminazione dei tuoi dati</p>
+                <p className="text-sm text-gray-600">Richiedere l&apos;eliminazione dei tuoi dati</p>
               </div>
               <div className="p-3 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold text-gray-900">Diritto di limitazione</h3>
@@ -201,14 +201,14 @@ export default function PrivacyPolicyPage() {
               </div>
               <div className="p-3 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold text-gray-900">Reclamo al Garante</h3>
-                <p className="text-sm text-gray-600">Presentare reclamo all'autorità di controllo</p>
+                <p className="text-sm text-gray-600">Presentare reclamo all&apos;autorità di controllo</p>
               </div>
             </div>
           </div>
 
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-blue-800 text-sm">
-              <strong>Come esercitare i tuoi diritti:</strong> Invia una richiesta a privacy@pivabalance.com 
+              <strong>Come esercitare i tuoi diritti:</strong> Invia una richiesta a privacy@pivabalance.com
               specificando quale diritto vuoi esercitare. Risponderemo entro 30 giorni dalla ricezione della richiesta.
             </p>
           </div>
@@ -221,7 +221,7 @@ export default function PrivacyPolicyPage() {
           </h2>
           <div className="prose text-gray-700 space-y-4">
             <p>
-              Implementiamo misure tecniche e organizzative appropriate per proteggere 
+              Implementiamo misure tecniche e organizzative appropriate per proteggere
               i tuoi dati personali contro accessi non autorizzati, perdite o distruzioni:
             </p>
             <ul className="list-disc list-inside space-y-1 ml-4">
@@ -242,7 +242,7 @@ export default function PrivacyPolicyPage() {
           </h2>
           <div className="prose text-gray-700 space-y-4">
             <p>
-              Conserviamo i tuoi dati personali solo per il tempo necessario alle finalità 
+              Conserviamo i tuoi dati personali solo per il tempo necessario alle finalità
               per cui sono stati raccolti:
             </p>
             <ul className="list-disc list-inside space-y-1 ml-4">
@@ -252,7 +252,7 @@ export default function PrivacyPolicyPage() {
               <li><strong>Log tecnici:</strong> Massimo 12 mesi</li>
             </ul>
             <p>
-              Alla scadenza dei termini di conservazione, i dati vengono cancellati 
+              Alla scadenza dei termini di conservazione, i dati vengono cancellati
               in modo sicuro e irreversibile.
             </p>
           </div>
@@ -265,7 +265,7 @@ export default function PrivacyPolicyPage() {
           </h2>
           <div className="prose text-gray-700 space-y-4">
             <p>
-              Per qualsiasi domanda relativa a questa informativa sulla privacy 
+              Per qualsiasi domanda relativa a questa informativa sulla privacy
               o per esercitare i tuoi diritti:
             </p>
             <div className="bg-gray-50 p-4 rounded-lg">
@@ -274,7 +274,7 @@ export default function PrivacyPolicyPage() {
               <p><strong>Garante Privacy:</strong> <a href="https://www.garanteprivacy.it" className="text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noopener noreferrer">www.garanteprivacy.it</a></p>
             </div>
             <p>
-              Consulta anche la nostra <Link href="/cookie-policy" className="text-blue-600 hover:text-blue-800 underline">Cookie Policy</Link> 
+              Consulta anche la nostra <Link href="/cookie-policy" className="text-blue-600 hover:text-blue-800 underline">Cookie Policy</Link>
               per informazioni specifiche sui cookie che utilizziamo.
             </p>
           </div>
@@ -282,11 +282,11 @@ export default function PrivacyPolicyPage() {
 
         {/* Back to top */}
         <div className="text-center mt-8">
-          <button 
+          <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            Torna all'inizio
+            Torna all&apos;inizio
           </button>
         </div>
       </div>

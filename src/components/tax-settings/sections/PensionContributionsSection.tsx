@@ -24,7 +24,7 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
   handleProfessionalFundChange,
 }) => {
   // Memoized callback to prevent infinite loops
-  const handleParametersChange = useCallback((params: any) => {
+  const handleParametersChange = useCallback((_params: unknown) => {
     // Don't call handleChange here to avoid infinite loops
     // The parameters will be handled directly in the fund selection component
   }, []);
@@ -35,7 +35,7 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
   }, [handleProfessionalFundChange]);
 
   // Memoized onFundChange to prevent infinite loops
-  const handleFundChange = useCallback((fund: any) => {
+  const handleFundChange = useCallback((_fund: unknown) => {
     // Fund change is handled by the component internally
   }, []);
   return (
@@ -79,7 +79,7 @@ export const PensionContributionsSection: React.FC<PensionContributionsSectionPr
               onChange={(type, rate, minContribution) => {
                 // Use batch change to avoid multiple re-renders and infinite loops
                 handleBatchChange({
-                  inpsRateType: type,
+                  inpsRateType: type as "COLLABORATOR_WITH_DISCOLL" | "COLLABORATOR_WITHOUT_DISCOLL" | "PROFESSIONAL" | "PENSIONER",
                   manualContributionRate: rate,
                   manualMinimumContribution: minContribution,
                   manualFixedAnnualContributions: 0,

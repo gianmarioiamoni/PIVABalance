@@ -51,14 +51,14 @@ export const DonationButton: React.FC<DonationButtonProps> = ({
     }
   };
 
-  const handleDonationSuccess = (donationId: string) => {
+  const handleDonationSuccess = (_donationId: string) => {
     // Refresh stats after successful donation
     if (showStats) {
       setTimeout(loadStats, 1000);
     }
-    
+
     // Optional: Show success notification
-    console.log('Donation successful:', donationId);
+    // Debug: Donation successful
   };
 
   // Size classes
@@ -131,11 +131,11 @@ export const DonationButton: React.FC<DonationButtonProps> = ({
                 <HeartIcon className="h-6 w-6 text-white" />
               </div>
             </div>
-            
+
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Supporta PIVABalance
             </h3>
-            
+
             <p className="text-gray-600 text-sm mb-4">
               Aiutaci a mantenere questo servizio gratuito e a sviluppare nuove funzionalità.
             </p>
@@ -156,7 +156,7 @@ export const DonationButton: React.FC<DonationButtonProps> = ({
                     <div className="text-xs text-gray-500">Donazioni</div>
                   </div>
                 </div>
-                
+
                 {/* Progress bar for monthly goal */}
                 <div className="mt-3">
                   <div className="flex justify-between items-center mb-1">
@@ -166,7 +166,7 @@ export const DonationButton: React.FC<DonationButtonProps> = ({
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-gradient-to-r from-pink-500 to-red-500 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${Math.min(100, stats.monthlyProgress)}%` }}
                     />

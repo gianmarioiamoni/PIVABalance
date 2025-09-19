@@ -14,6 +14,7 @@ import {
   DashboardLayout,
   WidgetPosition,
   WidgetType,
+  WidgetSize,
 } from "@/components/widgets/base/types";
 import { WidgetRegistry } from "@/components/widgets/registry/WidgetRegistry";
 import { useNotifications } from "@/providers/NotificationProvider";
@@ -73,50 +74,7 @@ import { dashboardLayoutService } from "@/services/dashboardLayoutService";
  * Create Default Layout
  * SRP: Handles only default layout creation
  */
-const _createDefaultLayout = (): DashboardLayout => {
-  const defaultWidgets = WidgetRegistry.getDefaultLayout()
-    .map((item) => {
-      const registryEntry = WidgetRegistry.getById(item.widgetId);
-      if (!registryEntry) return null;
-
-      return {
-        id: `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        type: registryEntry.type, // Use registry type, not widget ID
-        title: registryEntry.name,
-        size: registryEntry.defaultSize,
-        position: item.position,
-        isVisible: true,
-        refreshInterval: 300,
-        customSettings: {
-          ...registryEntry.defaultConfig.customSettings || {},
-          widgetRegistryId: item.widgetId, // Store the actual widget ID for component rendering
-        },
-      } as WidgetConfig;
-    })
-    .filter(Boolean) as WidgetConfig[];
-
-  return {
-    id: "default",
-    userId: "current-user",
-    name: "Layout Predefinito",
-    isDefault: true,
-    widgets: defaultWidgets,
-    layoutSettings: {
-      columns: 12,
-      rowHeight: 150,
-      margin: [16, 16],
-      containerPadding: [16, 16],
-      breakpoints: {
-        lg: 1200,
-        md: 996,
-        sm: 768,
-        xs: 480,
-      },
-    },
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-};
+// Default layout creation logic moved to WidgetRegistry.getDefaultLayout()
 
 /**
  * Widget Position Utilities
@@ -190,29 +148,33 @@ const positionUtils = {
   /**
    * Reorganize widgets to avoid overlaps after moving one widget
    */
-  reorganizeWidgets(widgets: WidgetConfig[], movedWidgetId: string, newPosition: WidgetPosition): WidgetConfig[] {
+  reorganizeWidgets(
+    widgets: WidgetConfig[],
+    movedWidgetId: string,
+    newPosition: WidgetPosition
+  ): WidgetConfig[] {
     const result = [...widgets];
-    const movedWidget = result.find(w => w.id === movedWidgetId);
-    
+    const movedWidget = result.find((w) => w.id === movedWidgetId);
+
     if (!movedWidget) return result;
-    
+
     // Update the moved widget position
     movedWidget.position = { ...newPosition };
-    
+
     // Find widgets that collide with the moved widget
-    const collidingWidgets = result.filter(w => 
-      w.id !== movedWidgetId && this.hasCollision(newPosition, [w])
+    const collidingWidgets = result.filter(
+      (w) => w.id !== movedWidgetId && this.hasCollision(newPosition, [w])
     );
-    
+
     // For each colliding widget, find a new position
     for (const collidingWidget of collidingWidgets) {
       const newPos = this.findNextPosition(
-        result.filter(w => w.id !== collidingWidget.id), // Exclude the widget we're moving
+        result.filter((w) => w.id !== collidingWidget.id), // Exclude the widget we're moving
         collidingWidget.size
       );
       collidingWidget.position = newPos;
     }
-    
+
     // After moving colliding widgets, check for any new collisions created
     // and resolve them recursively (but limit recursion to prevent infinite loops)
     return this.resolveAllCollisions(result, 3);
@@ -221,41 +183,47 @@ const positionUtils = {
   /**
    * Resolve all collisions in the layout
    */
-  resolveAllCollisions(widgets: WidgetConfig[], maxIterations: number = 3): WidgetConfig[] {
-    let result = [...widgets];
+  resolveAllCollisions(
+    widgets: WidgetConfig[],
+    maxIterations: number = 3
+  ): WidgetConfig[] {
+    const result = [...widgets];
     let iteration = 0;
-    
+
     while (iteration < maxIterations) {
       let hasCollisions = false;
-      
+
       // Find all collision pairs
       for (let i = 0; i < result.length; i++) {
         for (let j = i + 1; j < result.length; j++) {
           const widgetA = result[i];
           const widgetB = result[j];
-          
+
           if (this.hasCollision(widgetA.position, [widgetB])) {
             hasCollisions = true;
-            
+
             // Move the widget that's lower (higher Y) or rightmost if same Y
-            const toMove = widgetA.position.y > widgetB.position.y || 
-                          (widgetA.position.y === widgetB.position.y && widgetA.position.x > widgetB.position.x) 
-                          ? widgetA : widgetB;
-            
+            const toMove =
+              widgetA.position.y > widgetB.position.y ||
+              (widgetA.position.y === widgetB.position.y &&
+                widgetA.position.x > widgetB.position.x)
+                ? widgetA
+                : widgetB;
+
             // Find new position for the widget to move
             const newPos = this.findNextPosition(
-              result.filter(w => w.id !== toMove.id),
+              result.filter((w) => w.id !== toMove.id),
               toMove.size
             );
             toMove.position = newPos;
           }
         }
       }
-      
+
       if (!hasCollisions) break;
       iteration++;
     }
-    
+
     return result;
   },
 };
@@ -290,22 +258,18 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
   // Save layout mutation
   const saveLayoutMutation = useMutation({
     mutationFn: (layout: DashboardLayout) => {
-      console.log("🔄 Saving layout:", { id: layout.id, widgetCount: layout.widgets.length });
-      
       // If we have a real MongoDB _id (not "default"), update existing layout
       if (layout.id && layout.id !== "default" && layout.id.length === 24) {
-        console.log("📝 Updating existing layout with ID:", layout.id);
         return dashboardLayoutService.updateLayout(layout.id, layout);
       } else {
         // Create new default layout (will be marked as default)
         const layoutToCreate = {
           ...layout,
           isDefault: true, // Ensure it's marked as default
-          name: layout.name || "Dashboard Personalizzata"
+          name: layout.name || "Dashboard Personalizzata",
         };
         // Remove the "default" id as it's not a real MongoDB id
-        const { id, ...layoutData } = layoutToCreate;
-        console.log("✨ Creating new default layout:", { widgetCount: layoutData.widgets.length });
+        const { id: _id, ...layoutData } = layoutToCreate;
         return dashboardLayoutService.createLayout(layoutData);
       }
     },
@@ -338,7 +302,11 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
 
   // Widget management functions
   const addWidget = useCallback(
-    (widgetType: string, selectedSize?: string, customPosition?: Partial<WidgetPosition>) => {
+    (
+      widgetType: string,
+      selectedSize?: string,
+      customPosition?: Partial<WidgetPosition>
+    ) => {
       const registryEntry = WidgetRegistry.getById(widgetType);
       if (!registryEntry) {
         showError(
@@ -349,17 +317,15 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
       }
 
       // Use selected size if provided and supported, otherwise use default
-      const widgetSize = selectedSize && registryEntry.supportedSizes.includes(selectedSize as any) 
-        ? selectedSize as WidgetConfig["size"]
-        : registryEntry.defaultSize;
-
+      const widgetSize =
+        selectedSize &&
+        registryEntry.supportedSizes.includes(selectedSize as WidgetSize)
+          ? (selectedSize as WidgetConfig["size"])
+          : registryEntry.defaultSize;
 
       const position = customPosition
         ? {
-            ...positionUtils.findNextPosition(
-              widgets,
-              widgetSize
-            ),
+            ...positionUtils.findNextPosition(widgets, widgetSize),
             ...customPosition,
           }
         : positionUtils.findNextPosition(widgets, widgetSize);
@@ -373,11 +339,10 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         isVisible: true,
         refreshInterval: registryEntry.defaultConfig.refreshInterval || 300,
         customSettings: {
-          ...registryEntry.defaultConfig.customSettings || {},
+          ...(registryEntry.defaultConfig.customSettings || {}),
           widgetRegistryId: widgetType, // Store the actual widget ID for component rendering
         },
       };
-
 
       setWidgets((prev) => [...prev, newWidget]);
       setHasChanges(true);
@@ -420,7 +385,11 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
   const moveWidget = useCallback(
     (widgetId: string, position: WidgetPosition) => {
       // Use reorganization logic to avoid overlaps
-      const reorganizedWidgets = positionUtils.reorganizeWidgets(widgets, widgetId, position);
+      const reorganizedWidgets = positionUtils.reorganizeWidgets(
+        widgets,
+        widgetId,
+        position
+      );
       setWidgets(reorganizedWidgets);
       setHasChanges(true);
     },
@@ -434,39 +403,38 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
 
   const saveLayout = useCallback(async () => {
     if (!hasChanges) {
-      console.log("⚠️ No changes to save");
       return;
     }
 
-    console.log("💾 saveLayout called:", { hasLayout: !!layout, widgetCount: widgets.length });
-
     // Create layout object to save
-    const layoutToSave: DashboardLayout = layout ? {
-      ...layout,
-      widgets,
-      updatedAt: new Date(),
-    } : {
-      // Create new default layout if no existing layout
-      id: "default",
-      userId: "current-user", // Will be set by API
-      name: "Dashboard Personalizzata",
-      isDefault: true,
-      widgets,
-      layoutSettings: {
-        columns: 12,
-        rowHeight: 150,
-        margin: [16, 16],
-        containerPadding: [16, 16],
-        breakpoints: {
-          lg: 1200,
-          md: 996,
-          sm: 768,
-          xs: 480,
-        },
-      },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const layoutToSave: DashboardLayout = layout
+      ? {
+          ...layout,
+          widgets,
+          updatedAt: new Date(),
+        }
+      : {
+          // Create new default layout if no existing layout
+          id: "default",
+          userId: "current-user", // Will be set by API
+          name: "Dashboard Personalizzata",
+          isDefault: true,
+          widgets,
+          layoutSettings: {
+            columns: 12,
+            rowHeight: 150,
+            margin: [16, 16],
+            containerPadding: [16, 16],
+            breakpoints: {
+              lg: 1200,
+              md: 996,
+              sm: 768,
+              xs: 480,
+            },
+          },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
 
     await saveLayoutMutation.mutateAsync(layoutToSave);
   }, [layout, widgets, hasChanges, saveLayoutMutation]);

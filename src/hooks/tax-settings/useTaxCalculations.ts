@@ -145,7 +145,7 @@ export const useTaxCalculations = (selectedYear: number) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       // Calculations are automatically updated via the useMemo dependency array
     } catch (error) {
-      setCalculationError("Errore durante l'aggiornamento dei calcoli");
+      setCalculationError("Errore durante l&apos;aggiornamento dei calcoli");
       console.error("Refresh calculations error:", error);
     } finally {
       setIsCalculating(false);

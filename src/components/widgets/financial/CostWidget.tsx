@@ -209,7 +209,7 @@ export const CostWidget: React.FC<CostWidgetProps> = ({
     const widgetData = {
         id: config.id,
         data: costData,
-        lastUpdated,
+        lastUpdated: lastUpdated || new Date(),
         isLoading,
         error: error || undefined
     };

@@ -134,9 +134,9 @@ class InvoiceService {
    * Update an existing invoice
    * Uses PUT /api/invoices/{id} endpoint
    */
-  async updateInvoice(id: string, data: UpdateInvoiceData): Promise<Invoice> {
+  async updateInvoice(_id: string, data: UpdateInvoiceData): Promise<Invoice> {
     try {
-      const invoice = await api.put<Invoice>(`/invoices/${id}`, data);
+      const invoice = await api.put<Invoice>(`/invoices/${_id}`, data);
       return invoice;
     } catch (error) {
       console.error("Error updating invoice:", error);

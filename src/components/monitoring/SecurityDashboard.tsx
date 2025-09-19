@@ -289,7 +289,7 @@ export const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
             }
 
             const result = await response.json();
-            
+
             if (result.success) {
                 setAuditReport(result.data);
             } else {

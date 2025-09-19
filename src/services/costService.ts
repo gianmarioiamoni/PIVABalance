@@ -1,4 +1,4 @@
-import { api } from './api';
+import { api } from "./api";
 
 /**
  * Cost interface for API responses
@@ -35,10 +35,10 @@ export interface UpdateCostData {
 
 /**
  * Enhanced Cost Service for Next.js API Routes
- * 
+ *
  * Replaces the old Express backend cost management with Next.js API Routes.
  * Uses JWT authentication and follows the new ApiResponse format.
- * 
+ *
  * Features:
  * - TypeScript strict typing (zero 'any')
  * - JWT authentication integration
@@ -56,7 +56,7 @@ class CostService {
       const costs = await api.get<Cost[]>(`/costs?year=${year}`);
       return costs;
     } catch (error) {
-      console.error('Error fetching costs:', error);
+      console.error("Error fetching costs:", error);
       throw error;
     }
   }
@@ -67,10 +67,10 @@ class CostService {
    */
   async getAllCosts(): Promise<Cost[]> {
     try {
-      const costs = await api.get<Cost[]>('/costs');
+      const costs = await api.get<Cost[]>("/costs");
       return costs;
     } catch (error) {
-      console.error('Error fetching all costs:', error);
+      console.error("Error fetching all costs:", error);
       throw error;
     }
   }
@@ -84,7 +84,7 @@ class CostService {
       const cost = await api.get<Cost>(`/costs/${id}`);
       return cost;
     } catch (error) {
-      console.error('Error fetching cost:', error);
+      console.error("Error fetching cost:", error);
       throw error;
     }
   }
@@ -95,13 +95,13 @@ class CostService {
    */
   async createCost(data: CreateCostData): Promise<Cost> {
     try {
-      const cost = await api.post<Cost>('/costs', {
+      const cost = await api.post<Cost>("/costs", {
         ...data,
         deductible: data.deductible ?? true, // Default to deductible
       });
       return cost;
     } catch (error) {
-      console.error('Error creating cost:', error);
+      console.error("Error creating cost:", error);
       throw error;
     }
   }
@@ -110,12 +110,12 @@ class CostService {
    * Update an existing cost
    * Uses PUT /api/costs/{id} endpoint
    */
-  async updateCost(id: string, data: UpdateCostData): Promise<Cost> {
+  async updateCost(_id: string, data: UpdateCostData): Promise<Cost> {
     try {
-      const cost = await api.put<Cost>(`/costs/${id}`, data);
+      const cost = await api.put<Cost>(`/costs/${_id}`, data);
       return cost;
     } catch (error) {
-      console.error('Error updating cost:', error);
+      console.error("Error updating cost:", error);
       throw error;
     }
   }
@@ -128,7 +128,7 @@ class CostService {
     try {
       await api.delete(`/costs/${id}`);
     } catch (error) {
-      console.error('Error deleting cost:', error);
+      console.error("Error deleting cost:", error);
       throw error;
     }
   }
@@ -139,7 +139,7 @@ class CostService {
    */
   calculateYearTotal(costs: Cost[], year: number): number {
     return costs
-      .filter(cost => new Date(cost.date).getFullYear() === year)
+      .filter((cost) => new Date(cost.date).getFullYear() === year)
       .reduce((total, cost) => total + cost.amount, 0);
   }
 
@@ -149,9 +149,8 @@ class CostService {
    */
   calculateDeductibleTotal(costs: Cost[], year: number): number {
     return costs
-      .filter(cost => 
-        cost.deductible && 
-        new Date(cost.date).getFullYear() === year
+      .filter(
+        (cost) => cost.deductible && new Date(cost.date).getFullYear() === year
       )
       .reduce((total, cost) => total + cost.amount, 0);
   }
@@ -160,15 +159,11 @@ class CostService {
    * Filter costs by date range
    * Client-side filtering helper
    */
-  filterByDateRange(
-    costs: Cost[], 
-    startDate: string, 
-    endDate: string
-  ): Cost[] {
+  filterByDateRange(costs: Cost[], startDate: string, endDate: string): Cost[] {
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
-    return costs.filter(cost => {
+
+    return costs.filter((cost) => {
       const costDate = new Date(cost.date);
       return costDate >= start && costDate <= end;
     });
@@ -180,7 +175,7 @@ class CostService {
    */
   groupByMonth(costs: Cost[], year: number): Record<string, Cost[]> {
     const yearCosts = costs.filter(
-      cost => new Date(cost.date).getFullYear() === year
+      (cost) => new Date(cost.date).getFullYear() === year
     );
 
     return yearCosts.reduce((groups, cost) => {
@@ -200,37 +195,37 @@ class CostService {
   validateCostData(data: CreateCostData | UpdateCostData): string[] {
     const errors: string[] = [];
 
-    if ('description' in data) {
+    if ("description" in data) {
       if (!data.description || data.description.trim().length === 0) {
-        errors.push('Descrizione richiesta');
+        errors.push("Descrizione richiesta");
       }
       if (data.description && data.description.length > 200) {
-        errors.push('Descrizione troppo lunga (max 200 caratteri)');
+        errors.push("Descrizione troppo lunga (max 200 caratteri)");
       }
     }
 
-    if ('amount' in data) {
+    if ("amount" in data) {
       if (data.amount === undefined || data.amount <= 0) {
-        errors.push('Importo deve essere maggiore di zero');
+        errors.push("Importo deve essere maggiore di zero");
       }
       if (data.amount && data.amount > 999999.99) {
-        errors.push('Importo troppo elevato');
+        errors.push("Importo troppo elevato");
       }
     }
 
-    if ('date' in data) {
+    if ("date" in data) {
       if (!data.date) {
-        errors.push('Data richiesta');
+        errors.push("Data richiesta");
       } else {
         const date = new Date(data.date);
         if (isNaN(date.getTime())) {
-          errors.push('Data non valida');
+          errors.push("Data non valida");
         }
         // Check if date is too far in the future
         const maxDate = new Date();
         maxDate.setFullYear(maxDate.getFullYear() + 1);
         if (date > maxDate) {
-          errors.push('Data non può essere superiore a un anno nel futuro');
+          errors.push("Data non può essere superiore a un anno nel futuro");
         }
       }
     }

@@ -223,7 +223,7 @@ export async function ensureSuperAdmin(): Promise<void> {
       existingUser.role = "super_admin";
       existingUser.isActive = true;
       await existingUser.save();
-      console.log("Upgraded existing user to super admin:", superAdminEmail);
+      // Debug: Upgraded existing user to super admin
     } else {
       // Create new super admin
       const superAdmin = new User({
@@ -235,7 +235,7 @@ export async function ensureSuperAdmin(): Promise<void> {
       });
 
       await superAdmin.save();
-      console.log("Created super admin user:", superAdminEmail);
+      // Debug: Created super admin user
     }
   } catch (error) {
     console.error("Error ensuring super admin:", error);

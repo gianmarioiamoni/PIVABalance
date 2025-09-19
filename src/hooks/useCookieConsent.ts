@@ -188,7 +188,7 @@ export const useCookieConsent = () => {
   /**
    * Hide banner without saving consent
    */
-  const hideBanner = () => {
+  const _hideBanner = () => {
     setState((prev) => ({
       ...prev,
       showBanner: false,
@@ -209,7 +209,7 @@ export const useCookieConsent = () => {
       hasConsent: false,
       showBanner: true,
       preferences: DEFAULT_PREFERENCES,
-      consentDate: null,
+      consentDate: undefined,
     });
   };
 
@@ -380,7 +380,7 @@ export const useCookieConsent = () => {
     acceptNecessaryOnly,
     savePreferences,
     reopenBanner,
-    hideBanner,
+    hideBanner: _hideBanner,
     clearConsent,
 
     // Utilities

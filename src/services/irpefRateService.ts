@@ -49,7 +49,6 @@ class IrpefRateService {
 
     for (let i = 0; i < sortedRates.length; i++) {
       const rate = sortedRates[i];
-      const _nextRate = sortedRates[i + 1];
       const upperLimit = rate.upperBound ?? Infinity;
       const bracketSize = Math.min(
         upperLimit - rate.lowerBound,

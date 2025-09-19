@@ -102,7 +102,6 @@ const useHeatmapGrid = (data: HeatmapDataPoint[], cellSize: string = 'medium') =
 
         data.forEach(point => {
             const date = new Date(point.date);
-            const _month = date.getMonth();
             const day = date.getDate();
             const monthKey = date.toLocaleDateString('it-IT', { month: 'short' });
 

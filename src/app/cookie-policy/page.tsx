@@ -2,12 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { 
-  ShieldCheckIcon, 
-  ChartBarIcon, 
-  MegaphoneIcon, 
+import {
+  ShieldCheckIcon,
+  ChartBarIcon,
+  MegaphoneIcon,
   WrenchScrewdriverIcon,
-  ArrowLeftIcon 
+  ArrowLeftIcon
 } from '@heroicons/react/24/outline';
 
 /**
@@ -25,7 +25,7 @@ export default function CookiePolicyPage() {
             <h1 className="text-3xl font-bold text-gray-900">
               Cookie Policy
             </h1>
-            <Link 
+            <Link
               href="/"
               className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
             >
@@ -37,10 +37,10 @@ export default function CookiePolicyPage() {
             Informazioni sui cookie utilizzati da PIVABalance e su come gestire le tue preferenze
           </p>
           <div className="mt-4 text-sm text-gray-500">
-            <p><strong>Ultimo aggiornamento:</strong> {new Date().toLocaleDateString('it-IT', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            <p><strong>Ultimo aggiornamento:</strong> {new Date().toLocaleDateString('it-IT', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
             })}</p>
             <p><strong>Versione:</strong> 1.0</p>
           </div>
@@ -53,14 +53,14 @@ export default function CookiePolicyPage() {
           </h2>
           <div className="prose text-gray-700 space-y-4">
             <p>
-              I cookie sono piccoli file di testo che vengono memorizzati sul tuo dispositivo 
-              (computer, tablet, smartphone) quando visiti un sito web. I cookie ci permettono 
-              di riconoscerti e ricordare le tue preferenze per migliorare la tua esperienza 
+              I cookie sono piccoli file di testo che vengono memorizzati sul tuo dispositivo
+              (computer, tablet, smartphone) quando visiti un sito web. I cookie ci permettono
+              di riconoscerti e ricordare le tue preferenze per migliorare la tua esperienza
               di navigazione.
             </p>
             <p>
-              I cookie possono essere <strong>"di prima parte"</strong> (impostati direttamente 
-              da PIVABalance) o <strong>"di terze parti"</strong> (impostati da altri servizi 
+              I cookie possono essere <strong>&quot;di prima parte&quot;</strong> (impostati direttamente
+              da PIVABalance) o <strong>&quot;di terze parti&quot;</strong> (impostati da altri servizi
               che utilizziamo sul nostro sito).
             </p>
           </div>
@@ -71,7 +71,7 @@ export default function CookiePolicyPage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">
             Tipi di cookie che utilizziamo
           </h2>
-          
+
           <div className="space-y-6">
             {/* Necessary cookies */}
             <div className="border-l-4 border-green-400 bg-green-50 p-4 rounded-r-lg">
@@ -82,7 +82,7 @@ export default function CookiePolicyPage() {
                     Cookie Necessari (Sempre Attivi)
                   </h3>
                   <p className="text-green-800 mb-3">
-                    Questi cookie sono essenziali per il funzionamento del sito web e 
+                    Questi cookie sono essenziali per il funzionamento del sito web e
                     non possono essere disabilitati nei nostri sistemi.
                   </p>
                   <div className="text-sm text-green-700">
@@ -109,7 +109,7 @@ export default function CookiePolicyPage() {
                     Cookie Funzionali
                   </h3>
                   <p className="text-blue-800 mb-3">
-                    Questi cookie permettono al sito di fornire funzionalità avanzate 
+                    Questi cookie permettono al sito di fornire funzionalità avanzate
                     e personalizzazioni basate sulle tue scelte.
                   </p>
                   <div className="text-sm text-blue-700">
@@ -136,7 +136,7 @@ export default function CookiePolicyPage() {
                     Cookie Analitici
                   </h3>
                   <p className="text-purple-800 mb-3">
-                    Questi cookie ci aiutano a capire come i visitatori interagiscono 
+                    Questi cookie ci aiutano a capire come i visitatori interagiscono
                     con il sito web raccogliendo e riportando informazioni in forma anonima.
                   </p>
                   <div className="text-sm text-purple-700">
@@ -164,8 +164,8 @@ export default function CookiePolicyPage() {
                     Cookie di Marketing
                   </h3>
                   <p className="text-orange-800 mb-3">
-                    Questi cookie sono utilizzati per personalizzare la pubblicità 
-                    e tracciare l'efficacia delle nostre campagne marketing.
+                    Questi cookie sono utilizzati per personalizzare la pubblicità
+                    e tracciare l&apos;efficacia delle nostre campagne marketing.
                   </p>
                   <div className="text-sm text-orange-700">
                     <p className="font-medium mb-2">Finalità:</p>
@@ -203,7 +203,7 @@ export default function CookiePolicyPage() {
                   Vai alle impostazioni account → Privacy e Cookie
                 </Link>
               </li>
-              <li>Clicca su "Mostra Banner" per modificare le tue preferenze</li>
+              <li>Clicca su &quot;Mostra Banner&quot; per modificare le tue preferenze</li>
               <li>Seleziona le categorie di cookie che desideri accettare</li>
             </ul>
 
@@ -222,8 +222,8 @@ export default function CookiePolicyPage() {
 
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
               <p className="text-yellow-800">
-                <strong>Nota:</strong> Disabilitare i cookie necessari potrebbe compromettere 
-                il funzionamento del sito e limitare l'accesso ad alcune funzionalità.
+                <strong>Nota:</strong> Disabilitare i cookie necessari potrebbe compromettere
+                il funzionamento del sito e limitare l&apos;accesso ad alcune funzionalità.
               </p>
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function CookiePolicyPage() {
               <li><strong>GDPR</strong> - Regolamento (UE) 2016/679 del Parlamento europeo</li>
               <li><strong>Codice Privacy</strong> - D.Lgs. 196/2003 e successive modifiche</li>
               <li><strong>Direttiva ePrivacy</strong> - Direttiva 2002/58/CE</li>
-              <li><strong>Provvedimento Garante</strong> - "Individuazione delle modalità semplificate per l'informativa e l'acquisizione del consenso per l'uso dei cookie"</li>
+              <li><strong>Provvedimento Garante</strong> - &quot;Individuazione delle modalità semplificate per l&apos;informativa e l&apos;acquisizione del consenso per l&apos;uso dei cookie&quot;</li>
             </ul>
 
             <h3 className="text-lg font-semibold text-gray-900 mt-6">
@@ -251,8 +251,8 @@ export default function CookiePolicyPage() {
             <div className="bg-gray-50 p-4 rounded-lg">
               <p><strong>PIVABalance</strong></p>
               <p>Email: privacy@pivabalance.com</p>
-              <p>Per esercitare i tuoi diritti relativi al trattamento dei dati personali, 
-                 consulta la nostra <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-800 underline">Informativa sulla Privacy</Link>.
+              <p>Per esercitare i tuoi diritti relativi al trattamento dei dati personali,
+                consulta la nostra <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-800 underline">Informativa sulla Privacy</Link>.
               </p>
             </div>
 
@@ -263,7 +263,7 @@ export default function CookiePolicyPage() {
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>Accedere ai tuoi dati personali</li>
               <li>Rettificare dati inesatti</li>
-              <li>Cancellare i tuoi dati (diritto all'oblio)</li>
+              <li>Cancellare i tuoi dati (diritto all&apos;oblio)</li>
               <li>Limitare il trattamento</li>
               <li>Portabilità dei dati</li>
               <li>Opporti al trattamento</li>
@@ -279,7 +279,7 @@ export default function CookiePolicyPage() {
           </h2>
           <div className="prose text-gray-700 space-y-4">
             <p>
-              Per qualsiasi domanda relativa a questa Cookie Policy o per esercitare 
+              Per qualsiasi domanda relativa a questa Cookie Policy o per esercitare
               i tuoi diritti, puoi contattarci:
             </p>
             <div className="bg-gray-50 p-4 rounded-lg">
@@ -287,9 +287,9 @@ export default function CookiePolicyPage() {
               <p><strong>Supporto:</strong> support@pivabalance.com</p>
             </div>
             <p>
-              Ci riserviamo il diritto di modificare questa Cookie Policy in qualsiasi momento. 
-              Le modifiche saranno pubblicate su questa pagina con l'indicazione della data 
-              di ultimo aggiornamento. Ti invitiamo a consultare periodicamente questa pagina 
+              Ci riserviamo il diritto di modificare questa Cookie Policy in qualsiasi momento.
+              Le modifiche saranno pubblicate su questa pagina con l&apos;indicazione della data
+              di ultimo aggiornamento. Ti invitiamo a consultare periodicamente questa pagina
               per essere sempre informato su come utilizziamo i cookie.
             </p>
           </div>
@@ -297,11 +297,11 @@ export default function CookiePolicyPage() {
 
         {/* Back to top */}
         <div className="text-center mt-8">
-          <button 
+          <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            Torna all'inizio
+            Torna all&apos;inizio
           </button>
         </div>
       </div>

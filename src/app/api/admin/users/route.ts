@@ -28,13 +28,16 @@ export async function GET(
       return NextResponse.json(
         {
           success: false,
-          message: authResult.error,
+          message:
+            typeof authResult.error === "string"
+              ? authResult.error
+              : "Authentication failed",
         },
-        { status: authResult.status }
+        { status: 401 }
       );
     }
 
-    const { user: currentUser } = authResult;
+    // Authentication successful
 
     // Parse query parameters for pagination and filtering
     const url = new URL(request.url);
@@ -45,7 +48,7 @@ export async function GET(
     const active = url.searchParams.get("active");
 
     // Build query filters
-    const query: any = {};
+    const query: Record<string, unknown> = {};
 
     if (search) {
       query.$or = [

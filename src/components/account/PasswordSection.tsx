@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { api } from '@/services/api';
-import { 
-  KeyIcon, 
-  EyeIcon, 
+import {
+  KeyIcon,
+  EyeIcon,
   EyeSlashIcon,
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
@@ -25,12 +25,12 @@ export const PasswordSection: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   // Form state
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+
   // Visibility toggles
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -46,7 +46,7 @@ export const PasswordSection: React.FC = () => {
   };
 
   const isPasswordValid = Object.values(passwordValidation).every(Boolean);
-  const isGoogleUser = user?.googleId && !user?.password;
+  const isGoogleUser = !!user?.googleId;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +62,7 @@ export const PasswordSection: React.FC = () => {
       });
 
       setSuccess('Password cambiata con successo!');
-      
+
       // Clear form
       setCurrentPassword('');
       setNewPassword('');
@@ -71,26 +71,13 @@ export const PasswordSection: React.FC = () => {
       // Clear success message after 5 seconds
       setTimeout(() => setSuccess(''), 5000);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Password change error:', err);
-      
+
       // Handle different types of errors with user-friendly messages
       let errorMessage = 'Errore durante il cambio password';
-      
-      if (err?.data?.details) {
-        // Handle validation errors from Zod
-        const details = err.data.details;
-        if (details.currentPassword) {
-          errorMessage = 'Password attuale non corretta';
-        } else if (details.newPassword) {
-          errorMessage = details.newPassword[0] || 'Nuova password non valida';
-        } else if (details.confirmPassword) {
-          errorMessage = 'Le password non corrispondono';
-        }
-      } else if (err?.data?.error) {
-        // Handle API error messages
-        errorMessage = err.data.error;
-      } else if (err?.message) {
+
+      if (err instanceof Error) {
         // Handle other error messages
         if (err.message.includes('400')) {
           errorMessage = 'Dati non validi. Controlla i requisiti della password.';
@@ -101,8 +88,25 @@ export const PasswordSection: React.FC = () => {
         } else {
           errorMessage = err.message;
         }
+      } else if (typeof err === 'object' && err !== null) {
+        // Handle API error objects
+        const errorObj = err as { data?: { details?: Record<string, string[]>; error?: string } };
+        if (errorObj.data?.details) {
+          // Handle validation errors from Zod
+          const details = errorObj.data.details;
+          if (details.currentPassword) {
+            errorMessage = 'Password attuale non corretta';
+          } else if (details.newPassword) {
+            errorMessage = details.newPassword[0] || 'Nuova password non valida';
+          } else if (details.confirmPassword) {
+            errorMessage = 'Le password non corrispondono';
+          }
+        } else if (errorObj.data?.error) {
+          // Handle API error messages
+          errorMessage = errorObj.data.error;
+        }
       }
-      
+
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -134,7 +138,7 @@ export const PasswordSection: React.FC = () => {
               Account Google Sicuro
             </h4>
             <p className="text-gray-600 mb-4">
-              Il tuo account è protetto dall'autenticazione Google. 
+              Il tuo account è protetto dall&apos;autenticazione Google.
               Non è necessario impostare una password separata.
             </p>
             <p className="text-sm text-gray-500">
@@ -227,7 +231,7 @@ export const PasswordSection: React.FC = () => {
                 )}
               </button>
             </div>
-            
+
             {/* Password Requirements */}
             {newPassword && (
               <div className="mt-2 space-y-1">
@@ -286,7 +290,7 @@ export const PasswordSection: React.FC = () => {
                 )}
               </button>
             </div>
-            
+
             {/* Password Match Indicator */}
             {confirmPassword && (
               <div className="mt-2">

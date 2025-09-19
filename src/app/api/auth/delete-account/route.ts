@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getUserFromRequest } from '@/lib/auth/jwt';
-import { connectDB } from '@/lib/database/mongodb';
-import { User } from '@/models/User';
-import { UserSettings } from '@/models/UserSettings';
-import { Invoice } from '@/models/Invoice';
-import { Cost } from '@/models/Cost';
-import { comparePassword } from '@/utils/userCalculations';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getUserFromRequest } from "@/lib/auth/jwt";
+import { connectDB } from "@/lib/database/mongodb";
+import { User } from "@/models/User";
+import { UserSettings } from "@/models/UserSettings";
+import { Invoice } from "@/models/Invoice";
+import { Cost } from "@/models/Cost";
+import { comparePassword } from "@/utils/userCalculations";
+import { z } from "zod";
 
 /**
  * Delete Account API Route
- * 
+ *
  * Handles secure account deletion with data cleanup.
  * Follows security best practices:
  * - Password verification required
@@ -20,11 +20,11 @@ import { z } from 'zod';
  */
 
 const deleteAccountSchema = z.object({
-  password: z.string().min(1, 'Password is required for account deletion'),
+  password: z.string().min(1, "Password is required for account deletion"),
   confirmationText: z
     .string()
     .refine(
-      (text) => text === 'ELIMINA IL MIO ACCOUNT',
+      (text) => text === "ELIMINA IL MIO ACCOUNT",
       'You must type "ELIMINA IL MIO ACCOUNT" to confirm deletion'
     ),
 });
@@ -35,7 +35,7 @@ export async function DELETE(request: NextRequest) {
     const userData = await getUserFromRequest(request);
     if (!userData) {
       return NextResponse.json(
-        { error: 'Authentication required' },
+        { error: "Authentication required" },
         { status: 401 }
       );
     }
@@ -43,12 +43,12 @@ export async function DELETE(request: NextRequest) {
     // Parse and validate request body
     const body = await request.json();
     const validationResult = deleteAccountSchema.safeParse(body);
-    
+
     if (!validationResult.success) {
       return NextResponse.json(
-        { 
-          error: 'Validation failed',
-          details: validationResult.error.flatten().fieldErrors
+        {
+          error: "Validation failed",
+          details: validationResult.error.flatten().fieldErrors,
         },
         { status: 400 }
       );
@@ -62,10 +62,7 @@ export async function DELETE(request: NextRequest) {
     // Find user
     const user = await User.findById(userData.userId);
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Verify password (skip for Google auth users)
@@ -73,7 +70,7 @@ export async function DELETE(request: NextRequest) {
       const isPasswordValid = await comparePassword(password, user.password);
       if (!isPasswordValid) {
         return NextResponse.json(
-          { error: 'Invalid password' },
+          { error: "Invalid password" },
           { status: 400 }
         );
       }
@@ -96,25 +93,27 @@ export async function DELETE(request: NextRequest) {
       ]);
 
       return NextResponse.json(
-        { 
-          message: 'Account and all associated data have been permanently deleted',
-          deletedAt: new Date().toISOString()
+        {
+          message:
+            "Account and all associated data have been permanently deleted",
+          deletedAt: new Date().toISOString(),
         },
         { status: 200 }
       );
-
     } catch (deleteError) {
-      console.error('Error during account deletion:', deleteError);
+      console.error("Error during account deletion:", deleteError);
       return NextResponse.json(
-        { error: 'Failed to delete account data. Please try again or contact support.' },
+        {
+          error:
+            "Failed to delete account data. Please try again or contact support.",
+        },
         { status: 500 }
       );
     }
-
   } catch (error) {
-    console.error('Delete account error:', error);
+    console.error("Delete account error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

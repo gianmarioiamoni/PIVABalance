@@ -34,7 +34,8 @@
     "setup:stripe": "node scripts/setup-stripe.js",
     "vercel:check": "node scripts/vercel-deploy-check.js",
     "db:verify": "node scripts/verify-db-connection.js",
-    "stripe:test": "node scripts/test-stripe-config.js"
+    "stripe:test": "node scripts/test-stripe-config.js",
+    "admin:init": "node scripts/init-super-admin.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

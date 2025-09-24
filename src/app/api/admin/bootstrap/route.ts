@@ -11,7 +11,7 @@ import { ApiResponse } from "@/types";
  */
 
 export async function POST(
-  request: NextRequest
+  _request: NextRequest
 ): Promise<NextResponse<ApiResponse<{ message: string }>>> {
   try {
     // Only allow in development or if explicitly enabled

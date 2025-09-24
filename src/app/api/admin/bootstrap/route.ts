@@ -5,7 +5,7 @@ import { ApiResponse } from "@/types";
 
 /**
  * Bootstrap API - Emergency Super Admin Promotion
- * 
+ *
  * This is a temporary endpoint to fix super admin role issues.
  * Should be removed after initial setup is complete.
  */
@@ -15,7 +15,7 @@ export async function POST(
 ): Promise<NextResponse<ApiResponse<{ message: string }>>> {
   try {
     // Only allow in development or if explicitly enabled
-    const allowBootstrap = 
+    const allowBootstrap =
       process.env.NODE_ENV === "development" ||
       process.env.ALLOW_INIT_API === "true" ||
       process.env.ALLOW_BOOTSTRAP === "true";
@@ -32,7 +32,7 @@ export async function POST(
 
     // Get the super admin email from environment
     const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
-    
+
     if (!superAdminEmail) {
       return NextResponse.json(
         {
@@ -48,7 +48,7 @@ export async function POST(
 
     // Find the user by email
     const user = await User.findOne({ email: superAdminEmail });
-    
+
     if (!user) {
       return NextResponse.json(
         {
@@ -76,7 +76,6 @@ export async function POST(
       },
       { status: 200 }
     );
-
   } catch (error) {
     console.error("Bootstrap error:", error);
     return NextResponse.json(

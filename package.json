@@ -33,7 +33,8 @@
     "production:deploy": "npm run test:ci && npm run build:production && npm run production:check",
     "setup:stripe": "node scripts/setup-stripe.js",
     "vercel:check": "node scripts/vercel-deploy-check.js",
-    "db:verify": "node scripts/verify-db-connection.js"
+    "db:verify": "node scripts/verify-db-connection.js",
+    "stripe:test": "node scripts/test-stripe-config.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

@@ -41,7 +41,7 @@ ALLOW_INIT_API=true
 # 🔑 STRIPE CONFIGURATION - SOSTITUISCI CON LE TUE CHIAVI
 STRIPE_SECRET_KEY=sk_test_51ABC...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51ABC...
-STRIPE_WEBHOOK_SECRET=whsec_123... (opzionale per ora)
+STRIPE_WEBHOOK_SECRET=whsec_123... (OBBLIGATORIO per produzione)
 
 # Rate Limiting
 RATE_LIMIT_WINDOW_MS=900000
@@ -112,6 +112,72 @@ Usa queste carte per testare:
 - Verifica di essere in modalità TEST su Stripe
 - Controlla la console per errori dettagliati
 
+## 🔗 **Configurazione Webhooks (IMPORTANTE per Produzione)**
+
+### **Step 1: Creare Webhook Endpoint in Stripe**
+
+1. **Vai su**: https://dashboard.stripe.com
+2. **Assicurati modalità Test** (per sviluppo)
+3. **Vai su**: Developers → Webhooks
+4. **Clicca**: "Add endpoint"
+
+### **Step 2: Configurare Endpoint URL**
+
+**Per sviluppo locale (usa ngrok):**
+
+```bash
+# Installa ngrok se non lo hai
+npm install -g ngrok
+
+# In un terminale separato, esponi il port 3000
+ngrok http 3000
+
+# Usa l'URL generato (es: https://abc123.ngrok.io)
+```
+
+**Endpoint URL**: `https://your-ngrok-url.ngrok.io/api/donations/webhook`
+
+**Per produzione Vercel:**
+**Endpoint URL**: `https://your-app.vercel.app/api/donations/webhook`
+
+### **Step 3: Selezionare Eventi**
+
+Seleziona questi eventi (OBBLIGATORI):
+
+```
+✅ payment_intent.succeeded
+✅ payment_intent.payment_failed
+✅ payment_intent.canceled
+```
+
+### **Step 4: Ottenere Webhook Secret**
+
+1. **Clicca** su "Add endpoint"
+2. **Clicca** sull'endpoint appena creato
+3. **Nella sezione "Signing secret"**, clicca **"Click to reveal"**
+4. **Copia** il secret che inizia con `whsec_...`
+
+### **Step 5: Aggiungere alle Variabili d'Ambiente**
+
+**Nel tuo .env.local:**
+
+```env
+STRIPE_WEBHOOK_SECRET=whsec_1234567890abcdef...
+```
+
+**Su Vercel Dashboard:**
+
+```
+STRIPE_WEBHOOK_SECRET = whsec_1234567890abcdef...
+```
+
+### **⚠️ IMPORTANTE - Sicurezza Webhooks**
+
+- ✅ **Webhook secret** verifica che le chiamate provengano da Stripe
+- ❌ **Senza secret** chiunque può simulare pagamenti falsi
+- 🔒 **Mai esporre** il webhook secret nel frontend
+- 🔄 **Rigenera** se compromesso
+
 ## 📊 **Monitoraggio**
 
 Dopo i test, vai su:
@@ -119,3 +185,4 @@ Dopo i test, vai su:
 - **Stripe Dashboard** → Payments
 - **Vedi le transazioni** di test
 - **Analytics** e **Logs** disponibili
+- **Webhooks** → Events (per verificare ricezione webhook)

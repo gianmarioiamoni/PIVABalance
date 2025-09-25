@@ -206,10 +206,6 @@ class ApiClient {
       // Handle authentication errors
       if (response.status === 401) {
         this.setAuthToken(null);
-        // Redirect to login if we're on the client side
-        if (typeof window !== "undefined") {
-          window.location.href = "/signin";
-        }
         throw new ApiError("Authentication required", 401);
       }
 

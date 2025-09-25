@@ -32,6 +32,10 @@ export function useAuth() {
         const result = await authService.checkAuth();
         return result;
       } catch (error) {
+        // Silently handle 401 errors (expected for non-authenticated users)
+        if (error instanceof Error && error.message.includes("Authentication required")) {
+          return null;
+        }
         console.error("Auth check error:", error);
         throw error;
       }

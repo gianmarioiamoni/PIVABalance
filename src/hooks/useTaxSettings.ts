@@ -28,12 +28,15 @@ export function useTaxSettings() {
     useState<ProfessionalFund | null>(null);
 
   // Use SWR for initial settings loading with optimized caching
+  // Only fetch if user has a token (to avoid 401 errors)
+  const hasToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  
   const {
     data: loadedSettings,
     error: loadError,
     isLoading: loading,
   } = useSWR<UserSettings>(
-    "user-settings",
+    hasToken ? "user-settings" : null, // Only fetch if authenticated
     () => settingsService.getUserSettings(),
     {
       revalidateOnFocus: false,

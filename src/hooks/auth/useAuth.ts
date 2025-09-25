@@ -15,16 +15,20 @@ export function useAuth() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [token, setToken, isLoaded] = useLocalStorage<string>("token");
+  
+  // Client-side check to prevent SSR issues
+  const isClient = typeof window !== "undefined";
 
-  // Query for user authentication status
+  // Query for user authentication status - only run if we have a token
   const {
     data: user,
     isLoading,
     refetch,
     error,
   } = useQuery<User | null>({
-    queryKey: ["auth"],
+    queryKey: ["auth", token], // Include token in key to invalidate when token changes
     queryFn: async () => {
+      // Double-check we have token (should never be null due to enabled condition)
       if (!token) {
         return null;
       }
@@ -40,7 +44,7 @@ export function useAuth() {
         throw error;
       }
     },
-    enabled: isLoaded && !!token, // Only run query when localStorage is loaded AND token exists
+    enabled: isClient && isLoaded && !!token && token.length > 0, // Only run on client side, when loaded AND token exists
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
@@ -151,10 +155,10 @@ export function useAuth() {
 
   return {
     // State
-    user,
-    isLoading: !isLoaded || isLoading,
-    isAuthenticated: !!user && !!token,
-    error,
+    user: isClient ? user : null, // No user data on server side
+    isLoading: !isClient || !isLoaded || isLoading, // Loading if not client-side or loading
+    isAuthenticated: isClient && !!user && !!token,
+    error: isClient ? error : null, // No errors on server side
 
     // Actions
     signIn,

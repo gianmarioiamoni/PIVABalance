@@ -13,6 +13,7 @@ import { settingsService } from "@/services/settingsService";
 import { invoiceService } from "@/services/invoiceService";
 import { costService } from "@/services/costService";
 import { TaxData } from "@/components/widgets/financial/TaxWidget";
+import { useAuthContext } from "@/providers/AuthProvider";
 
 /**
  * Tax Calculation Logic
@@ -247,11 +248,9 @@ const calculateSavingsOpportunity = (
  * SRP: Handles only tax data fetching and state management
  */
 export const useTaxData = () => {
+  const { isAuthenticated } = useAuthContext();
   const [taxData, setTaxData] = useState<TaxData | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-
-  // Only fetch if user has a token (to avoid 401 errors)
-  const hasToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   // Fetch all required data
   const {
@@ -264,7 +263,7 @@ export const useTaxData = () => {
     queryKey: ["settings"],
     queryFn: () => settingsService.getUserSettings(),
     staleTime: 10 * 60 * 1000, // 10 minutes
-    enabled: !!hasToken, // Only fetch if authenticated
+    enabled: isAuthenticated, // Only fetch if authenticated
   });
 
   const {
@@ -277,7 +276,7 @@ export const useTaxData = () => {
     queryKey: ["invoices", "tax-calculation"],
     queryFn: () => invoiceService.getAllInvoices(),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: !!hasToken, // Only fetch if authenticated
+    enabled: isAuthenticated, // Only fetch if authenticated
   });
 
   const {
@@ -290,7 +289,7 @@ export const useTaxData = () => {
     queryKey: ["costs", "tax-calculation"],
     queryFn: () => costService.getAllCosts(),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: !!hasToken, // Only fetch if authenticated
+    enabled: isAuthenticated, // Only fetch if authenticated
   });
 
   // Process tax data when all data is available

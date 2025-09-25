@@ -6,8 +6,11 @@ import {
   professionalFundService,
 } from "@/services/professionalFundService";
 import { ProfitabilityRate } from "@/components/tax-settings/shared/ProfitabilityRateTable";
+import { useAuthContext } from "@/providers/AuthProvider";
 
 export function useTaxSettings() {
+  const { isAuthenticated, user } = useAuthContext();
+  
   const [settings, setSettings] = useState<UserSettings>({
     taxRegime: "forfettario",
     substituteRate: 5,
@@ -28,15 +31,14 @@ export function useTaxSettings() {
     useState<ProfessionalFund | null>(null);
 
   // Use SWR for initial settings loading with optimized caching
-  // Only fetch if user has a token (to avoid 401 errors)
-  const hasToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  // Only fetch if user is authenticated (to avoid 401 errors)
   
   const {
     data: loadedSettings,
     error: loadError,
     isLoading: loading,
   } = useSWR<UserSettings>(
-    hasToken ? "user-settings" : null, // Only fetch if authenticated
+    isAuthenticated ? "user-settings" : null, // Only fetch if authenticated
     () => settingsService.getUserSettings(),
     {
       revalidateOnFocus: false,
@@ -51,9 +53,13 @@ export function useTaxSettings() {
       setSettings(loadedSettings);
       setOriginalSettings(loadedSettings);
     }
-  }, [loadedSettings, originalSettings]);
+    // If not authenticated, ensure we have default settings
+    if (!isAuthenticated && !originalSettings) {
+      setOriginalSettings(settings);
+    }
+  }, [loadedSettings, originalSettings, isAuthenticated, settings]);
 
-  const error = loadError ? "Errore nel caricamento delle impostazioni" : null;
+  const error = loadError && isAuthenticated ? "Errore nel caricamento delle impostazioni" : null;
 
   const hasChanges = () => {
     if (!originalSettings) return false;

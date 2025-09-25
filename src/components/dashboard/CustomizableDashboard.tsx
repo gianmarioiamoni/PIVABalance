@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Edit3, Save, RotateCcw, Plus, Layout } from 'lucide-react';
 // import { WidgetContainer } from '../widgets/base/WidgetContainer'; // Not directly used
 import { WidgetSkeleton } from '../widgets/base/WidgetSkeleton';
@@ -341,6 +341,31 @@ export const CustomizableDashboard: React.FC<CustomizableDashboardProps> = ({
     maxWidgets = 20
 }) => {
     const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);
+    const [footerHeight, setFooterHeight] = useState(160); // Default 160px (pb-40)
+
+    // Calculate footer height dynamically
+    useEffect(() => {
+        const calculateFooterHeight = () => {
+            const footer = document.querySelector('footer');
+            if (footer) {
+                const height = footer.offsetHeight;
+                // Add some extra margin (40px) for safety, minimum 160px
+                const safeHeight = Math.max(height + 40, 160);
+                setFooterHeight(safeHeight);
+            }
+        };
+
+        // Calculate after a short delay to ensure footer is rendered
+        const timeoutId = setTimeout(calculateFooterHeight, 100);
+        
+        // Also calculate on window resize
+        window.addEventListener('resize', calculateFooterHeight);
+
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('resize', calculateFooterHeight);
+        };
+    }, []);
 
     // Use dashboard layout hook for state management
     const {
@@ -400,8 +425,8 @@ export const CustomizableDashboard: React.FC<CustomizableDashboardProps> = ({
                 />
             )}
 
-            {/* Dashboard Content - Scrollable with bottom margin */}
-            <div className="p-4 pb-24">
+            {/* Dashboard Content - Scrollable with dynamic bottom margin for footer clearance */}
+            <div className="p-4" style={{ paddingBottom: `${footerHeight}px` }}>
                 {isLoading ? (
                     /* Loading State */
                     <div className="grid grid-cols-12 gap-4">

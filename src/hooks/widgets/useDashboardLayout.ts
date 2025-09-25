@@ -87,13 +87,13 @@ const positionUtils = {
   findNextPosition(
     existingWidgets: WidgetConfig[],
     widgetSize: WidgetConfig["size"],
-    columns: number = 12
+    columns: number = 24  // Doubled for finer positioning
   ): WidgetPosition {
     const sizeMap = {
-      small: { w: 3, h: 1 },
-      medium: { w: 6, h: 1 },
-      large: { w: 6, h: 2 },
-      full: { w: 12, h: 2 },
+      small: { w: 6, h: 2 },    // 25% width, finer height
+      medium: { w: 12, h: 3 },  // 50% width, finer height  
+      large: { w: 12, h: 4 },   // 50% width, taller
+      full: { w: 24, h: 4 },    // 100% width, finer height
     };
 
     const { w, h } = sizeMap[widgetSize];
@@ -433,18 +433,18 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
           name: "Dashboard Personalizzata",
           isDefault: true,
           widgets,
-          layoutSettings: {
-            columns: 12,
-            rowHeight: 150,
-            margin: [16, 16],
-            containerPadding: [16, 16],
-            breakpoints: {
-              lg: 1200,
-              md: 996,
-              sm: 768,
-              xs: 480,
-            },
+        layoutSettings: {
+          columns: 24,  // Increased for finer positioning
+          rowHeight: 80,  // Smaller rows for more precision
+          margin: [8, 8],  // Smaller margins between widgets
+          containerPadding: [16, 16],
+          breakpoints: {
+            lg: 1200,
+            md: 996,
+            sm: 768,
+            xs: 480,
           },
+        },
           createdAt: new Date(),
           updatedAt: new Date(),
         };

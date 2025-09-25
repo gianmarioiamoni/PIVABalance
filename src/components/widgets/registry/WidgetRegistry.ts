@@ -212,23 +212,23 @@ export class WidgetRegistry {
     return [
       {
         widgetId: "cashflow-widget",
-        position: { x: 0, y: 0, w: 12, h: 2 },
+        position: { x: 0, y: 0, w: 24, h: 4 },  // Full width, finer height
       },
       {
-        widgetId: "revenue-widget",
-        position: { x: 0, y: 2, w: 3, h: 2 },
+        widgetId: "revenue-widget", 
+        position: { x: 0, y: 4, w: 6, h: 4 },   // 25% width, finer positioning
       },
       {
         widgetId: "cost-widget",
-        position: { x: 3, y: 2, w: 3, h: 2 },
+        position: { x: 6, y: 4, w: 6, h: 4 },   // 25% width
       },
       {
         widgetId: "profit-widget",
-        position: { x: 6, y: 2, w: 3, h: 2 },
+        position: { x: 12, y: 4, w: 6, h: 4 },  // 25% width
       },
       {
-        widgetId: "tax-widget",
-        position: { x: 9, y: 2, w: 3, h: 2 },
+        widgetId: "tax-widget", 
+        position: { x: 18, y: 4, w: 6, h: 4 },  // 25% width
       },
     ];
   }

@@ -208,12 +208,12 @@ const WidgetGrid: React.FC<{
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
 
-        // Calculate grid position based on mouse position
+        // Calculate grid position based on mouse position (24 column grid)
         const rect = e.currentTarget.getBoundingClientRect();
-        const x = Math.floor(((e.clientX - rect.left) / rect.width) * 12);
-        const y = Math.floor((e.clientY - rect.top) / 150); // Assuming 150px row height
+        const x = Math.floor(((e.clientX - rect.left) / rect.width) * 24);
+        const y = Math.floor((e.clientY - rect.top) / 80); // Smaller 80px row height
 
-        setDragOverPosition({ x: Math.max(0, Math.min(11, x)), y: Math.max(0, y) });
+        setDragOverPosition({ x: Math.max(0, Math.min(23, x)), y: Math.max(0, y) });
     }, [isEditing, draggedWidget]);
 
     // Check which widgets would be affected by the drop
@@ -268,13 +268,16 @@ const WidgetGrid: React.FC<{
 
     // Calculate the maximum row needed
     const maxRow = Math.max(0, ...widgets.map(w => w.position.y + w.position.h));
-    const gridTemplateRows = `repeat(${Math.max(maxRow, 4)}, 150px)`;
+    const gridTemplateRows = `repeat(${Math.max(maxRow, 6)}, 80px)`;
 
     return (
         <div
-            className={`grid grid-cols-12 gap-4 min-h-[200px] relative ${isEditing ? 'transition-all duration-200' : ''
+            className={`grid gap-2 min-h-[200px] relative ${isEditing ? 'transition-all duration-200' : ''
                 }`}
-            style={{ gridTemplateRows }}
+            style={{ 
+                gridTemplateRows,
+                gridTemplateColumns: 'repeat(24, 1fr)'  // 24 columns for finer control
+            }}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
         >
@@ -283,10 +286,10 @@ const WidgetGrid: React.FC<{
                 <div
                     className="absolute bg-blue-200 bg-opacity-50 border-2 border-blue-400 border-dashed rounded-lg pointer-events-none z-10"
                     style={{
-                        left: `${(dragOverPosition.x / 12) * 100}%`,
-                        top: `${dragOverPosition.y * 150}px`,
-                        width: `${(widgets.find(w => w.id === draggedWidget)?.position.w || 3) / 12 * 100}%`,
-                        height: `${(widgets.find(w => w.id === draggedWidget)?.position.h || 1) * 150}px`
+                        left: `${(dragOverPosition.x / 24) * 100}%`,
+                        top: `${dragOverPosition.y * 80}px`,
+                        width: `${(widgets.find(w => w.id === draggedWidget)?.position.w || 6) / 24 * 100}%`,
+                        height: `${(widgets.find(w => w.id === draggedWidget)?.position.h || 2) * 80}px`
                     }}
                 />
             )}

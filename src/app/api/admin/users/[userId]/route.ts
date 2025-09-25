@@ -255,6 +255,7 @@ export async function DELETE(
       {
         success: true,
         message: "Utente eliminato con successo",
+        data: { deletedUserId: userId },
       },
       { status: 200 }
     );

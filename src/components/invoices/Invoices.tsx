@@ -67,9 +67,11 @@ export const Invoices = ({ taxRegime }: InvoicesProps) => {
     selectedYear,
     taxRegime,
     userId: user?.id || '',
-    onSuccess: () => {
+    onSuccess: async () => {
       setShowNewInvoiceForm(false);
-      refreshInvoices();
+      // Small delay to ensure the invoice is saved and query invalidation completed
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await refreshInvoices();
     }
   });
 

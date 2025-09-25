@@ -76,6 +76,7 @@ export const useInvoices = ({
     data: invoices = [],
     isLoading,
     error: queryError,
+    refetch: forceRefetch,
   } = useQuery({
     queryKey,
     queryFn: async () => {
@@ -156,8 +157,13 @@ export const useInvoices = ({
 
   const refreshInvoices = useCallback(async () => {
     try {
-      // Invalidate and refetch all invoice-related queries
-      await queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      // Force refetch this specific query
+      await forceRefetch();
+      // Also invalidate all other invoice-related queries
+      await queryClient.invalidateQueries({ 
+        queryKey: ["invoices"],
+        exact: false // This will match all queries that start with "invoices"
+      });
       setError(null);
     } catch (err: unknown) {
       const errorMessage =
@@ -166,7 +172,7 @@ export const useInvoices = ({
           : "Errore nel ricaricamento delle fatture";
       setError(errorMessage);
     }
-  }, [queryClient]);
+  }, [forceRefetch, queryClient]);
 
   return {
     invoices,

@@ -89,7 +89,10 @@ export const useNewInvoice = ({
     onSuccess: () => {
       setError(null);
       // Invalidate all invoice queries to refresh the list
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ 
+        queryKey: ["invoices"],
+        exact: false // This will match all queries that start with "invoices"
+      });
       resetForm();
       onSuccess?.();
     },

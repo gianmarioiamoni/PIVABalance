@@ -7,7 +7,7 @@ interface UseNewCostProps {
   onSuccess: () => void;
 }
 
-export const useNewCost = ({ selectedYear, onSuccess }: UseNewCostProps) => {
+export const useNewCost = ({ selectedYear: _selectedYear, onSuccess }: UseNewCostProps) => {
   const [showNewCostForm, setShowNewCostForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();

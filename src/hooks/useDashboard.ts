@@ -72,8 +72,7 @@ export const useDashboard = (): UseDashboardReturn => {
     error: costsError,
   } = useCosts(currentYear);
 
-  // Load user tax settings for accurate calculations (only if authenticated)
-  const hasToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  // Load user tax settings for accurate calculations
   const {
     state: { settings: taxSettings, loading: settingsLoading },
   } = useTaxSettings();

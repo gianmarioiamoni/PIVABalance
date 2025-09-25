@@ -65,7 +65,7 @@ export async function POST(
     await user.save();
 
     // Log the action
-    console.log(`🔧 Bootstrap: Promoted ${superAdminEmail} to super_admin`);
+    console.error(`🔧 Bootstrap: Promoted ${superAdminEmail} to super_admin`);
 
     return NextResponse.json(
       {

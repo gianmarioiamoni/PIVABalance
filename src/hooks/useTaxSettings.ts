@@ -9,7 +9,7 @@ import { ProfitabilityRate } from "@/components/tax-settings/shared/Profitabilit
 import { useAuthContext } from "@/providers/AuthProvider";
 
 export function useTaxSettings() {
-  const { isAuthenticated, user } = useAuthContext();
+  const { isAuthenticated } = useAuthContext();
   
   const [settings, setSettings] = useState<UserSettings>({
     taxRegime: "forfettario",

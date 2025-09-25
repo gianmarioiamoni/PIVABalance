@@ -8,13 +8,10 @@ const STATIC_CACHE = 'piva-balance-static-v1';
 const DYNAMIC_CACHE = 'piva-balance-dynamic-v1';
 const API_CACHE = 'piva-balance-api-v1';
 
-// Assets to cache immediately
+// Assets to cache immediately (only existing ones)
 const STATIC_ASSETS = [
   '/',
-  '/dashboard',
   '/manifest.json',
-  '/_next/static/css/',
-  '/_next/static/js/',
 ];
 
 // API routes to cache
@@ -80,6 +77,11 @@ self.addEventListener('fetch', (event) => {
 
   // Skip chrome-extension and other non-http requests
   if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
+  // Skip external domains (like Stripe, CDNs)
+  if (url.origin !== self.location.origin) {
     return;
   }
 

@@ -93,6 +93,19 @@ export const UserManagement: React.FC = () => {
         loadUsers();
     }, [loadUsers]);
 
+    // Add visibility change listener to refresh when returning to page
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                // Page became visible, refresh data
+                loadUsers();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, [loadUsers]);
+
     // Handle search with debounce
     useEffect(() => {
         const timeoutId = setTimeout(() => {

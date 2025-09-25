@@ -19,7 +19,7 @@ const inter = Inter({
 export const metadata = {
   title: 'P.IVA Balance - Gestione Finanziaria',
   description: 'Sistema di gestione finanziaria per Partite IVA',
-  manifest: "/manifest.json",
+  manifest: "/api/manifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { IInvoice } from "@/types";
 import { VatOption, vatOptions } from "@/components/invoices/NewInvoiceForm";
 import { invoiceService, CreateInvoiceData } from "@/services/invoiceService";
@@ -34,6 +34,7 @@ export const useNewInvoice = ({
   userId,
   onSuccess,
 }: UseNewInvoiceProps): UseNewInvoiceReturn => {
+  const queryClient = useQueryClient();
   const [showNewInvoiceForm, setShowNewInvoiceForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -87,6 +88,8 @@ export const useNewInvoice = ({
     },
     onSuccess: () => {
       setError(null);
+      // Invalidate all invoice queries to refresh the list
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
       resetForm();
       onSuccess?.();
     },

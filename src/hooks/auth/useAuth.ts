@@ -98,12 +98,17 @@ export function useAuth() {
       // Set token and wait for it to be available
       setToken(newToken);
 
-      // Wait a bit for localStorage to update
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Wait longer for localStorage to update and API client to pick up the token
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       // Clear cache and refetch with new token
       queryClient.setQueryData(["auth"], null);
       await queryClient.invalidateQueries({ queryKey: ["auth"] });
+
+      // Also invalidate settings and other user-dependent queries
+      await queryClient.invalidateQueries({ queryKey: ["settings"] });
+      await queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      await queryClient.invalidateQueries({ queryKey: ["costs"] });
 
       const userData = await checkAuth();
       // Debug: updateToken - checkAuth result

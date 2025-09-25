@@ -97,7 +97,9 @@ export async function GET(_request: NextRequest) {
     status: 200,
     headers: {
       'Content-Type': 'application/manifest+json',
-      'Cache-Control': 'public, max-age=86400', // Cache for 1 day
+      'Cache-Control': 'no-cache, no-store, must-revalidate', // Force refresh
+      'Pragma': 'no-cache',
+      'Expires': '0',
     },
   });
 }

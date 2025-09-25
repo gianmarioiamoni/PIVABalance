@@ -75,7 +75,6 @@ export const useInvoices = ({
   const {
     data: invoices = [],
     isLoading,
-    refetch,
     error: queryError,
   } = useQuery({
     queryKey,

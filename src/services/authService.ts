@@ -98,7 +98,7 @@ class AuthService {
    */
   async checkAuth(): Promise<User | null> {
     const token = api.getAuthToken();
-    if (!token) {
+    if (!token || token.length === 0) {
       return null;
     }
 
@@ -106,6 +106,12 @@ class AuthService {
       const user = await api.get<User>("/auth/me");
       return user;
     } catch (error) {
+      // Don't log 401 errors as they are expected for unauthenticated users
+      if (error instanceof Error && error.message.includes("Authentication required")) {
+        // Clear invalid token silently
+        api.setAuthToken(null);
+        return null;
+      }
       console.error("Error checking auth:", error);
       // Clear invalid token
       api.setAuthToken(null);

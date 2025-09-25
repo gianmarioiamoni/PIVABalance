@@ -100,8 +100,8 @@ export const config = {
   matcher: [
     /*
      * Match only API routes for security middleware
-     * Exclude all static files, Next.js internals, and assets
+     * Exclude public endpoints and static files
      */
-    '/api/:path*',
+    '/api/((?!manifest|health).*)',
   ],
 };

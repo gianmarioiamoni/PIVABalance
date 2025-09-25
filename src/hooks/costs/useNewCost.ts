@@ -22,7 +22,11 @@ export const useNewCost = ({ selectedYear, onSuccess }: UseNewCostProps) => {
   const createCostMutation = useMutation({
     mutationFn: (data: CreateCostData) => costService.createCost(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["costs", selectedYear] });
+      // Invalidate all cost queries to refresh the list
+      queryClient.invalidateQueries({ 
+        queryKey: ["costs"],
+        exact: false // This will match all queries that start with "costs"
+      });
       resetForm();
       onSuccess();
       setError(null);

@@ -36,7 +36,11 @@ export const Costs: React.FC = () => {
         loading: createLoading,
         error: createError
     } = useCostForm({
-        onSuccess: refreshCosts
+        onSuccess: async () => {
+            // Small delay to ensure the cost is saved and query invalidation completed
+            await new Promise(resolve => setTimeout(resolve, 100));
+            await refreshCosts();
+        }
     });
 
     // Calculate summary data

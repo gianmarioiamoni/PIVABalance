@@ -26,7 +26,10 @@ export const useCosts = (selectedYear: number) => {
       data: Omit<Cost, "id" | "createdAt" | "updatedAt">;
     }) => costService.updateCost(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["costs", selectedYear] });
+      queryClient.invalidateQueries({ 
+        queryKey: ["costs"],
+        exact: false
+      });
       setError(null);
     },
     onError: (err: unknown) => {
@@ -38,7 +41,10 @@ export const useCosts = (selectedYear: number) => {
   const deleteCostMutation = useMutation({
     mutationFn: (id: string) => costService.deleteCost(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["costs", selectedYear] });
+      queryClient.invalidateQueries({ 
+        queryKey: ["costs"],
+        exact: false
+      });
       setError(null);
     },
     onError: (err: unknown) => {
@@ -58,8 +64,18 @@ export const useCosts = (selectedYear: number) => {
     deleteCostMutation.mutate(id);
   };
 
-  const refreshCosts = () => {
-    refetchCosts();
+  const refreshCosts = async () => {
+    try {
+      // Force refetch this specific query
+      await refetchCosts();
+      // Also invalidate all other cost-related queries
+      await queryClient.invalidateQueries({ 
+        queryKey: ["costs"],
+        exact: false // This will match all queries that start with "costs"
+      });
+    } catch (error) {
+      console.error("Error refreshing costs:", error);
+    }
   };
 
   // Set error from query if it exists

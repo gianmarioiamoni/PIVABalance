@@ -107,8 +107,8 @@ export function useAuth() {
 
       // Also invalidate settings and other user-dependent queries
       await queryClient.invalidateQueries({ queryKey: ["settings"] });
-      await queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      await queryClient.invalidateQueries({ queryKey: ["costs"] });
+      await queryClient.invalidateQueries({ queryKey: ["invoices"], exact: false });
+      await queryClient.invalidateQueries({ queryKey: ["costs"], exact: false });
 
       const userData = await checkAuth();
       // Debug: updateToken - checkAuth result

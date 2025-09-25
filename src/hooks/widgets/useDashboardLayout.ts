@@ -98,31 +98,19 @@ const positionUtils = {
 
     const { w, h } = sizeMap[widgetSize];
 
-    // Try to find a position with minimal Y (prefer higher positions)
-    // and minimal X (prefer left positions)
-    let bestPosition: WidgetPosition | null = null;
-    let bestScore = Infinity;
-
-    for (let y = 0; y < 20; y++) {
+    // Increase search area for better placement
+    for (let y = 0; y < 50; y++) {
       for (let x = 0; x <= columns - w; x++) {
         const position = { x, y, w, h };
+        
+        // Enhanced collision check - ensure we don't overlap
         if (!this.hasCollision(position, existingWidgets)) {
-          // Score: prioritize higher positions (lower Y) and left positions (lower X)
-          const score = y * 100 + x; // Y is much more important than X
-          if (score < bestScore) {
-            bestScore = score;
-            bestPosition = position;
-          }
+          return position;
         }
       }
     }
 
-    // If we found a good position, return it
-    if (bestPosition) {
-      return bestPosition;
-    }
-
-    // Fallback: place at bottom
+    // If no position found after exhaustive search, place at bottom
     const maxY = Math.max(
       0,
       ...existingWidgets.map((w) => w.position.y + w.position.h)
@@ -158,26 +146,52 @@ const positionUtils = {
 
     if (!movedWidget) return result;
 
-    // Update the moved widget position
-    movedWidget.position = { ...newPosition };
-
-    // Find widgets that collide with the moved widget
-    const collidingWidgets = result.filter(
-      (w) => w.id !== movedWidgetId && this.hasCollision(newPosition, [w])
-    );
-
-    // For each colliding widget, find a new position
-    for (const collidingWidget of collidingWidgets) {
-      const newPos = this.findNextPosition(
-        result.filter((w) => w.id !== collidingWidget.id), // Exclude the widget we're moving
-        collidingWidget.size
-      );
-      collidingWidget.position = newPos;
+    // First, validate the new position doesn't cause collisions
+    const otherWidgets = result.filter((w) => w.id !== movedWidgetId);
+    
+    // If the requested position would cause collision, find a safe alternative
+    if (this.hasCollision(newPosition, otherWidgets)) {
+      // Find the closest safe position to the requested position
+      const safePosition = this.findSafePositionNear(newPosition, otherWidgets);
+      movedWidget.position = safePosition;
+    } else {
+      // Update the moved widget position
+      movedWidget.position = { ...newPosition };
     }
 
-    // After moving colliding widgets, check for any new collisions created
-    // and resolve them recursively (but limit recursion to prevent infinite loops)
-    return this.resolveAllCollisions(result, 3);
+    // Always perform collision resolution after any move
+    return this.resolveAllCollisions(result, 5); // Increased iterations
+  },
+
+  /**
+   * Find a safe position near the requested position
+   */
+  findSafePositionNear(
+    requestedPosition: WidgetPosition,
+    existingWidgets: WidgetConfig[]
+  ): WidgetPosition {
+    const { w, h } = requestedPosition;
+    
+    // Try positions in expanding search radius around requested position
+    for (let radius = 0; radius <= 10; radius++) {
+      for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+          const testPosition = {
+            x: Math.max(0, Math.min(24 - w, requestedPosition.x + dx)),
+            y: Math.max(0, requestedPosition.y + dy),
+            w,
+            h
+          };
+          
+          if (!this.hasCollision(testPosition, existingWidgets)) {
+            return testPosition;
+          }
+        }
+      }
+    }
+    
+    // Fallback: find any available position
+    return this.findNextPosition(existingWidgets, 'medium', 24);
   },
 
   /**
@@ -185,15 +199,16 @@ const positionUtils = {
    */
   resolveAllCollisions(
     widgets: WidgetConfig[],
-    maxIterations: number = 3
+    maxIterations: number = 5  // Increased default
   ): WidgetConfig[] {
     const result = [...widgets];
     let iteration = 0;
 
     while (iteration < maxIterations) {
       let hasCollisions = false;
+      const collisionPairs: Array<{a: WidgetConfig, b: WidgetConfig}> = [];
 
-      // Find all collision pairs
+      // Collect all collision pairs first
       for (let i = 0; i < result.length; i++) {
         for (let j = i + 1; j < result.length; j++) {
           const widgetA = result[i];
@@ -201,26 +216,37 @@ const positionUtils = {
 
           if (this.hasCollision(widgetA.position, [widgetB])) {
             hasCollisions = true;
-
-            // Move the widget that's lower (higher Y) or rightmost if same Y
-            const toMove =
-              widgetA.position.y > widgetB.position.y ||
-              (widgetA.position.y === widgetB.position.y &&
-                widgetA.position.x > widgetB.position.x)
-                ? widgetA
-                : widgetB;
-
-            // Find new position for the widget to move
-            const newPos = this.findNextPosition(
-              result.filter((w) => w.id !== toMove.id),
-              toMove.size
-            );
-            toMove.position = newPos;
+            collisionPairs.push({a: widgetA, b: widgetB});
           }
         }
       }
 
       if (!hasCollisions) break;
+
+      // Resolve collisions in order of severity (larger overlaps first)
+      for (const pair of collisionPairs) {
+        const {a: widgetA, b: widgetB} = pair;
+        
+        // Still colliding after potential moves by previous pairs?
+        if (this.hasCollision(widgetA.position, [widgetB])) {
+          // Move the widget that's lower (higher Y) or rightmost if same Y
+          const toMove =
+            widgetA.position.y > widgetB.position.y ||
+            (widgetA.position.y === widgetB.position.y &&
+              widgetA.position.x > widgetB.position.x)
+              ? widgetA
+              : widgetB;
+
+          // Find new position for the widget to move
+          const newPos = this.findNextPosition(
+            result.filter((w) => w.id !== toMove.id),
+            toMove.size,
+            24  // Ensure we use 24 columns
+          );
+          toMove.position = newPos;
+        }
+      }
+
       iteration++;
     }
 
@@ -336,11 +362,15 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
           ? (selectedSize as WidgetConfig["size"])
           : registryEntry.defaultSize;
 
+      // Find safe position for the new widget (no overlaps)
       const position = customPosition
-        ? {
-            ...positionUtils.findNextPosition(widgets, widgetSize),
-            ...customPosition,
-          }
+        ? positionUtils.findSafePositionNear(
+            {
+              ...positionUtils.findNextPosition(widgets, widgetSize),
+              ...customPosition,
+            } as WidgetPosition,
+            widgets
+          )
         : positionUtils.findNextPosition(widgets, widgetSize);
 
       const newWidget: WidgetConfig = {
@@ -357,7 +387,10 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         },
       };
 
-      setWidgets((prev) => [...prev, newWidget]);
+      // Add the widget and resolve any remaining collisions
+      const newWidgets = [...widgets, newWidget];
+      const safeWidgets = positionUtils.resolveAllCollisions(newWidgets, 5);
+      setWidgets(safeWidgets);
       setHasChanges(true);
       showSuccess(
         "Widget Aggiunto",

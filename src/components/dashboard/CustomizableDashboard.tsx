@@ -247,18 +247,19 @@ const WidgetGrid: React.FC<{
         e.preventDefault();
 
         const rect = e.currentTarget.getBoundingClientRect();
-        const x = Math.floor(((e.clientX - rect.left) / rect.width) * 12);
-        const y = Math.floor((e.clientY - rect.top) / 150);
+        const x = Math.floor(((e.clientX - rect.left) / rect.width) * 24);
+        const y = Math.floor((e.clientY - rect.top) / 80);
 
         const widget = widgets.find(w => w.id === draggedWidget);
         if (widget) {
             const newPosition: WidgetPosition = {
-                x: Math.max(0, Math.min(12 - widget.position.w, x)),
+                x: Math.max(0, Math.min(24 - widget.position.w, x)),
                 y: Math.max(0, y),
                 w: widget.position.w,
                 h: widget.position.h
             };
 
+            // The collision resolution will be handled by the moveWidget function
             onWidgetMove(draggedWidget, newPosition);
         }
 

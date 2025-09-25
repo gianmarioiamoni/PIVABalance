@@ -30,7 +30,7 @@ export const dynamic = 'force-dynamic';
 export default function CustomizableDashboardPage() {
     return (
         <RoleBasedAccess allowedRoles={['user', 'admin']} redirectSuperAdminTo="/dashboard/admin">
-            <div className="min-h-screen bg-gray-50">
+            <div className="bg-gray-50 pb-6">
                 <LazyCustomizableDashboard />
             </div>
         </RoleBasedAccess>

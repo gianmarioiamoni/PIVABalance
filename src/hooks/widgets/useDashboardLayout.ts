@@ -247,12 +247,16 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["dashboard-layout", defaultLayoutId],
+    queryKey: ["dashboard-layout", defaultLayoutId || "default"],
     queryFn: () =>
       defaultLayoutId
         ? dashboardLayoutService.getLayout(defaultLayoutId)
         : dashboardLayoutService.getDefaultLayout(),
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 15 * 60 * 1000, // 15 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes cache time
+    refetchOnMount: false, // Don't refetch if we have cached data
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    enabled: typeof window !== "undefined", // Only fetch client-side
   });
 
   // Save layout mutation
@@ -280,7 +284,16 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         "Layout Salvato",
         "La configurazione della dashboard è stata salvata"
       );
-      queryClient.invalidateQueries({ queryKey: ["dashboard-layout"] });
+      // Update the cache with the saved layout immediately
+      queryClient.setQueryData(
+        ["dashboard-layout", defaultLayoutId || "default"],
+        savedLayout
+      );
+      // Also invalidate to ensure fresh data on next navigation
+      queryClient.invalidateQueries({ 
+        queryKey: ["dashboard-layout"],
+        exact: false
+      });
     },
     onError: (error) => {
       showError(

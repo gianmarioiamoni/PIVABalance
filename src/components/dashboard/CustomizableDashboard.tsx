@@ -386,7 +386,7 @@ export const CustomizableDashboard: React.FC<CustomizableDashboardProps> = ({
     }, [saveLayout]);
 
     return (
-        <div className={`customizable-dashboard ${className}`}>
+        <div className={`customizable-dashboard ${className} min-h-screen`}>
             {/* Dashboard Toolbar */}
             {enableCustomization && (
                 <DashboardToolbar
@@ -400,8 +400,8 @@ export const CustomizableDashboard: React.FC<CustomizableDashboardProps> = ({
                 />
             )}
 
-            {/* Dashboard Content */}
-            <div className="p-4">
+            {/* Dashboard Content - Scrollable with bottom margin */}
+            <div className="p-4 pb-24">
                 {isLoading ? (
                     /* Loading State */
                     <div className="grid grid-cols-12 gap-4">

@@ -20,6 +20,9 @@ import { WidgetRegistry } from "@/components/widgets/registry/WidgetRegistry";
 import { useNotifications } from "@/providers/NotificationProvider";
 import { dashboardLayoutService } from "@/services/dashboardLayoutService";
 
+// Type for layout with MongoDB _id (returned from database)
+type DashboardLayoutWithMongoId = DashboardLayout & { _id?: string };
+
 /**
  * Dashboard Layout API Service (Legacy - now using dashboardLayoutService)
  * SRP: Handles only layout API communication
@@ -305,7 +308,7 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
           
           // Check if existingLayout exists first, then get id
           if (existingLayout) {
-            const existingId = existingLayout.id || (existingLayout as any)._id;
+            const existingId = existingLayout.id || (existingLayout as DashboardLayoutWithMongoId)._id;
             if (existingId && existingId !== "default") {
             console.warn("💾 SAVE DEBUG: Found existing, will update:", existingId);
             // Update the existing default layout
@@ -340,9 +343,15 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
       console.warn("💾 SAVE SUCCESS: savedLayout =", savedLayout);
       
       // CRITICAL: Ensure layout keeps the correct ID from saved layout
-      const normalizedLayout = {
+      const layoutId = savedLayout.id || (savedLayout as DashboardLayoutWithMongoId)._id;
+      if (!layoutId) {
+        console.error("💾 SAVE ERROR: No valid ID found in savedLayout", savedLayout);
+        return;
+      }
+      
+      const normalizedLayout: DashboardLayout = {
         ...savedLayout,
-        id: savedLayout.id || (savedLayout as any)._id // Ensure we have id not just _id
+        id: layoutId // Ensured to be string
       };
       
       setLayout(normalizedLayout);

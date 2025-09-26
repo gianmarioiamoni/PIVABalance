@@ -305,7 +305,7 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
           
           // Check if existingLayout exists first, then get id
           if (existingLayout) {
-            const existingId = existingLayout.id || existingLayout._id;
+            const existingId = existingLayout.id || (existingLayout as any)._id;
             if (existingId && existingId !== "default") {
             console.warn("💾 SAVE DEBUG: Found existing, will update:", existingId);
             // Update the existing default layout
@@ -342,7 +342,7 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
       // CRITICAL: Ensure layout keeps the correct ID from saved layout
       const normalizedLayout = {
         ...savedLayout,
-        id: savedLayout.id || savedLayout._id // Ensure we have id not just _id
+        id: savedLayout.id || (savedLayout as any)._id // Ensure we have id not just _id
       };
       
       setLayout(normalizedLayout);

@@ -326,6 +326,12 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
     onSuccess: (savedLayout) => {
       setLayout(savedLayout);
       setHasChanges(false);
+      
+      // CRITICAL: Sync widgets state with saved layout for immediate display
+      if (savedLayout.widgets) {
+        setWidgets(savedLayout.widgets);
+      }
+      
       showSuccess(
         "Layout Salvato",
         "La configurazione della dashboard è stata salvata"

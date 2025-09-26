@@ -270,7 +270,7 @@ const WidgetGrid: React.FC<{
 
             setDragOverPosition(safePosition);
         }
-    }, [isEditing, draggedWidget, widgets]);
+    }, [isEditing, draggedWidget, widgets, hasCollisionAtPosition, findSafePositionPreview]);
 
     // Check which widgets would be affected by the drop
     const getAffectedWidgets = useCallback(() => {

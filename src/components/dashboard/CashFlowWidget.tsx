@@ -8,7 +8,7 @@ import { WidgetContainer } from '@/components/widgets/base/WidgetContainer';
 import { WidgetConfig, WidgetData } from '@/components/widgets/base/types';
 
 export interface CashFlowWidgetProps {
-  config: WidgetConfig;
+  config?: WidgetConfig;  // Made optional for backward compatibility
   data?: WidgetData;
   isEditing?: boolean;
   onConfigChange?: (config: WidgetConfig) => void;
@@ -239,22 +239,74 @@ export const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({
 }) => {
   const { data, isLoading, error, refreshData } = useCashFlowData(months);
 
-  // Handle refresh action
-  const handleRefresh = () => {
-    refreshData();
-    if (onRefresh) {
-      onRefresh(config.id);
-    }
-  };
-
   // Calculate metrics using specialized hook
   const metrics = useCashFlowMetrics(data);
   const trendInfo = useTrendInfo(metrics.netTrend);
 
-  // Widget data for container
-  const widgetData = {
+  // Handle refresh action
+  const handleRefresh = () => {
+    refreshData();
+    if (onRefresh && config) {
+      onRefresh(config.id);
+    }
+  };
+
+  // If no config provided (legacy usage), render without WidgetContainer
+  if (!config) {
+    return (
+      <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
+        {/* Header */}
+        {showHeader && (
+          <CashFlowHeader
+            months={months}
+            trendInfo={trendInfo}
+            onRefresh={handleRefresh}
+            isLoading={isLoading}
+          />
+        )}
+
+        {/* Content */}
+        <div className="p-6 space-y-6">
+          {/* Quick Stats */}
+          <CashFlowStats
+            totalIncome={metrics.totalIncome}
+            totalExpenses={metrics.totalExpenses}
+            totalNet={metrics.totalNet}
+            netTrend={metrics.netTrend}
+          />
+
+          {/* Chart */}
+          <div className="h-64">
+            <CashFlowChart
+              data={data}
+              loading={isLoading}
+              error={error}
+              config={{
+                height: 240,
+                margin: { top: 10, right: 10, left: 10, bottom: 20 },
+                showLegend: false
+              }}
+            />
+          </div>
+
+          {/* Insights */}
+          {!isLoading && data.length > 0 && (
+            <CashFlowInsights
+              data={data}
+              currentNet={metrics.currentNet}
+              netTrend={metrics.netTrend}
+              months={months}
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Widget data for container - cast data to satisfy WidgetData type
+  const widgetData: WidgetData = {
     id: config.id,
-    data: data,
+    data: data as unknown as Record<string, unknown>,
     lastUpdated: new Date(),
     isLoading,
     error: error || undefined

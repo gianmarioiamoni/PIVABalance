@@ -287,16 +287,34 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
 
   // Save layout mutation
   const saveLayoutMutation = useMutation({
-    mutationFn: (layout: DashboardLayout) => {
-      // If we have a real MongoDB _id (not "default"), update existing layout
-      if (layout.id && layout.id !== "default" && layout.id.length === 24) {
+    mutationFn: async (layout: DashboardLayout) => {
+      // If we have a real layout with a MongoDB _id, update it
+      if (layout.id && layout.id !== "default" && layout.id.match(/^[0-9a-fA-F]{24}$/)) {
         return dashboardLayoutService.updateLayout(layout.id, layout);
       } else {
-        // Create new default layout (will be marked as default)
+        // Try to find existing default layout first to avoid duplicates
+        try {
+          const existingLayout = await dashboardLayoutService.getDefaultLayout();
+          if (existingLayout && existingLayout.id && existingLayout.id !== "default") {
+            // Update the existing default layout
+            const updatedLayout = {
+              ...existingLayout,
+              widgets: layout.widgets,
+              layoutSettings: layout.layoutSettings,
+              updatedAt: new Date(),
+            };
+            return dashboardLayoutService.updateLayout(existingLayout.id, updatedLayout);
+          }
+        } catch (error) {
+          console.log("No existing layout found, creating new one");
+        }
+
+        // Create new default layout with unique name
+        const timestamp = Date.now();
         const layoutToCreate = {
           ...layout,
-          isDefault: true, // Ensure it's marked as default
-          name: layout.name || "Dashboard Personalizzata",
+          isDefault: true,
+          name: layout.name || `Dashboard Personalizzata ${timestamp}`,
         };
         // Remove the "default" id as it's not a real MongoDB id
         const { id: _id, ...layoutData } = layoutToCreate;

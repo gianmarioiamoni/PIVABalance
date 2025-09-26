@@ -289,15 +289,22 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
   // Save layout mutation
   const saveLayoutMutation = useMutation({
     mutationFn: async (layout: DashboardLayout) => {
+      console.warn("💾 SAVE DEBUG: layout.id =", layout.id);
+      console.warn("💾 SAVE DEBUG: isValidMongoId =", layout.id && layout.id !== "default" && layout.id.match(/^[0-9a-fA-F]{24}$/));
+      
       // If we have a real layout with a MongoDB _id, update it
       if (layout.id && layout.id !== "default" && layout.id.match(/^[0-9a-fA-F]{24}$/)) {
+        console.warn("💾 SAVE DEBUG: Taking updateLayout path");
         return dashboardLayoutService.updateLayout(layout.id, layout);
       } else {
+        console.warn("💾 SAVE DEBUG: Taking create/find path");
         // Try to find existing default layout first to avoid duplicates
         try {
           const existingLayout = await dashboardLayoutService.getDefaultLayout();
+          console.warn("💾 SAVE DEBUG: existingLayout =", existingLayout);
           
           if (existingLayout && existingLayout.id && existingLayout.id !== "default") {
+            console.warn("💾 SAVE DEBUG: Found existing, will update:", existingLayout.id);
             // Update the existing default layout
             const updatedLayout = {
               ...existingLayout,
@@ -307,10 +314,11 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
             };
             return dashboardLayoutService.updateLayout(existingLayout.id, updatedLayout);
           }
-        } catch (_error) {
-          // No existing layout found, will create new one
+        } catch (error) {
+          console.warn("💾 SAVE DEBUG: getDefaultLayout failed:", error);
         }
 
+        console.warn("💾 SAVE DEBUG: Will create new layout");
         // Create new default layout with unique name
         const uniqueName = `Dashboard Personalizzata ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`;
         

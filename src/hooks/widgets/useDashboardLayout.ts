@@ -315,7 +315,6 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         }
 
         // Create new default layout with unique name
-        const timestamp = Date.now();
         const uniqueName = `Dashboard Personalizzata ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`;
         console.warn("DEBUG: Creating new layout with name:", uniqueName);
         

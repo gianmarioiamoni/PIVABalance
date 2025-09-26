@@ -305,8 +305,8 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
             };
             return dashboardLayoutService.updateLayout(existingLayout.id, updatedLayout);
           }
-        } catch (error) {
-          console.log("No existing layout found, creating new one");
+        } catch (_error) {
+          console.warn("No existing layout found, creating new one");
         }
 
         // Create new default layout with unique name

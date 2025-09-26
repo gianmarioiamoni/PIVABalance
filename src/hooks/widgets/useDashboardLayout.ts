@@ -325,12 +325,14 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
     },
     onSuccess: (savedLayout) => {
       setLayout(savedLayout);
-      setHasChanges(false);
       
       // CRITICAL: Sync widgets state with saved layout for immediate display
       if (savedLayout.widgets) {
         setWidgets(savedLayout.widgets);
       }
+      
+      // Reset hasChanges AFTER syncing widgets to prevent useEffect override
+      setHasChanges(false);
       
       showSuccess(
         "Layout Salvato",
@@ -370,13 +372,19 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
   });
 
   // Initialize widgets from layout data
+  // Sync layout data with local state, but avoid overriding fresh changes
   useEffect(() => {
     if (layoutData) {
       setLayout(layoutData);
-      setWidgets(layoutData.widgets);
-      setHasChanges(false);
+      
+      // Only update widgets if we don't have pending changes
+      // This prevents the useEffect from overriding fresh widget additions
+      if (!hasChanges) {
+        setWidgets(layoutData.widgets);
+        setHasChanges(false);
+      }
     }
-  }, [layoutData]);
+  }, [layoutData, hasChanges]);
 
   // Widget management functions
   const addWidget = useCallback(

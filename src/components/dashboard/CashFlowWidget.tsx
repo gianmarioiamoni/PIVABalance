@@ -324,15 +324,7 @@ export const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({
     >
       {/* Content without wrapper div - WidgetContainer provides it */}
       <div className="space-y-6">
-        {/* Header - only show if not in editing mode or showHeader is true */}
-        {(!isEditing && showHeader) && (
-          <CashFlowHeader
-            months={months}
-            trendInfo={trendInfo}
-            onRefresh={handleRefresh}
-            isLoading={isLoading}
-          />
-        )}
+        {/* WidgetContainer already provides header with controls, no need for custom header */}
 
         {/* Quick Stats */}
         <CashFlowStats

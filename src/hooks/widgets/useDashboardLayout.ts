@@ -278,9 +278,9 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
       defaultLayoutId
         ? dashboardLayoutService.getLayout(defaultLayoutId)
         : dashboardLayoutService.getDefaultLayout(),
-    staleTime: 15 * 60 * 1000, // 15 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes cache time
-    refetchOnMount: false, // Don't refetch if we have cached data
+    staleTime: 5 * 60 * 1000, // 5 minutes (reduced from 15)
+    gcTime: 15 * 60 * 1000, // 15 minutes cache time (reduced from 30)
+    refetchOnMount: "always", // Always refetch on mount to get latest
     refetchOnWindowFocus: false, // Don't refetch on window focus
     enabled: typeof window !== "undefined", // Only fetch client-side
   });
@@ -295,10 +295,8 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         // Try to find existing default layout first to avoid duplicates
         try {
           const existingLayout = await dashboardLayoutService.getDefaultLayout();
-          console.warn("DEBUG: Existing layout found:", existingLayout);
           
           if (existingLayout && existingLayout.id && existingLayout.id !== "default") {
-            console.warn("DEBUG: Updating existing layout with ID:", existingLayout.id);
             // Update the existing default layout
             const updatedLayout = {
               ...existingLayout,
@@ -307,16 +305,13 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
               updatedAt: new Date(),
             };
             return dashboardLayoutService.updateLayout(existingLayout.id, updatedLayout);
-          } else {
-            console.warn("DEBUG: No valid existing layout ID, will create new");
           }
         } catch (_error) {
-          console.warn("DEBUG: Error getting existing layout, creating new one:", _error);
+          // No existing layout found, will create new one
         }
 
         // Create new default layout with unique name
         const uniqueName = `Dashboard Personalizzata ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`;
-        console.warn("DEBUG: Creating new layout with name:", uniqueName);
         
         const layoutToCreate = {
           ...layout,
@@ -335,13 +330,26 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         "Layout Salvato",
         "La configurazione della dashboard è stata salvata"
       );
-      // Update the cache with the saved layout immediately
-      queryClient.setQueryData(
+      
+      // Update all possible cache keys for the saved layout
+      const cacheKeys = [
+        ["dashboard-layout", "default"],
         ["dashboard-layout", defaultLayoutId || "default"],
-        savedLayout
-      );
-      // Also invalidate to ensure fresh data on next navigation
+        ["dashboard-layout", savedLayout.id],
+      ];
+      
+      cacheKeys.forEach(key => {
+        queryClient.setQueryData(key, savedLayout);
+      });
+      
+      // Invalidate all dashboard layout queries to ensure fresh data
       queryClient.invalidateQueries({ 
+        queryKey: ["dashboard-layout"],
+        exact: false
+      });
+      
+      // Force refetch on next page visit
+      queryClient.refetchQueries({
         queryKey: ["dashboard-layout"],
         exact: false
       });

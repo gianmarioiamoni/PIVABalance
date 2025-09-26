@@ -303,9 +303,10 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
           const existingLayout = await dashboardLayoutService.getDefaultLayout();
           console.warn("💾 SAVE DEBUG: existingLayout =", existingLayout);
           
-          // Check both id and _id (MongoDB returns _id)
-          const existingId = existingLayout.id || existingLayout._id;
-          if (existingLayout && existingId && existingId !== "default") {
+          // Check if existingLayout exists first, then get id
+          if (existingLayout) {
+            const existingId = existingLayout.id || existingLayout._id;
+            if (existingId && existingId !== "default") {
             console.warn("💾 SAVE DEBUG: Found existing, will update:", existingId);
             // Update the existing default layout
             const updatedLayout = {
@@ -315,6 +316,7 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
               updatedAt: new Date(),
             };
             return dashboardLayoutService.updateLayout(existingId, updatedLayout);
+            }
           }
         } catch (error) {
           console.warn("💾 SAVE DEBUG: getDefaultLayout failed:", error);

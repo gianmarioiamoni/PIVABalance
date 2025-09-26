@@ -263,6 +263,7 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
   const [isEditing, setIsEditing] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [layout, setLayout] = useState<DashboardLayout | null>(null);
+  const [justSaved, setJustSaved] = useState(false);
 
   const { showSuccess, showError } = useNotifications();
   const queryClient = useQueryClient();
@@ -331,8 +332,16 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         setWidgets(savedLayout.widgets);
       }
       
-      // Reset hasChanges AFTER syncing widgets to prevent useEffect override
+      // Set justSaved flag to prevent useEffect from overriding for a short period
+      setJustSaved(true);
+      
+      // Reset hasChanges AFTER syncing widgets
       setHasChanges(false);
+      
+      // Clear the justSaved flag after a short delay to allow cache updates to settle
+      setTimeout(() => {
+        setJustSaved(false);
+      }, 1000); // 1 second protection window
       
       showSuccess(
         "Layout Salvato",
@@ -350,14 +359,9 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         queryClient.setQueryData(key, savedLayout);
       });
       
-      // Invalidate all dashboard layout queries to ensure fresh data
+      // Invalidate queries for next navigation, but don't force immediate refetch
+      // to prevent race conditions with our current state
       queryClient.invalidateQueries({ 
-        queryKey: ["dashboard-layout"],
-        exact: false
-      });
-      
-      // Force refetch on next page visit
-      queryClient.refetchQueries({
         queryKey: ["dashboard-layout"],
         exact: false
       });
@@ -372,19 +376,19 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
   });
 
   // Initialize widgets from layout data
-  // Sync layout data with local state, but avoid overriding fresh changes
+  // Sync layout data with local state, but avoid overriding fresh changes or recent saves
   useEffect(() => {
     if (layoutData) {
       setLayout(layoutData);
       
-      // Only update widgets if we don't have pending changes
-      // This prevents the useEffect from overriding fresh widget additions
-      if (!hasChanges) {
+      // Only update widgets if we don't have pending changes AND we didn't just save
+      // This prevents the useEffect from overriding fresh widget additions or fresh saves
+      if (!hasChanges && !justSaved) {
         setWidgets(layoutData.widgets);
         setHasChanges(false);
       }
     }
-  }, [layoutData, hasChanges]);
+  }, [layoutData, hasChanges, justSaved]);
 
   // Widget management functions
   const addWidget = useCallback(

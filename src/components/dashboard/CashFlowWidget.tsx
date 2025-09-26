@@ -4,8 +4,16 @@ import React from 'react';
 import { TrendingUp, TrendingDown, AlertCircle, RefreshCw } from 'lucide-react';
 import { CashFlowChart } from '@/components/charts';
 import { useCashFlowData } from '@/hooks/useChartData';
+import { WidgetContainer } from '@/components/widgets/base/WidgetContainer';
+import { WidgetConfig, WidgetData } from '@/components/widgets/base/types';
 
 export interface CashFlowWidgetProps {
+  config: WidgetConfig;
+  data?: WidgetData;
+  isEditing?: boolean;
+  onConfigChange?: (config: WidgetConfig) => void;
+  onRemove?: (widgetId: string) => void;
+  onRefresh?: (widgetId: string) => void;
   className?: string;
   months?: number;
   showHeader?: boolean;
@@ -219,30 +227,61 @@ const CashFlowInsights: React.FC<{
 };
 
 export const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({
+  config,
+  data: _data,
+  isEditing,
+  onConfigChange,
+  onRemove,
+  onRefresh,
   className = '',
   months = 6, // Shorter period for widget
   showHeader = true
 }) => {
   const { data, isLoading, error, refreshData } = useCashFlowData(months);
 
+  // Handle refresh action
+  const handleRefresh = () => {
+    refreshData();
+    if (onRefresh) {
+      onRefresh(config.id);
+    }
+  };
+
   // Calculate metrics using specialized hook
   const metrics = useCashFlowMetrics(data);
   const trendInfo = useTrendInfo(metrics.netTrend);
 
-  return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
-      {/* Header */}
-      {showHeader && (
-        <CashFlowHeader
-          months={months}
-          trendInfo={trendInfo}
-          onRefresh={refreshData}
-          isLoading={isLoading}
-        />
-      )}
+  // Widget data for container
+  const widgetData = {
+    id: config.id,
+    data: data,
+    lastUpdated: new Date(),
+    isLoading,
+    error: error || undefined
+  };
 
-      {/* Content */}
-      <div className="p-6 space-y-6">
+  return (
+    <WidgetContainer
+      config={config}
+      data={widgetData}
+      isEditing={isEditing}
+      onConfigChange={onConfigChange}
+      onRemove={onRemove}
+      onRefresh={handleRefresh}
+      className={className}
+    >
+      {/* Content without wrapper div - WidgetContainer provides it */}
+      <div className="space-y-6">
+        {/* Header - only show if not in editing mode or showHeader is true */}
+        {(!isEditing && showHeader) && (
+          <CashFlowHeader
+            months={months}
+            trendInfo={trendInfo}
+            onRefresh={handleRefresh}
+            isLoading={isLoading}
+          />
+        )}
+
         {/* Quick Stats */}
         <CashFlowStats
           totalIncome={metrics.totalIncome}
@@ -275,7 +314,7 @@ export const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({
           />
         )}
       </div>
-    </div>
+    </WidgetContainer>
   );
 };
 

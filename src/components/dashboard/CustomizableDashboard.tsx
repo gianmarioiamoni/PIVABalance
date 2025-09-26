@@ -184,7 +184,47 @@ const WidgetGrid: React.FC<{
     onWidgetMove?: (widgetId: string, position: WidgetPosition) => void;
 }> = ({ widgets, isEditing, onWidgetChange, onWidgetRemove, onWidgetRefresh, onWidgetMove }) => {
     const [draggedWidget, setDraggedWidget] = useState<string | null>(null);
-    const [dragOverPosition, setDragOverPosition] = useState<{ x: number, y: number } | null>(null);
+    const [dragOverPosition, setDragOverPosition] = useState<WidgetPosition | null>(null);
+
+    // Helper function to check collision at specific position
+    const hasCollisionAtPosition = useCallback((position: WidgetPosition, widgets: WidgetConfig[]): boolean => {
+        return widgets.some((widget) => {
+            const w = widget.position;
+            return !(
+                position.x >= w.x + w.w ||
+                position.x + position.w <= w.x ||
+                position.y >= w.y + w.h ||
+                position.y + position.h <= w.y
+            );
+        });
+    }, []);
+
+    // Helper function to find safe position for preview (simplified version)
+    const findSafePositionPreview = useCallback((requestedPosition: WidgetPosition, existingWidgets: WidgetConfig[]): WidgetPosition => {
+        const { w, h } = requestedPosition;
+        
+        // Try positions in expanding search radius around requested position
+        for (let radius = 0; radius <= 5; radius++) {
+            for (let dy = -radius; dy <= radius; dy++) {
+                for (let dx = -radius; dx <= radius; dx++) {
+                    const testPosition = {
+                        x: Math.max(0, Math.min(24 - w, requestedPosition.x + dx)),
+                        y: Math.max(0, requestedPosition.y + dy),
+                        w,
+                        h
+                    };
+                    
+                    if (!hasCollisionAtPosition(testPosition, existingWidgets)) {
+                        return testPosition;
+                    }
+                }
+            }
+        }
+        
+        // Fallback: just place it at bottom
+        const maxY = Math.max(0, ...existingWidgets.map((w) => w.position.y + w.position.h));
+        return { x: 0, y: maxY, w, h };
+    }, [hasCollisionAtPosition]);
 
     // Handle drag start
     const handleDragStart = useCallback((e: React.DragEvent, widgetId: string) => {
@@ -201,7 +241,7 @@ const WidgetGrid: React.FC<{
         setDragOverPosition(null);
     }, []);
 
-    // Handle drag over (for drop zones)
+    // Handle drag over (for drop zones)  
     const handleDragOver = useCallback((e: React.DragEvent) => {
         if (!isEditing || !draggedWidget) return;
 
@@ -213,32 +253,37 @@ const WidgetGrid: React.FC<{
         const x = Math.floor(((e.clientX - rect.left) / rect.width) * 24);
         const y = Math.floor((e.clientY - rect.top) / 80); // Smaller 80px row height
 
-        setDragOverPosition({ x: Math.max(0, Math.min(23, x)), y: Math.max(0, y) });
-    }, [isEditing, draggedWidget]);
+        const widget = widgets.find(w => w.id === draggedWidget);
+        if (widget) {
+            const requestedPosition = {
+                x: Math.max(0, Math.min(24 - widget.position.w, x)),
+                y: Math.max(0, y),
+                w: widget.position.w,
+                h: widget.position.h
+            };
+
+            // Calculate where the widget will ACTUALLY end up after collision resolution
+            const tempWidgets = widgets.filter(w => w.id !== draggedWidget);
+            const safePosition = hasCollisionAtPosition(requestedPosition, tempWidgets) 
+                ? findSafePositionPreview(requestedPosition, tempWidgets)
+                : requestedPosition;
+
+            setDragOverPosition(safePosition);
+        }
+    }, [isEditing, draggedWidget, widgets]);
 
     // Check which widgets would be affected by the drop
     const getAffectedWidgets = useCallback(() => {
         if (!draggedWidget || !dragOverPosition) return [];
 
-        const draggedWidgetData = widgets.find(w => w.id === draggedWidget);
-        if (!draggedWidgetData) return [];
-
-        const proposedPosition = {
-            x: Math.max(0, Math.min(12 - draggedWidgetData.position.w, dragOverPosition.x)),
-            y: Math.max(0, dragOverPosition.y),
-            w: draggedWidgetData.position.w,
-            h: draggedWidgetData.position.h
-        };
-
-        // Find widgets that would collide with the proposed position
-        return widgets.filter(w =>
+        // Since dragOverPosition now contains the FINAL position, 
+        // no widgets should be affected (collision already resolved)
+        // But we can show widgets that WOULD have been affected by the original position
+        return widgets.filter(w => 
             w.id !== draggedWidget &&
-            !(proposedPosition.x >= w.position.x + w.position.w ||
-                proposedPosition.x + proposedPosition.w <= w.position.x ||
-                proposedPosition.y >= w.position.y + w.position.h ||
-                proposedPosition.y + proposedPosition.h <= w.position.y)
+            hasCollisionAtPosition(dragOverPosition, [w])
         );
-    }, [draggedWidget, dragOverPosition, widgets]);
+    }, [draggedWidget, dragOverPosition, widgets, hasCollisionAtPosition]);
 
     // Handle drop
     const handleDrop = useCallback((e: React.DragEvent) => {
@@ -282,15 +327,15 @@ const WidgetGrid: React.FC<{
             onDragOver={handleDragOver}
             onDrop={handleDrop}
         >
-            {/* Drag overlay indicator */}
+            {/* Drag overlay indicator - shows ACTUAL final position */}
             {isEditing && dragOverPosition && draggedWidget && (
                 <div
-                    className="absolute bg-blue-200 bg-opacity-50 border-2 border-blue-400 border-dashed rounded-lg pointer-events-none z-10"
+                    className="absolute bg-green-200 bg-opacity-60 border-2 border-green-500 border-dashed rounded-lg pointer-events-none z-10"
                     style={{
                         left: `${(dragOverPosition.x / 24) * 100}%`,
                         top: `${dragOverPosition.y * 80}px`,
-                        width: `${(widgets.find(w => w.id === draggedWidget)?.position.w || 6) / 24 * 100}%`,
-                        height: `${(widgets.find(w => w.id === draggedWidget)?.position.h || 2) * 80}px`
+                        width: `${dragOverPosition.w / 24 * 100}%`,
+                        height: `${dragOverPosition.h * 80}px`
                     }}
                 />
             )}

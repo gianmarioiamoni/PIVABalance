@@ -155,8 +155,8 @@ const positionUtils = {
       const safePosition = this.findSafePositionNear(newPosition, otherWidgets);
       movedWidget.position = safePosition;
     } else {
-      // Update the moved widget position
-      movedWidget.position = { ...newPosition };
+    // Update the moved widget position
+    movedWidget.position = { ...newPosition };
     }
 
     // Always perform collision resolution after any move
@@ -229,21 +229,21 @@ const positionUtils = {
         
         // Still colliding after potential moves by previous pairs?
         if (this.hasCollision(widgetA.position, [widgetB])) {
-          // Move the widget that's lower (higher Y) or rightmost if same Y
-          const toMove =
-            widgetA.position.y > widgetB.position.y ||
-            (widgetA.position.y === widgetB.position.y &&
-              widgetA.position.x > widgetB.position.x)
-              ? widgetA
-              : widgetB;
+            // Move the widget that's lower (higher Y) or rightmost if same Y
+            const toMove =
+              widgetA.position.y > widgetB.position.y ||
+              (widgetA.position.y === widgetB.position.y &&
+                widgetA.position.x > widgetB.position.x)
+                ? widgetA
+                : widgetB;
 
-          // Find new position for the widget to move
-          const newPos = this.findNextPosition(
-            result.filter((w) => w.id !== toMove.id),
+            // Find new position for the widget to move
+            const newPos = this.findNextPosition(
+              result.filter((w) => w.id !== toMove.id),
             toMove.size,
             24  // Ensure we use 24 columns
-          );
-          toMove.position = newPos;
+            );
+            toMove.position = newPos;
         }
       }
 
@@ -295,7 +295,10 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         // Try to find existing default layout first to avoid duplicates
         try {
           const existingLayout = await dashboardLayoutService.getDefaultLayout();
+          console.warn("DEBUG: Existing layout found:", existingLayout);
+          
           if (existingLayout && existingLayout.id && existingLayout.id !== "default") {
+            console.warn("DEBUG: Updating existing layout with ID:", existingLayout.id);
             // Update the existing default layout
             const updatedLayout = {
               ...existingLayout,
@@ -304,17 +307,22 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
               updatedAt: new Date(),
             };
             return dashboardLayoutService.updateLayout(existingLayout.id, updatedLayout);
+          } else {
+            console.warn("DEBUG: No valid existing layout ID, will create new");
           }
         } catch (_error) {
-          console.warn("No existing layout found, creating new one");
+          console.warn("DEBUG: Error getting existing layout, creating new one:", _error);
         }
 
         // Create new default layout with unique name
         const timestamp = Date.now();
+        const uniqueName = `Dashboard Personalizzata ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`;
+        console.warn("DEBUG: Creating new layout with name:", uniqueName);
+        
         const layoutToCreate = {
           ...layout,
           isDefault: true,
-          name: layout.name || `Dashboard Personalizzata ${timestamp}`,
+          name: uniqueName,
         };
         // Remove the "default" id as it's not a real MongoDB id
         const { id: _id, ...layoutData } = layoutToCreate;
@@ -384,8 +392,8 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
       const position = customPosition
         ? positionUtils.findSafePositionNear(
             {
-              ...positionUtils.findNextPosition(widgets, widgetSize),
-              ...customPosition,
+            ...positionUtils.findNextPosition(widgets, widgetSize),
+            ...customPosition,
             } as WidgetPosition,
             widgets
           )
@@ -484,18 +492,18 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
           name: "Dashboard Personalizzata",
           isDefault: true,
           widgets,
-        layoutSettings: {
+          layoutSettings: {
           columns: 24,  // Increased for finer positioning
           rowHeight: 80,  // Smaller rows for more precision
           margin: [8, 8],  // Smaller margins between widgets
-          containerPadding: [16, 16],
-          breakpoints: {
-            lg: 1200,
-            md: 996,
-            sm: 768,
-            xs: 480,
+            containerPadding: [16, 16],
+            breakpoints: {
+              lg: 1200,
+              md: 996,
+              sm: 768,
+              xs: 480,
+            },
           },
-        },
           createdAt: new Date(),
           updatedAt: new Date(),
         };

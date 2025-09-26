@@ -303,8 +303,10 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
           const existingLayout = await dashboardLayoutService.getDefaultLayout();
           console.warn("💾 SAVE DEBUG: existingLayout =", existingLayout);
           
-          if (existingLayout && existingLayout.id && existingLayout.id !== "default") {
-            console.warn("💾 SAVE DEBUG: Found existing, will update:", existingLayout.id);
+          // Check both id and _id (MongoDB returns _id)
+          const existingId = existingLayout.id || existingLayout._id;
+          if (existingLayout && existingId && existingId !== "default") {
+            console.warn("💾 SAVE DEBUG: Found existing, will update:", existingId);
             // Update the existing default layout
             const updatedLayout = {
               ...existingLayout,
@@ -312,7 +314,7 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
               layoutSettings: layout.layoutSettings,
               updatedAt: new Date(),
             };
-            return dashboardLayoutService.updateLayout(existingLayout.id, updatedLayout);
+            return dashboardLayoutService.updateLayout(existingId, updatedLayout);
           }
         } catch (error) {
           console.warn("💾 SAVE DEBUG: getDefaultLayout failed:", error);
@@ -333,7 +335,15 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
       }
     },
     onSuccess: (savedLayout) => {
-      setLayout(savedLayout);
+      console.warn("💾 SAVE SUCCESS: savedLayout =", savedLayout);
+      
+      // CRITICAL: Ensure layout keeps the correct ID from saved layout
+      const normalizedLayout = {
+        ...savedLayout,
+        id: savedLayout.id || savedLayout._id // Ensure we have id not just _id
+      };
+      
+      setLayout(normalizedLayout);
       
       // CRITICAL: Sync widgets state with saved layout for immediate display
       if (savedLayout.widgets) {

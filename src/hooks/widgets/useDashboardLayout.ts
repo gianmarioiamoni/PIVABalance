@@ -341,6 +341,8 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
     },
     onSuccess: (savedLayout) => {
       console.warn("💾 SAVE SUCCESS: savedLayout =", savedLayout);
+      console.warn("💾 SAVE SUCCESS: savedLayout.id =", savedLayout.id);
+      console.warn("💾 SAVE SUCCESS: savedLayout._id =", (savedLayout as DashboardLayoutWithMongoId)._id);
       
       // CRITICAL: Ensure layout keeps the correct ID from saved layout
       const layoutId = savedLayout.id || (savedLayout as DashboardLayoutWithMongoId)._id;
@@ -533,9 +535,16 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
     }
 
     // Create layout object to save
-    const layoutToSave: DashboardLayout = layout
+    // Important: Use current layout state, but ensure we have a valid ID if it exists
+    const currentLayoutId = layout?.id && layout.id !== "default" && layout.id !== "" ? layout.id : undefined;
+    
+    console.warn("💾 SAVE PREPARE: layout =", layout);
+    console.warn("💾 SAVE PREPARE: currentLayoutId =", currentLayoutId);
+    
+    const layoutToSave: DashboardLayout = currentLayoutId
       ? {
-          ...layout,
+          ...layout!,
+          id: currentLayoutId,
           widgets,
           updatedAt: new Date(),
         }

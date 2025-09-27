@@ -366,11 +366,13 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
       // Set justSaved flag to prevent useEffect from overriding for a short period
       setJustSaved(true);
       
-      // Reset hasChanges AFTER syncing widgets - delay to ensure layout state is updated
+      // Reset hasChanges immediately for UI feedback
+      setHasChanges(false);
+      
+      // Clear justSaved flag after delay to prevent useEffect override during state sync
       setTimeout(() => {
-        setHasChanges(false);
         setJustSaved(false);
-      }, 100); // Short delay to ensure state sync
+      }, 100); // Short delay to ensure state sync completes
       
       showSuccess(
         "Layout Salvato",
@@ -411,7 +413,7 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
       // Only update layout if we don't have a better one already (with valid MongoDB ID)
       const currentHasValidId = layout?.id && layout.id !== "default" && layout.id.match(/^[0-9a-fA-F]{24}$/);
       
-      if (!currentHasValidId) {
+      if (!currentHasValidId && !justSaved) {
         setLayout(layoutData);
       }
       

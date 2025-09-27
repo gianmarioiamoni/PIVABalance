@@ -366,13 +366,11 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
       // Set justSaved flag to prevent useEffect from overriding for a short period
       setJustSaved(true);
       
-      // Reset hasChanges AFTER syncing widgets
-      setHasChanges(false);
-      
-      // Clear the justSaved flag after a short delay to allow cache updates to settle
+      // Reset hasChanges AFTER syncing widgets - delay to ensure layout state is updated
       setTimeout(() => {
+        setHasChanges(false);
         setJustSaved(false);
-      }, 1000); // 1 second protection window
+      }, 100); // Short delay to ensure state sync
       
       showSuccess(
         "Layout Salvato",
@@ -410,7 +408,12 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
   // Sync layout data with local state, but avoid overriding fresh changes or recent saves
   useEffect(() => {
     if (layoutData) {
-      setLayout(layoutData);
+      // Only update layout if we don't have a better one already (with valid MongoDB ID)
+      const currentHasValidId = layout?.id && layout.id !== "default" && layout.id.match(/^[0-9a-fA-F]{24}$/);
+      
+      if (!currentHasValidId) {
+        setLayout(layoutData);
+      }
       
       // Only update widgets if we don't have pending changes AND we didn't just save
       // This prevents the useEffect from overriding fresh widget additions or fresh saves
@@ -419,7 +422,7 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
         setHasChanges(false);
       }
     }
-  }, [layoutData, hasChanges, justSaved]);
+  }, [layoutData, hasChanges, justSaved, layout]);
 
   // Widget management functions
   const addWidget = useCallback(

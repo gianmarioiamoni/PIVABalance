@@ -852,6 +852,80 @@ div[data-backdrop-style="light"] {
   }
 }
 
+/* ===============================================
+   RESPONSIVE ANALYTICS MENU STYLES
+   =============================================== */
+
+/* Hide scrollbar for mobile analytics tabs */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+/* Smooth scroll behavior for mobile tabs */
+.scrollbar-hide {
+  scroll-behavior: smooth;
+}
+
+/* Uniform analytics tabs for consistent spacing */
+.analytics-tab-uniform {
+  min-width: 64px !important;
+  max-width: 64px !important;
+  height: 56px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Responsive adjustments for different screen sizes */
+@media (max-width: 374px) {
+  .analytics-tab-uniform {
+    min-width: 60px !important;
+    max-width: 60px !important;
+    height: 52px !important;
+  }
+  
+  .analytics-tab-uniform span {
+    font-size: 9px !important;
+    line-height: 1.1 !important;
+  }
+  
+  .analytics-tab-uniform svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+@media (min-width: 375px) and (max-width: 639px) {
+  .analytics-tab-uniform {
+    min-width: 64px !important;
+    max-width: 64px !important;
+    height: 56px !important;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 767px) {
+  .analytics-tab-uniform {
+    min-width: 72px !important;
+    max-width: 72px !important;
+    height: 60px !important;
+  }
+  
+  .analytics-tab-uniform span {
+    font-size: 11px !important;
+  }
+  
+  .analytics-tab-uniform svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+}
+
 /* Custom shadow utilities for enhanced depth */
 .shadow-blue-100\/30 {
   box-shadow: 0 4px 15px -3px rgb(219 234 254 / 0.3), 0 2px 6px -4px rgb(219 234 254 / 0.3);

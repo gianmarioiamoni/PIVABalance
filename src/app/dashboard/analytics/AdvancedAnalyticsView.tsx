@@ -22,7 +22,7 @@ type AnalyticsTab = 'overview' | 'kpi' | 'reports' | 'heatmap';
 
 /**
  * Analytics Tab Selector
- * SRP: Handles only tab selection UI
+ * SRP: Handles only tab selection UI with responsive design
  */
 const AnalyticsTabSelector: React.FC<{
     activeTab: AnalyticsTab;
@@ -37,7 +37,8 @@ const AnalyticsTabSelector: React.FC<{
 
     return (
         <div className="border-b border-gray-200">
-            <nav className="flex space-x-8" aria-label="Tabs">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex space-x-8" aria-label="Tabs">
                 {tabs.map(tab => {
                     const IconComponent = tab.icon;
                     return (
@@ -45,8 +46,8 @@ const AnalyticsTabSelector: React.FC<{
                             key={tab.value}
                             onClick={() => onTabChange(tab.value)}
                             className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.value
-                                    ? 'border-blue-500 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                ? 'border-blue-500 text-blue-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                 }`}
                         >
                             <IconComponent className="h-4 w-4" />
@@ -54,6 +55,38 @@ const AnalyticsTabSelector: React.FC<{
                         </button>
                     );
                 })}
+            </nav>
+
+            {/* Mobile Navigation - Horizontal Scroll */}
+            <nav className="md:hidden overflow-x-auto scrollbar-hide" aria-label="Tabs">
+                <div className="flex space-x-1 min-w-max px-3 py-2">
+                    {tabs.map(tab => {
+                        const IconComponent = tab.icon;
+                        return (
+                            <button
+                                key={tab.value}
+                                onClick={() => onTabChange(tab.value)}
+                                className={`analytics-tab-uniform flex flex-col items-center justify-center space-y-1 py-2 px-2 rounded-lg font-medium transition-all ${activeTab === tab.value
+                                    ? 'bg-blue-100 text-blue-600 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                    }`}
+                                style={{
+                                    minWidth: '64px',
+                                    maxWidth: '64px',
+                                    height: '56px'
+                                }}
+                            >
+                                <IconComponent className="h-4 w-4 flex-shrink-0" />
+                                <span className="text-[10px] leading-tight text-center block w-full truncate">
+                                    {tab.value === 'overview' ? 'Panoramica' :
+                                        tab.value === 'kpi' ? 'KPI' :
+                                            tab.value === 'reports' ? 'Report' :
+                                                tab.value === 'heatmap' ? 'Heatmap' : tab.label}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
             </nav>
         </div>
     );

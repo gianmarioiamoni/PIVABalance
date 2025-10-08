@@ -882,6 +882,22 @@ div[data-backdrop-style="light"] {
   justify-content: center !important;
 }
 
+/* Uniform account tabs for consistent spacing */
+.account-tab-uniform {
+  min-width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Account tab text responsive behavior */
+.account-tab-text {
+  display: block;
+}
+
 /* Responsive adjustments for different screen sizes */
 @media (max-width: 374px) {
   .analytics-tab-uniform {
@@ -899,6 +915,25 @@ div[data-backdrop-style="light"] {
     width: 14px !important;
     height: 14px !important;
   }
+
+  .account-tab-uniform {
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+  }
+  
+  .account-tab-uniform span {
+    display: none !important; /* Solo icone su schermi molto piccoli */
+  }
+  
+  .account-tab-text {
+    display: none !important; /* Nascondi testo su iPhone SE */
+  }
+  
+  .account-tab-uniform svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
 }
 
 @media (min-width: 375px) and (max-width: 639px) {
@@ -906,6 +941,29 @@ div[data-backdrop-style="light"] {
     min-width: 64px !important;
     max-width: 64px !important;
     height: 56px !important;
+  }
+
+  .account-tab-uniform {
+    min-width: 52px !important;
+    max-width: 52px !important;
+    height: 52px !important;
+  }
+  
+  .account-tab-uniform span {
+    display: block !important; /* Mostra testo su schermi medi */
+    font-size: 9px !important;
+    line-height: 1.1 !important;
+  }
+  
+  .account-tab-text {
+    display: block !important; /* Mostra testo da 375px in su */
+    font-size: 9px !important;
+    line-height: 1.1 !important;
+  }
+  
+  .account-tab-uniform svg {
+    width: 16px !important;
+    height: 16px !important;
   }
 }
 
@@ -923,6 +981,27 @@ div[data-backdrop-style="light"] {
   .analytics-tab-uniform svg {
     width: 16px !important;
     height: 16px !important;
+  }
+
+  .account-tab-uniform {
+    min-width: 64px !important;
+    max-width: 64px !important;
+    height: 60px !important;
+  }
+  
+  .account-tab-uniform span {
+    display: block !important;
+    font-size: 10px !important;
+  }
+  
+  .account-tab-text {
+    display: block !important;
+    font-size: 10px !important;
+  }
+  
+  .account-tab-uniform svg {
+    width: 18px !important;
+    height: 18px !important;
   }
 }
 

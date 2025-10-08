@@ -6,9 +6,9 @@ import { PasswordSection } from './PasswordSection';
 import { DangerZone } from './DangerZone';
 import { PrivacyRights } from './PrivacyRights';
 import { CookieSettings } from '@/components/cookies';
-import { 
-  UserIcon, 
-  KeyIcon, 
+import {
+  UserIcon,
+  KeyIcon,
   ExclamationTriangleIcon,
   ShieldCheckIcon,
   DocumentTextIcon
@@ -75,19 +75,20 @@ export const AccountManagement: React.FC = () => {
     <div className="space-y-8">
       {/* Section Navigation */}
       <div className="border-b border-gray-200">
-        <nav className="flex space-x-8">
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex space-x-8">
           {sections.map((section) => {
             const Icon = section.icon;
             const isActive = activeSection === section.id;
-            
+
             return (
               <button
                 key={section.id}
                 onClick={() => setActiveSection(section.id)}
                 className={`
                   flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors
-                  ${isActive 
-                    ? `border-current ${section.color}` 
+                  ${isActive
+                    ? `border-current ${section.color}`
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }
                 `}
@@ -97,6 +98,43 @@ export const AccountManagement: React.FC = () => {
               </button>
             );
           })}
+        </nav>
+
+        {/* Mobile Navigation - Horizontal Scroll */}
+        <nav className="md:hidden overflow-x-auto scrollbar-hide" aria-label="Account sections">
+          <div className="flex space-x-1 min-w-max px-3 py-2">
+            {sections.map((section) => {
+              const Icon = section.icon;
+              const isActive = activeSection === section.id;
+
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={`account-tab-uniform flex flex-col items-center justify-center space-y-1 py-2 px-2 rounded-lg font-medium transition-all ${isActive
+                    ? `${section.bgColor} ${section.color} shadow-sm`
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    }`}
+                  style={{
+                    minWidth: '48px',
+                    maxWidth: '48px',
+                    height: '48px'
+                  }}
+                  title={section.title} // Tooltip per accessibilità
+                >
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  {/* Testo nascosto su schermi molto piccoli tramite CSS */}
+                  <span className="account-tab-text text-[9px] leading-tight text-center w-full truncate">
+                    {section.id === 'profile' ? 'Profilo' :
+                      section.id === 'security' ? 'Sicurezza' :
+                        section.id === 'privacy' ? 'Privacy' :
+                          section.id === 'rights' ? 'Diritti' :
+                            'Pericolo'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </nav>
       </div>
 
@@ -126,29 +164,29 @@ export const AccountManagement: React.FC = () => {
           </div>
         )}
 
-      {activeSection === 'privacy' && (
-        <div>
-          <div className="mb-6">
-            <h2 className="heading-md mb-2">Privacy e Cookie</h2>
-            <p className="text-tertiary">
-              Gestisci le tue preferenze sulla privacy e il consenso ai cookie secondo il GDPR.
-            </p>
+        {activeSection === 'privacy' && (
+          <div>
+            <div className="mb-6">
+              <h2 className="heading-md mb-2">Privacy e Cookie</h2>
+              <p className="text-tertiary">
+                Gestisci le tue preferenze sulla privacy e il consenso ai cookie secondo il GDPR.
+              </p>
+            </div>
+            <CookieSettings />
           </div>
-          <CookieSettings />
-        </div>
-      )}
+        )}
 
-      {activeSection === 'rights' && (
-        <div>
-          <div className="mb-6">
-            <h2 className="heading-md mb-2">Diritti Privacy (GDPR)</h2>
-            <p className="text-tertiary">
-              Esercita i tuoi diritti sulla protezione dei dati personali secondo il GDPR.
-            </p>
+        {activeSection === 'rights' && (
+          <div>
+            <div className="mb-6">
+              <h2 className="heading-md mb-2">Diritti Privacy (GDPR)</h2>
+              <p className="text-tertiary">
+                Esercita i tuoi diritti sulla protezione dei dati personali secondo il GDPR.
+              </p>
+            </div>
+            <PrivacyRights />
           </div>
-          <PrivacyRights />
-        </div>
-      )}
+        )}
 
         {activeSection === 'danger' && (
           <div>

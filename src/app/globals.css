@@ -760,6 +760,98 @@ body {
   -webkit-line-clamp: 3;
 }
 
+/* ===============================================
+   MOBILE MENU BACKDROP STYLES - FORCE OVERRIDE
+   =============================================== */
+
+/* Force backdrop blur with maximum specificity */
+div[data-backdrop-style="blur"] {
+  backdrop-filter: blur(8px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(180%) !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Force dark backdrop */
+div[data-backdrop-style="dark"] {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Force light backdrop */
+div[data-backdrop-style="light"] {
+  background-color: rgba(243, 244, 246, 0.8) !important;
+  background: rgba(243, 244, 246, 0.8) !important;
+}
+
+/* Custom backdrop blur utility with high specificity */
+.backdrop-blur-custom {
+  backdrop-filter: blur(8px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(180%) !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Alternative lighter blur */
+.backdrop-blur-light {
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+/* Strong blur for better effect */
+.backdrop-blur-strong {
+  backdrop-filter: blur(12px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(200%) !important;
+}
+
+/* Force override any existing backdrop styles */
+.mobile-menu-backdrop-blur {
+  backdrop-filter: blur(8px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(180%) !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(4px)) {
+  .backdrop-blur-custom,
+  .backdrop-blur-light,
+  .backdrop-blur-strong,
+  .mobile-menu-backdrop-blur,
+  div[data-backdrop-style="blur"] {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+  }
+}
+
+/* Dark theme adjustments */
+:root[data-theme="dark"] .backdrop-blur-custom,
+:root[data-theme="dark"] .mobile-menu-backdrop-blur,
+:root[data-theme="dark"] div[data-backdrop-style="blur"],
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .backdrop-blur-custom,
+  :root:not([data-theme="light"]) .mobile-menu-backdrop-blur,
+  :root:not([data-theme="light"]) div[data-backdrop-style="blur"] {
+    backdrop-filter: blur(8px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(180%) !important;
+    background-color: rgba(15, 23, 42, 0.2) !important;
+    background: rgba(15, 23, 42, 0.2) !important;
+  }
+}
+
+@supports not (backdrop-filter: blur(4px)) {
+  :root[data-theme="dark"] .backdrop-blur-custom,
+  :root[data-theme="dark"] .mobile-menu-backdrop-blur,
+  :root[data-theme="dark"] div[data-backdrop-style="blur"],
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .backdrop-blur-custom,
+    :root:not([data-theme="light"]) .mobile-menu-backdrop-blur,
+    :root:not([data-theme="light"]) div[data-backdrop-style="blur"] {
+      background-color: rgba(15, 23, 42, 0.85) !important; /* slate-900 with opacity */
+      background: rgba(15, 23, 42, 0.85) !important;
+    }
+  }
+}
+
 /* Custom shadow utilities for enhanced depth */
 .shadow-blue-100\/30 {
   box-shadow: 0 4px 15px -3px rgb(219 234 254 / 0.3), 0 2px 6px -4px rgb(219 234 254 / 0.3);

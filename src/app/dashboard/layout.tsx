@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import { useTaxSettings } from '@/hooks/useTaxSettings';
 import { PageErrorBoundary } from '@/components/error-boundaries';
 import { LogoutButton } from '@/components/dashboard/LogoutButton';
+import { MobileNavigationMenu } from '@/components/dashboard/MobileNavigationMenu';
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ');
@@ -252,29 +253,63 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="min-h-screen bg-gray-100">
+            {/* Mobile Navigation Menu */}
+            <MobileNavigationMenu
+                navigationItems={navigationItems}
+                getGroupColors={getGroupColors}
+                backdropStyle="blur"
+            />
+
             <main className="max-w-7xl mx-auto py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">
                 <div className="space-y-8">
-                    {/* Header */}
-                    <div className="relative text-center">
-                        <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-                            Benvenuto, {user.name}!
-                        </h1>
-                        <p className="mt-3 text-xl text-gray-500">
-                            Gestisci le tue impostazioni fiscali e monitora le tue performance finanziarie.
-                        </p>
+                    {/* Header - Responsive */}
+                    <div className="relative">
+                        {/* Mobile layout */}
+                        <div className="lg:hidden">
+                            {/* Leave space for hamburger menu */}
+                            <div className="pl-16 pr-20">
+                                <div className="text-center">
+                                    <h1 className="text-2xl font-extrabold text-gray-900">
+                                        Benvenuto, {user.name}!
+                                    </h1>
+                                    <p className="mt-2 text-base text-gray-500">
+                                        Gestisci le tue impostazioni fiscali e monitora le tue performance finanziarie.
+                                    </p>
+                                </div>
+                            </div>
 
-                        {/* Logout Button - positioned in top right */}
-                        <div className="absolute top-0 right-0">
-                            <LogoutButton
-                                variant="outline"
-                                size="sm"
-                                className="shadow-sm"
-                            />
+                            {/* Logout Button - fixed position for mobile */}
+                            <div className="absolute top-0 right-0">
+                                <LogoutButton
+                                    variant="outline"
+                                    size="sm"
+                                    className="shadow-sm"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Desktop layout */}
+                        <div className="hidden lg:block text-center">
+                            <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                                Benvenuto, {user.name}!
+                            </h1>
+                            <p className="mt-3 text-xl text-gray-500">
+                                Gestisci le tue impostazioni fiscali e monitora le tue performance finanziarie.
+                            </p>
+
+                            {/* Logout Button - positioned in top right */}
+                            <div className="absolute top-0 right-0">
+                                <LogoutButton
+                                    variant="outline"
+                                    size="sm"
+                                    className="shadow-sm"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Navigation */}
-                    <div>
+                    {/* Navigation - Desktop Only */}
+                    <div className="hidden lg:block">
                         <div className="lg:col-span-3">
                             <div className="px-4 sm:px-0">
                                 <nav className="flex flex-wrap gap-2 p-2 bg-white rounded-xl shadow-lg border border-gray-100" aria-label="Tabs">
@@ -358,6 +393,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                                 {children}
                             </div>
                         </div>
+                    </div>
+
+                    {/* Content - Mobile */}
+                    <div className="lg:hidden">
+                        {children}
                     </div>
                 </div>
             </main>

@@ -1,18 +1,28 @@
 import { Metadata } from 'next';
+import { Breadcrumbs, BreadcrumbSchema } from '@/components/navigation';
+import { RelatedLinks, getRelatedLinks } from '@/components/seo/RelatedLinks';
+import { AccessibleIcons } from '@/components/common';
 
 export const metadata: Metadata = {
   title: 'Calcoli Fiscali Automatici | P.IVA Balance',
   description: 'Calcola automaticamente tasse, contributi INPS e previdenziali per regime forfettario e ordinario con precisione garantita.',
+  alternates: {
+    canonical: '/features/calcoli-fiscali'
+  }
 };
 
 export default function CalcoliFiscaliPage() {
   return (
-    <div className="space-y-16">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumbs */}
+        <BreadcrumbSchema />
+        <Breadcrumbs className="mb-8" />
+        
+        <div className="space-y-16">
       {/* Hero Section */}
       <div className="text-center py-12">
-        <div className="text-6xl mb-6 text-blue-600">
-          🧮
-        </div>
+        <AccessibleIcons.Calculator size="xxl" className="mb-6 text-blue-600" />
         <h1 className="heading-xxl text-primary mb-6">
           Calcoli Fiscali Automatici
         </h1>
@@ -190,6 +200,14 @@ export default function CalcoliFiscaliPage() {
             </div>
           </div>
         </div>
+      </div>
+        </div>
+
+        {/* Related Links */}
+        <RelatedLinks 
+          links={getRelatedLinks('calcoli-fiscali')}
+          title="Funzionalità Correlate"
+        />
       </div>
     </div>
   );

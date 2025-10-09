@@ -4,6 +4,7 @@ import { HeroSection } from './HeroSection';
 import { FeaturesSection } from './FeaturesSection';
 import { CTASection } from './CTASection';
 import { StructuredData } from '@/components/seo';
+import { RelatedLinks, getRelatedLinks } from '@/components/seo/RelatedLinks';
 import { HOMEPAGE_CONFIG } from './config';
 
 /**
@@ -45,6 +46,14 @@ export const HomePage: React.FC = () => {
 
                     {/* Features Section */}
                     <FeaturesSection features={features} />
+
+                    {/* Related Links */}
+                    <div className="mx-auto container-wide space-section">
+                        <RelatedLinks 
+                            links={getRelatedLinks('homepage')}
+                            title="Esplora le Nostre Funzionalità"
+                        />
+                    </div>
 
                     {/* Bottom CTA Section */}
                     <CTASection {...cta} />

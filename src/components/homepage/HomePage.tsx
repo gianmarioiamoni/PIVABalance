@@ -3,6 +3,7 @@ import { AnimatedBackground } from './AnimatedBackground';
 import { HeroSection } from './HeroSection';
 import { FeaturesSection } from './FeaturesSection';
 import { CTASection } from './CTASection';
+import { StructuredData } from '@/components/seo';
 import { HOMEPAGE_CONFIG } from './config';
 
 /**
@@ -21,6 +22,15 @@ export const HomePage: React.FC = () => {
 
     return (
         <div className="min-h-screen relative overflow-hidden">
+            {/* SEO Structured Data */}
+            <StructuredData type="website" />
+            <StructuredData type="software" />
+            <StructuredData type="organization" />
+            <StructuredData type="service" data={{
+                name: "Gestione Finanziaria P.IVA",
+                description: "Servizio completo di gestione finanziaria per partite IVA con calcoli fiscali automatici, gestione fatture e controllo costi"
+            }} />
+
             {/* Client-side animated background */}
             <AnimatedBackground />
 

@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/ui';
 import { ServiceWorkerProvider } from '@/providers/ServiceWorkerProvider';
 import { CookieBanner } from '@/components/cookies/CookieBanner';
 import { Footer } from '@/components/layout/Footer';
+import { GoogleAnalytics } from '@/components/analytics';
 // import { PWAInstallPrompt } from '@/components/pwa';
 import './globals.css';
 
@@ -17,14 +18,75 @@ const inter = Inter({
 });
 
 export const metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://pivabalance.com'),
   title: 'P.IVA Balance - Gestione Finanziaria',
-  description: 'Sistema di gestione finanziaria per Partite IVA',
+  description: 'Sistema di gestione finanziaria per Partite IVA. Calcola tasse, gestisci fatture e costi con semplicità. Regime forfettario e ordinario supportati.',
+  keywords: 'partita iva, gestione finanziaria, calcolo tasse, regime forfettario, fatture, costi, INPS, commercialista',
+  authors: [{ name: 'P.IVA Balance Team' }],
+  creator: 'P.IVA Balance',
+  publisher: 'P.IVA Balance',
   manifest: "/api/manifest",
+  
+  // Open Graph
+  openGraph: {
+    type: 'website',
+    locale: 'it_IT',
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://pivabalance.com',
+    title: 'P.IVA Balance - Gestione Finanziaria per Partite IVA',
+    description: 'La soluzione completa per la gestione fiscale della tua partita IVA. Calcola tasse, gestisci fatture e costi con semplicità.',
+    siteName: 'P.IVA Balance',
+    images: [
+      {
+        url: '/icons/icon-512x512.svg',
+        width: 512,
+        height: 512,
+        alt: 'P.IVA Balance Logo',
+      },
+      {
+        url: '/icons/icon-192x192.svg',
+        width: 192,
+        height: 192,
+        alt: 'P.IVA Balance Icon',
+      },
+    ],
+  },
+
+  // Twitter Cards
+  twitter: {
+    card: 'summary_large_image',
+    title: 'P.IVA Balance - Gestione Finanziaria',
+    description: 'Sistema completo per la gestione fiscale della tua partita IVA. Calcoli automatici, fatture e costi organizzati.',
+    images: ['/icons/icon-512x512.svg'],
+    creator: '@pivabalance',
+    site: '@pivabalance',
+  },
+
+  // Additional SEO
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+
+  // PWA
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "P.IVA Balance"
-  }
+  },
+
+  // Verification (to be added when available)
+  // verification: {
+  //   google: 'google-site-verification-code',
+  //   yandex: 'yandex-verification-code',
+  //   yahoo: 'yahoo-site-verification-code',
+  // },
 };
 
 export const viewport = {
@@ -86,6 +148,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} flex flex-col min-h-screen`}>
+        {/* Google Analytics */}
+        <GoogleAnalytics />
+        
         <ThemeProvider>
           <ServiceWorkerProvider>
             <QueryProvider>

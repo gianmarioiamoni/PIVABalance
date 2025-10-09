@@ -1,0 +1,31 @@
+# Robots.txt for P.IVA Balance
+# https://pivabalance.com/robots.txt
+
+User-agent: *
+Allow: /
+
+# Allow important pages for SEO
+Allow: /features/
+Allow: /privacy-policy
+Allow: /cookie-policy
+
+# Disallow admin and private areas
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /signin
+Disallow: /signup
+Disallow: /_next/
+Disallow: /admin/
+
+# Disallow demo pages (development only)
+Disallow: /demo/
+
+# Allow search engines to access manifest and service worker
+Allow: /manifest.json
+Allow: /sw.js
+
+# Sitemap location
+Sitemap: https://pivabalance.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1

@@ -26,7 +26,7 @@ export const metadata = {
   creator: 'P.IVA Balance',
   publisher: 'P.IVA Balance',
   manifest: "/api/manifest",
-  
+
   // Open Graph
   openGraph: {
     type: 'website',
@@ -122,6 +122,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
 
         {/* Favicon */}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png" />
         <link rel="shortcut icon" href="/favicon.ico" />
@@ -150,7 +151,7 @@ export default function RootLayout({
       <body className={`${inter.className} flex flex-col min-h-screen`}>
         {/* Google Analytics */}
         <GoogleAnalytics />
-        
+
         <ThemeProvider>
           <ServiceWorkerProvider>
             <QueryProvider>

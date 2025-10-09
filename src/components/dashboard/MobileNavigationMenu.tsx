@@ -52,16 +52,32 @@ export const MobileNavigationMenu: React.FC<MobileNavigationMenuProps> = ({
         setIsOpen(false);
     }, [pathname]);
 
-    // Prevent body scroll when menu is open
+    // Prevent body scroll when menu is open and apply blur to main content
     useEffect(() => {
         if (isClient && isOpen) {
             document.body.style.overflow = 'hidden';
+            // Apply blur to main content
+            const mainContent = document.getElementById('dashboard-main-content');
+            if (mainContent) {
+                mainContent.style.filter = 'blur(2px)';
+                mainContent.style.transition = 'filter 0.3s ease-in-out';
+            }
         } else {
             document.body.style.overflow = 'unset';
+            // Remove blur from main content
+            const mainContent = document.getElementById('dashboard-main-content');
+            if (mainContent) {
+                mainContent.style.filter = 'none';
+            }
         }
 
         return () => {
             document.body.style.overflow = 'unset';
+            // Cleanup blur on unmount
+            const mainContent = document.getElementById('dashboard-main-content');
+            if (mainContent) {
+                mainContent.style.filter = 'none';
+            }
         };
     }, [isOpen, isClient]);
 

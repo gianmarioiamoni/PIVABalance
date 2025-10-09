@@ -934,6 +934,16 @@ div[data-backdrop-style="light"] {
     width: 16px !important;
     height: 16px !important;
   }
+
+  /* Invoice button - icon only on very small screens */
+  .invoice-add-button span {
+    display: none !important;
+  }
+  
+  .invoice-add-button {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
 }
 
 @media (min-width: 375px) and (max-width: 639px) {

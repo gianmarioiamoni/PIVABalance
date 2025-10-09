@@ -127,15 +127,17 @@ function StripePaymentForm({ donationData, onSuccess, onError, onBack }: Payment
                 />
             </div>
 
-            {/* Test Cards Info */}
-            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <h4 className="text-yellow-800 font-medium text-sm mb-2">🧪 Modalità Test</h4>
-                <div className="text-yellow-700 text-xs space-y-1">
-                    <p><strong>✅ Successo:</strong> 4242424242424242</p>
-                    <p><strong>❌ Rifiutata:</strong> 4000000000000002</p>
-                    <p><strong>💸 Fondi insufficienti:</strong> 4000000000009995</p>
+            {/* Test Cards Info - Only show in test mode */}
+            {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_test_') && (
+                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <h4 className="text-yellow-800 font-medium text-sm mb-2">🧪 Modalità Test</h4>
+                    <div className="text-yellow-700 text-xs space-y-1">
+                        <p><strong>✅ Successo:</strong> 4242424242424242</p>
+                        <p><strong>❌ Rifiutata:</strong> 4000000000000002</p>
+                        <p><strong>💸 Fondi insufficienti:</strong> 4000000000009995</p>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Buttons */}
             <div className="flex gap-3">

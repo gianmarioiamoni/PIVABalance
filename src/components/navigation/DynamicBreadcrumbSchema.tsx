@@ -23,7 +23,7 @@ export const DynamicBreadcrumbSchema: React.FC = () => {
     const breadcrumbs: Array<{ label: string; href: string }> = [{ label: 'Home', href: '/' }];
 
     let currentPath = '';
-    pathSegments.forEach((segment, index) => {
+    pathSegments.forEach((segment, _index) => {
       currentPath += `/${segment}`;
       
       // Convert segment to readable label

@@ -5,7 +5,7 @@ import { InvoiceHeader } from '../InvoiceHeader';
 
 // Mock Lucide React icons
 jest.mock('lucide-react', () => ({
-    PlusIcon: ({ className, ...props }: any) => <div data-testid="plus-icon" className={className} {...props} />,
+    PlusIcon: ({ className, ...props }: React.ComponentProps<'div'>) => <div data-testid="plus-icon" className={className} {...props} />,
 }));
 
 describe('InvoiceHeader', () => {

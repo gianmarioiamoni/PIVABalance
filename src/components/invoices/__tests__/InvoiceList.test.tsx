@@ -6,12 +6,12 @@ import { PlainInvoice } from '@/hooks/invoices/useInvoices';
 
 // Mock Lucide React icons
 jest.mock('lucide-react', () => ({
-    Trash2: ({ className, ...props }: any) => <div data-testid="trash-icon" className={className} {...props} />,
-    Calendar: ({ className, ...props }: any) => <div data-testid="calendar-icon" className={className} {...props} />,
-    Euro: ({ className, ...props }: any) => <div data-testid="euro-icon" className={className} {...props} />,
-    User: ({ className, ...props }: any) => <div data-testid="user-icon" className={className} {...props} />,
-    FileText: ({ className, ...props }: any) => <div data-testid="filetext-icon" className={className} {...props} />,
-    Hash: ({ className, ...props }: any) => <div data-testid="hash-icon" className={className} {...props} />,
+    Trash2: ({ className, ...props }: React.ComponentProps<'div'>) => <div data-testid="trash-icon" className={className} {...props} />,
+    Calendar: ({ className, ...props }: React.ComponentProps<'div'>) => <div data-testid="calendar-icon" className={className} {...props} />,
+    Euro: ({ className, ...props }: React.ComponentProps<'div'>) => <div data-testid="euro-icon" className={className} {...props} />,
+    User: ({ className, ...props }: React.ComponentProps<'div'>) => <div data-testid="user-icon" className={className} {...props} />,
+    FileText: ({ className, ...props }: React.ComponentProps<'div'>) => <div data-testid="filetext-icon" className={className} {...props} />,
+    Hash: ({ className, ...props }: React.ComponentProps<'div'>) => <div data-testid="hash-icon" className={className} {...props} />,
 }));
 
 // Mock LoadingSpinner

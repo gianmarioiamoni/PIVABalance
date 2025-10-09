@@ -49,7 +49,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, className = '' 
   };
 
   // Convert URL segment to human-readable label
-  const getSegmentLabel = (segment: string, segments: string[], index: number): string => {
+  const getSegmentLabel = (segment: string, _segments: string[], _index: number): string => {
     // Handle specific routes
     const routeLabels: Record<string, string> = {
       'dashboard': 'Dashboard',

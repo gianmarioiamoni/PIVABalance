@@ -546,9 +546,9 @@ export const useDashboardLayout = (defaultLayoutId?: string) => {
     console.warn("💾 SAVE PREPARE: layout =", layout);
     console.warn("💾 SAVE PREPARE: currentLayoutId =", currentLayoutId);
     
-    const layoutToSave: DashboardLayout = currentLayoutId
+    const layoutToSave: DashboardLayout = currentLayoutId && layout
       ? {
-          ...layout!,
+          ...layout,
           id: currentLayoutId,
           widgets,
           updatedAt: new Date(),

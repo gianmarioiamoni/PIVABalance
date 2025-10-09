@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-console */
+
 /**
  * Stripe Setup Helper Script
  * 
@@ -77,16 +79,16 @@ JWT_SECRET=your-super-secure-jwt-secret-at-least-32-characters-long-${Math.rando
 JWT_EXPIRES_IN=7d
 
 # Application
-NEXT_PUBLIC_APP_URL=http://localhost:3001
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 NODE_ENV=development
 
 # Security
 BCRYPT_ROUNDS=12
 SESSION_SECRET=your-session-secret-at-least-32-characters-long-${Math.random().toString(36).substring(2)}
 
-# Super Admin Configuration
-SUPER_ADMIN_EMAIL=admin@tuodominio.com
-SUPER_ADMIN_PASSWORD=SuperSecurePassword123!
+# Super Admin Configuration (configure as needed)
+SUPER_ADMIN_EMAIL=your-admin@example.com
+SUPER_ADMIN_PASSWORD=YourSecurePassword123!
 SUPER_ADMIN_NAME=Super Admin
 ALLOW_INIT_API=true
 
@@ -95,7 +97,7 @@ RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
 
 # CORS
-CORS_ORIGIN=http://localhost:3001
+CORS_ORIGIN=http://localhost:3000
 
 `;
         }
@@ -120,7 +122,7 @@ STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
         console.log('\n✅ Configurazione completata!');
         console.log('\n📋 Prossimi passi:');
         console.log('1. Riavvia il server: npm run dev');
-        console.log('2. Vai su: http://localhost:3001');
+        console.log('2. Vai su: http://localhost:3000');
         console.log('3. Clicca "Supporta il progetto" nel footer');
         console.log('4. Testa con carta: 4242424242424242');
 

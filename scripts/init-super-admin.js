@@ -1,21 +1,25 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-console */
+
 /**
  * Initialize Super Admin on Production
  * Calls the initialization API endpoint
  */
 
-const https = require('https');
+// Note: Using fetch API instead of https module
 
-// Configuration
-const VERCEL_URL = process.env.VERCEL_URL || 'piva-balance.vercel.app';
+// Configuration - reads from environment variables
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000';
 const API_ENDPOINT = `/api/admin/init`;
 
 console.log('🚀 PIVABalance - Super Admin Initialization\n');
 
 async function initializeSuperAdmin() {
     try {
-        const url = `https://${VERCEL_URL}${API_ENDPOINT}`;
+        // Ensure URL has protocol
+        const baseUrl = APP_URL.startsWith('http') ? APP_URL : `https://${APP_URL}`;
+        const url = `${baseUrl}${API_ENDPOINT}`;
 
         console.log(`📡 Calling: ${url}`);
 
@@ -42,11 +46,11 @@ async function initializeSuperAdmin() {
             console.log(`📋 Message: ${result.message}`);
 
             if (response.status === 403) {
-                console.log('\n🔧 Fix: Set ALLOW_INIT_API=true in Vercel Environment Variables');
+                console.log('\n🔧 Fix: Set ALLOW_INIT_API=true in your Environment Variables');
             }
 
             if (response.status === 400) {
-                console.log('\n🔧 Fix: Set SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD in Vercel Environment Variables');
+                console.log('\n🔧 Fix: Set SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD in your Environment Variables');
             }
         }
 
@@ -54,7 +58,7 @@ async function initializeSuperAdmin() {
         console.error('❌ Network Error:', error.message);
         console.log('\n🔧 Possible solutions:');
         console.log('- Check your internet connection');
-        console.log('- Verify the Vercel URL is correct');
+        console.log('- Verify the APP URL is correct');
         console.log('- Make sure the deployment is live');
     }
 }

@@ -1,21 +1,49 @@
-import Link from 'next/link';
-import { Metadata } from 'next';
-import { AccessibleIcon } from '@/components/common';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Pagina Non Trovata | P.IVA Balance',
-  description: 'La pagina che stai cercando non esiste. Torna alla homepage o esplora le nostre funzionalità.',
-  robots: {
-    index: false,
-    follow: true,
-  },
-};
+import Link from 'next/link';
+import { AccessibleIcon } from '@/components/common';
+import { useEffect } from 'react';
 
 /**
  * Custom 404 Page
  * Provides helpful navigation and maintains brand consistency
  */
 export default function NotFound() {
+  // Set document title and meta tags dynamically
+  useEffect(() => {
+    document.title = 'Pagina Non Trovata | P.IVA Balance';
+
+    // Set meta description
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'La pagina che stai cercando non esiste. Torna alla homepage o esplora le nostre funzionalità.');
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'description';
+      meta.content = 'La pagina che stai cercando non esiste. Torna alla homepage o esplora le nostre funzionalità.';
+      document.head.appendChild(meta);
+    }
+
+    // Set robots meta
+    const metaRobots = document.querySelector('meta[name="robots"]');
+    if (metaRobots) {
+      metaRobots.setAttribute('content', 'noindex, follow');
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'robots';
+      meta.content = 'noindex, follow';
+      document.head.appendChild(meta);
+    }
+  }, []);
+
+  const handleGoBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = '/';
+    }
+  };
+
   const suggestedLinks = [
     {
       title: 'Dashboard',
@@ -49,10 +77,10 @@ export default function NotFound() {
         <div className="bg-white py-16 px-8 shadow-lg rounded-2xl sm:px-16">
           {/* Error Icon and Code */}
           <div className="text-center mb-8">
-            <AccessibleIcon 
-              emoji="🔍" 
-              alt="Pagina non trovata" 
-              size="xxl" 
+            <AccessibleIcon
+              emoji="🔍"
+              alt="Pagina non trovata"
+              size="xxl"
               className="mb-6 text-gray-400"
             />
             <h1 className="text-6xl font-bold text-gray-900 mb-4">404</h1>
@@ -71,26 +99,26 @@ export default function NotFound() {
               href="/"
               className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             >
-              <AccessibleIcon 
-                emoji="🏠" 
-                alt="" 
-                size="sm" 
-                className="mr-2" 
-                aria-hidden 
+              <AccessibleIcon
+                emoji="🏠"
+                alt=""
+                size="sm"
+                className="mr-2"
+                aria-hidden
               />
               Torna alla Homepage
             </Link>
-            
+
             <button
-              onClick={() => window.history.back()}
+              onClick={handleGoBack}
               className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             >
-              <AccessibleIcon 
-                emoji="↩️" 
-                alt="" 
-                size="sm" 
-                className="mr-2" 
-                aria-hidden 
+              <AccessibleIcon
+                emoji="↩️"
+                alt=""
+                size="sm"
+                className="mr-2"
+                aria-hidden
               />
               Torna Indietro
             </button>
@@ -101,7 +129,7 @@ export default function NotFound() {
             <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center">
               Pagine Popolari
             </h3>
-            
+
             <div className="grid gap-4 sm:grid-cols-2">
               {suggestedLinks.map((link, index) => (
                 <Link
@@ -110,12 +138,12 @@ export default function NotFound() {
                   className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all duration-200 group"
                 >
                   <div className="flex items-start space-x-3">
-                    <AccessibleIcon 
-                      emoji={link.icon} 
-                      alt="" 
-                      size="md" 
-                      className="text-blue-600 mt-1" 
-                      aria-hidden 
+                    <AccessibleIcon
+                      emoji={link.icon}
+                      alt=""
+                      size="md"
+                      className="text-blue-600 mt-1"
+                      aria-hidden
                     />
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
@@ -125,12 +153,12 @@ export default function NotFound() {
                         {link.description}
                       </p>
                     </div>
-                    <AccessibleIcon 
-                      emoji="→" 
-                      alt="" 
-                      size="sm" 
-                      className="text-gray-400 group-hover:text-blue-600 transition-colors mt-1" 
-                      aria-hidden 
+                    <AccessibleIcon
+                      emoji="→"
+                      alt=""
+                      size="sm"
+                      className="text-gray-400 group-hover:text-blue-600 transition-colors mt-1"
+                      aria-hidden
                     />
                   </div>
                 </Link>
@@ -141,10 +169,10 @@ export default function NotFound() {
           {/* Search Suggestion */}
           <div className="mt-8 p-4 bg-blue-50 rounded-lg">
             <div className="flex items-center justify-center space-x-2 text-blue-700">
-              <AccessibleIcon 
-                emoji="💡" 
-                alt="Suggerimento" 
-                size="sm" 
+              <AccessibleIcon
+                emoji="💡"
+                alt="Suggerimento"
+                size="sm"
               />
               <p className="text-sm font-medium">
                 Suggerimento: Usa la barra di ricerca nella homepage per trovare rapidamente quello che cerchi
@@ -156,8 +184,8 @@ export default function NotFound() {
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-500">
               Hai ancora problemi? {' '}
-              <Link 
-                href="/support" 
+              <Link
+                href="/support"
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 Contatta il supporto

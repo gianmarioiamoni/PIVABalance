@@ -9,6 +9,8 @@ import { useTaxSettings } from '@/hooks/useTaxSettings';
 import { PageErrorBoundary } from '@/components/error-boundaries';
 import { LogoutButton } from '@/components/dashboard/LogoutButton';
 import { MobileNavigationMenu } from '@/components/dashboard/MobileNavigationMenu';
+import { Breadcrumbs } from '@/components/navigation';
+import { DynamicBreadcrumbSchema } from '@/components/navigation/DynamicBreadcrumbSchema';
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ');
@@ -261,7 +263,15 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             />
 
             <main id="dashboard-main-content" className="max-w-7xl mx-auto py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">
+                {/* SEO Breadcrumb Schema */}
+                <DynamicBreadcrumbSchema />
+                
                 <div className="space-y-8">
+                    {/* Breadcrumbs - Above tabbar */}
+                    <div className="pt-2">
+                        <Breadcrumbs className="text-sm" />
+                    </div>
+
                     {/* Header - Responsive */}
                     <div className="relative">
                         {/* Mobile layout */}

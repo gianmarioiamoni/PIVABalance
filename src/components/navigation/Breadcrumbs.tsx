@@ -25,7 +25,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, className = '' 
   // Generate breadcrumbs from pathname if no custom items provided
   const generateBreadcrumbs = (): BreadcrumbItem[] => {
     const pathSegments = pathname.split('/').filter(segment => segment !== '');
-    
+
     const breadcrumbs: BreadcrumbItem[] = [
       { label: 'Home', href: '/' }
     ];
@@ -34,10 +34,10 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, className = '' 
     pathSegments.forEach((segment, index) => {
       currentPath += `/${segment}`;
       const isLast = index === pathSegments.length - 1;
-      
+
       // Convert segment to readable label
       const label = getSegmentLabel(segment, pathSegments, index);
-      
+
       breadcrumbs.push({
         label,
         href: currentPath,
@@ -84,8 +84,8 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, className = '' 
   }
 
   return (
-    <nav 
-      className={`flex ${className}`} 
+    <nav
+      className={`flex ${className}`}
       aria-label="Breadcrumb"
     >
       <ol className="inline-flex items-center space-x-1 md:space-x-3">
@@ -94,7 +94,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, className = '' 
             {index > 0 && (
               <ChevronRightIcon className="w-4 h-4 text-gray-400 mx-1" />
             )}
-            
+
             {item.current ? (
               <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 {index === 0 && (
@@ -120,51 +120,3 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, className = '' 
   );
 };
 
-/**
- * Breadcrumb Schema.org Structured Data
- * Generates JSON-LD for breadcrumb navigation
- */
-export const BreadcrumbSchema: React.FC<{ items?: BreadcrumbItem[] }> = ({ items }) => {
-  const pathname = usePathname();
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pivabalance.com';
-  
-  // Generate breadcrumbs if not provided
-  const breadcrumbItems = items || (() => {
-    const pathSegments = pathname.split('/').filter(segment => segment !== '');
-    const breadcrumbs: BreadcrumbItem[] = [{ label: 'Home', href: '/' }];
-
-    let currentPath = '';
-    pathSegments.forEach((segment, index) => {
-      currentPath += `/${segment}`;
-      const label = segment.charAt(0).toUpperCase() + segment.slice(1);
-      breadcrumbs.push({ label, href: currentPath });
-    });
-
-    return breadcrumbs;
-  })();
-
-  // Don't generate schema for home page
-  if (pathname === '/' || breadcrumbItems.length <= 1) {
-    return null;
-  }
-
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": breadcrumbItems.map((item, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "name": item.label,
-      "item": `${baseUrl}${item.href}`
-    }))
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(breadcrumbSchema, null, 2)
-      }}
-    />
-  );
-};

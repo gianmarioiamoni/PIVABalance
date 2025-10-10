@@ -17,6 +17,7 @@ Una soluzione **production-ready** e **open source** per la gestione fiscale di 
 - 🧪 **63+ Test Completi** - TDD con coverage superiore al 90%
 - ⚡ **Performance Ottimizzate** - Build pulito senza warning, bundle ottimizzato
 - 🔒 **Type Safety 100%** - Zero `any` types, validazione Zod completa
+- 🌐 **Open Source Ready** - Configurazione completa per contributi della community
 
 ---
 

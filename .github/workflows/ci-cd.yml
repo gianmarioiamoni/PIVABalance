@@ -83,10 +83,16 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: 🛡️ Run Snyk security scan
-        uses: snyk/actions/node@master
+      - name: 🛡️ Run custom security scan
+        run: NODE_ENV=production node scripts/security-scan.js
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          NODE_ENV: production
+
+      # Snyk security scan (commented out - requires SNYK_TOKEN secret)
+      # - name: 🛡️ Run Snyk security scan
+      #   uses: snyk/actions/node@master
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   # Job 4: Deploy to Vercel (only for main branch)
   deploy:

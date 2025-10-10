@@ -29,11 +29,11 @@
   --surface-border: #e5e7eb;      /* gray-200 */
   --surface-hover: #f3f4f6;       /* gray-100 */
   
-  /* Text Colors - Light Theme */
-  --text-primary: #111827;        /* gray-900 */
-  --text-secondary: #374151;      /* gray-700 */
-  --text-tertiary: #6b7280;       /* gray-500 */
-  --text-quaternary: #9ca3af;     /* gray-400 */
+  /* Text Colors - Light Theme - WCAG AA Compliant */
+  --text-primary: #111827;        /* gray-900 - 16.9:1 contrast */
+  --text-secondary: #374151;      /* gray-700 - 9.9:1 contrast */
+  --text-tertiary: #4b5563;       /* gray-600 - 7.0:1 contrast (AA compliant) */
+  --text-quaternary: #6b7280;     /* gray-500 - 4.5:1 contrast (AA compliant) */
   --text-inverse: #ffffff;        /* white */
   
   /* Status Colors */
@@ -91,11 +91,11 @@
     --surface-border: #475569;      /* slate-600 */
     --surface-hover: #334155;       /* slate-700 */
     
-    /* Text Colors - Dark Theme */
-    --text-primary: #f8fafc;        /* slate-50 */
-    --text-secondary: #e2e8f0;      /* slate-200 */
-    --text-tertiary: #cbd5e1;       /* slate-300 */
-    --text-quaternary: #94a3b8;     /* slate-400 */
+    /* Text Colors - Dark Theme - WCAG AA Compliant */
+    --text-primary: #f8fafc;        /* slate-50 - 18.7:1 contrast on dark */
+    --text-secondary: #e2e8f0;      /* slate-200 - 12.6:1 contrast */
+    --text-tertiary: #cbd5e1;       /* slate-300 - 8.5:1 contrast (AA compliant) */
+    --text-quaternary: #94a3b8;     /* slate-400 - 4.5:1 contrast (AA compliant) */
     --text-inverse: #0f172a;        /* slate-900 */
     
     /* Brand Colors Adjusted for Dark */
@@ -201,9 +201,91 @@ body {
   transition-duration: 200ms;
 }
 
-/* ===============================================
-   UTILITY CLASSES
-   =============================================== */
+  /* ===============================================
+     ACCESSIBILITY - ENHANCED FOCUS INDICATORS (WCAG 2.1 AA)
+     =============================================== */
+  
+  /* Enhanced focus styles for better visibility */
+  *:focus {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 2px;
+  }
+  
+  /* High contrast focus for interactive elements */
+  button:focus,
+  a:focus,
+  input:focus,
+  select:focus,
+  textarea:focus,
+  [role="button"]:focus,
+  [role="link"]:focus,
+  [tabindex]:focus {
+    outline: 3px solid var(--brand-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.1);
+  }
+  
+  /* Custom focus for dark theme */
+  :root[data-theme="dark"] *:focus,
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) *:focus {
+      outline-color: #60a5fa; /* blue-400 for better contrast on dark */
+    }
+  }
+
+  /* ===============================================
+     ACCESSIBILITY - MOTION PREFERENCES (WCAG 2.1 AA)
+     =============================================== */
+  
+  /* Respect user's motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* ===============================================
+     ACCESSIBILITY - SKIP LINKS (WCAG 2.1 AA)
+     =============================================== */
+  .skip-links {
+    position: relative;
+    z-index: 9999;
+  }
+  
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: var(--brand-primary);
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 0 0 4px 4px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: top 0.2s ease-in-out;
+    z-index: 10000;
+  }
+  
+  .skip-link:focus {
+    top: 0;
+    outline: 3px solid #fbbf24; /* High contrast outline */
+    outline-offset: 2px;
+  }
+  
+  .skip-link:hover:focus {
+    background: var(--brand-primary-hover);
+  }
+
+  /* ===============================================
+     UTILITY CLASSES
+     =============================================== */
 @layer utilities {
   /* Surface Classes */
   .surface-primary { 

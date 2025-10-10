@@ -7,6 +7,7 @@ import { ServiceWorkerProvider } from '@/providers/ServiceWorkerProvider';
 import { CookieBanner } from '@/components/cookies/CookieBanner';
 import { Footer } from '@/components/layout/Footer';
 import { GoogleAnalytics } from '@/components/analytics';
+import { SkipLinks } from '@/components/common/SkipLinks';
 // import { PWAInstallPrompt } from '@/components/pwa';
 import './globals.css';
 
@@ -92,8 +93,8 @@ export const metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
-  userScalable: true,
+  // Removed maximumScale and userScalable restrictions for WCAG 2.1 AA compliance
+  // Users must be able to zoom up to 200% without loss of functionality
   viewportFit: "cover",
   themeColor: "#3B82F6"
 };
@@ -149,15 +150,18 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} flex flex-col min-h-screen`}>
+        {/* Skip Links for WCAG 2.1 AA Compliance */}
+        <SkipLinks />
+        
         {/* Google Analytics */}
         <GoogleAnalytics />
-
+        
         <ThemeProvider>
           <ServiceWorkerProvider>
             <QueryProvider>
               <AuthProvider>
                 <NotificationProvider>
-                  <div className="flex-grow">
+                  <div id="main-content" className="flex-grow">
                     {children}
                   </div>
                   <Footer />

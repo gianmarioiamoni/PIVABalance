@@ -27,6 +27,7 @@ export const Navbar = () => {
 
   return (
     <nav 
+      id="navigation"
       className="navbar-base"
       aria-label={ARIA_LABELS.navbar}
       role="navigation"

@@ -25,7 +25,7 @@ export const CostFormWrapper: React.FC<CostFormWrapperProps> = ({
     cost
 }) => {
     // Enhanced error handling with automatic retry
-    const { execute: executeWithRetry, isRetrying, retryCount } = useRetry({
+    const { execute: executeWithRetry, isRetrying } = useRetry({
         maxRetries: 3,
         delay: 1000,
         exponentialBackoff: true
@@ -106,7 +106,6 @@ export const CostFormWrapper: React.FC<CostFormWrapperProps> = ({
             errors={error ? { submit: error } : errors}
             touched={touched}
             isSubmitting={loading || isRetrying}
-            retryCount={retryCount}
         />
     );
 }; 

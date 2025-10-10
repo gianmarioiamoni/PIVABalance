@@ -38,7 +38,7 @@ export interface UseRetryReturn<T> {
  * };
  * ```
  */
-export const useRetry = <T = any>(options: RetryOptions = {}): UseRetryReturn<T> => {
+export const useRetry = <T = unknown>(options: RetryOptions = {}): UseRetryReturn<T> => {
   const {
     maxRetries = 3,
     delay = 1000,

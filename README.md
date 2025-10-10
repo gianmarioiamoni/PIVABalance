@@ -1,6 +1,13 @@
-# 🚀 P.IVA Balance - Sistema Completo di Gestione Bilancio per Freelancer 
+# 🚀 P.IVA Balance - Sistema Completo di Gestione Bilancio per Freelancer
 
-Una soluzione **production-ready** per la gestione fiscale di partite IVA, costruita con **Next.js 15**, **TypeScript**, e **MongoDB** seguendo i principi **SOLID** e **TDD**.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![Accessibility](https://img.shields.io/badge/WCAG-2.1%20AA-green.svg)](https://www.w3.org/WAI/WCAG21/quickref/)
+[![CI/CD](https://github.com/gianmarioiamoni/PIVABalance/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/gianmarioiamoni/PIVABalance/actions)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](CONTRIBUTING.md)
+
+Una soluzione **production-ready** e **open source** per la gestione fiscale di partite IVA, costruita con **Next.js 15**, **TypeScript**, e **MongoDB** seguendo i principi **SOLID** e **TDD**.
 
 ## ⭐ **Highlights del Progetto**
 
@@ -264,21 +271,25 @@ PIVABalance implementa **Privacy by Design** con conformità GDPR al **100%**:
 
 ```tsx
 // ✅ Cookie Consent Management with Audit Trail
-import { useCookieConsent, CookieBanner, CookieSettings } from "@/components/cookies";
+import {
+  useCookieConsent,
+  CookieBanner,
+  CookieSettings,
+} from "@/components/cookies";
 
-const { 
-  hasConsent, 
-  preferences, 
-  savePreferences, 
+const {
+  hasConsent,
+  preferences,
+  savePreferences,
   getConsentAuditTrail,
-  exportConsentAudit 
+  exportConsentAudit,
 } = useCookieConsent();
 
-<CookieBanner 
+<CookieBanner
   onAcceptAll={acceptAll}
   onAcceptNecessaryOnly={acceptNecessaryOnly}
   onCustomize={openSettings}
-/>
+/>;
 ```
 
 ### **📋 Data Subject Rights (Art. 12-23 GDPR)**
@@ -287,10 +298,10 @@ const {
 // ✅ Automated Privacy Request System
 import { PrivacyRequestForm } from "@/components/privacy";
 
-<PrivacyRequestForm />
+<PrivacyRequestForm />;
 // Supports all 9 GDPR rights:
 // - Access (Art. 15)
-// - Rectification (Art. 16) 
+// - Rectification (Art. 16)
 // - Erasure (Art. 17)
 // - Restriction (Art. 18)
 // - Portability (Art. 20)
@@ -1025,7 +1036,7 @@ npm run start
 #### **🚀 Step 4: Final Production Optimization (NEXT)**
 
 - 🔧 Performance monitoring e optimizations
-- 🔒 Security audit e hardening  
+- 🔒 Security audit e hardening
 - 📱 Mobile UX final refinements
 - 🚀 Production deployment preparation
 
@@ -1085,6 +1096,43 @@ npm run build         # Build verification
 
 ---
 
+## 🤝 **Contributing**
+
+Questo è un progetto **open source** e accogliamo contributi dalla comunità!
+
+### **🚀 Come Contribuire**
+
+1. **Fork** il repository
+2. **Clone** il tuo fork: `git clone https://github.com/YOUR_USERNAME/PIVABalance.git`
+3. **Crea un branch** per la tua feature: `git checkout -b feature/amazing-feature`
+4. **Fai le tue modifiche** seguendo le nostre [guidelines](CONTRIBUTING.md)
+5. **Testa** le tue modifiche: `npm test`
+6. **Commit** con conventional commits: `git commit -m "feat: add amazing feature"`
+7. **Push** al tuo fork: `git push origin feature/amazing-feature`
+8. **Apri una Pull Request** verso il branch `develop`
+
+### **📋 Linee Guida**
+
+- **Target branch**: Sempre `develop`, mai `main`
+- **Coding standards**: TypeScript, SOLID principles, TDD
+- **Testing**: Minimo 80% coverage per nuovo codice
+- **Accessibility**: WCAG 2.1 AA compliance richiesta
+- **Mobile-first**: Design responsive obbligatorio
+
+### **🎯 Aree di Contributo**
+
+- 🐛 **Bug fixes** - Risoluzione problemi esistenti
+- ✨ **Nuove features** - Funzionalità aggiuntive
+- 📚 **Documentazione** - Miglioramenti docs
+- ♿ **Accessibilità** - Miglioramenti A11y
+- 🎨 **UI/UX** - Miglioramenti interfaccia
+- ⚡ **Performance** - Ottimizzazioni
+- 🧪 **Testing** - Ampliamento test coverage
+
+Leggi la [guida completa per contribuire](CONTRIBUTING.md) per tutti i dettagli.
+
+---
+
 ## 🎊 **Project Status**
 
 ### **✅ PRODUCTION READY**
@@ -1129,6 +1177,7 @@ npm run build         # Build verification
 ## 📚 **Documentation Links**
 
 ### **🏗️ Architecture & Development**
+
 - [🎛️ Widget System Architecture](docs/architecture/WIDGET_SYSTEM_ARCHITECTURE.md)
 - [📊 Chart Architecture](docs/architecture/ARCHITECTURE.md)
 - [📱 Mobile SSR/CSR](docs/architecture/SSR_CSR_ARCHITECTURE.md)
@@ -1139,6 +1188,7 @@ npm run build         # Build verification
 - [📚 Documentation Index](docs/DOCUMENTATION_INDEX.md)
 
 ### **🔒 GDPR & Privacy Compliance**
+
 - [🛡️ GDPR Compliance Audit](docs/gdpr-compliance/GDPR_COMPLIANCE_AUDIT.md)
 - [📋 Processing Activities Register](docs/gdpr-compliance/REGISTRO_TRATTAMENTI_GDPR.md)
 - [👨‍💼 Admin System Setup](docs/gdpr-compliance/ADMIN_SETUP.md)

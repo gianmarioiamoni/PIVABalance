@@ -1,0 +1,31 @@
+# Code Owners for P.IVA Balance
+# These owners will be requested for review when someone opens a pull request.
+
+# Global ownership - you as the maintainer
+* @gianmarioiamoni
+
+# Critical files - require your approval
+/src/app/layout.tsx @gianmarioiamoni
+/src/middleware.ts @gianmarioiamoni
+/next.config.ts @gianmarioiamoni
+/package.json @gianmarioiamoni
+/tsconfig.json @gianmarioiamoni
+
+# Database and API routes - require your approval
+/src/app/api/ @gianmarioiamoni
+/src/models/ @gianmarioiamoni
+/src/lib/database/ @gianmarioiamoni
+
+# Security and authentication
+/src/lib/auth/ @gianmarioiamoni
+/src/providers/AuthProvider.tsx @gianmarioiamoni
+
+# Deployment and CI/CD
+/.github/ @gianmarioiamoni
+/vercel.json @gianmarioiamoni
+/Dockerfile @gianmarioiamoni
+/docker-compose.yml @gianmarioiamoni
+
+# Documentation - can be reviewed by community but final approval by you
+/docs/ @gianmarioiamoni
+/README.md @gianmarioiamoni

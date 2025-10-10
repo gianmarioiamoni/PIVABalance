@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Security: Disable X-Powered-By header
+  poweredByHeader: false,
+  
   // Performance optimizations
   experimental: {
     optimizePackageImports: ["lucide-react", "@heroicons/react", "recharts", "react-query"],

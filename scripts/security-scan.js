@@ -95,12 +95,20 @@ class SecurityScanner {
     scanEnvironmentSecurity() {
         console.log(`${colors.cyan}🌍 Scanning Environment Security...${colors.reset}`);
 
-        // Check for .env files in repository
+        // Check for .env files in repository (only if they're tracked by git)
         const envFiles = ['.env', '.env.local', '.env.production', '.env.development'];
         envFiles.forEach(file => {
             if (fs.existsSync(path.join(process.cwd(), file))) {
-                this.vulnerabilities.push(`❌ Environment file ${file} found in repository`);
-                this.score -= 15;
+                // Check if file is tracked by git
+                try {
+                    execSync(`git ls-files --error-unmatch ${file}`, { stdio: 'pipe' });
+                    // File is tracked by git - this is a security issue
+                    this.vulnerabilities.push(`❌ Environment file ${file} found in repository`);
+                    this.score -= 15;
+                } catch (error) {
+                    // File is not tracked by git (ignored) - this is OK
+                    console.log(`  ${colors.green}✓${colors.reset} Environment file ${file}: Properly ignored by git`);
+                }
             }
         });
 

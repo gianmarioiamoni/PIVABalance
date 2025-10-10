@@ -34,12 +34,18 @@ const donationRequestSchema = z.object({
 });
 
 /**
- * Initialize Stripe
+ * Initialize Stripe (only if API key is available)
  * Uses server-side secret key for secure payment processing
  */
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-02-24.acacia",
-});
+const getStripe = () => {
+  const apiKey = process.env.STRIPE_SECRET_KEY;
+  if (!apiKey) {
+    throw new Error("Stripe configuration missing. Please set STRIPE_SECRET_KEY environment variable.");
+  }
+  return new Stripe(apiKey, {
+    apiVersion: "2025-02-24.acacia",
+  });
+};
 
 /**
  * POST /api/donations/create-payment-intent
@@ -81,6 +87,9 @@ export async function POST(
         );
       }
     }
+
+    // Initialize Stripe (will throw if not configured)
+    const stripe = getStripe();
 
     // Create Stripe Payment Intent
     const paymentIntent = await stripe.paymentIntents.create({

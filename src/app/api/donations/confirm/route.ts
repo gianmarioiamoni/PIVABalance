@@ -13,11 +13,17 @@ const confirmDonationSchema = z.object({
 });
 
 /**
- * Initialize Stripe
+ * Initialize Stripe (only if API key is available)
  */
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-02-24.acacia",
-});
+const getStripe = () => {
+  const apiKey = process.env.STRIPE_SECRET_KEY;
+  if (!apiKey) {
+    throw new Error("Stripe configuration missing. Please set STRIPE_SECRET_KEY environment variable.");
+  }
+  return new Stripe(apiKey, {
+    apiVersion: "2025-02-24.acacia",
+  });
+};
 
 /**
  * POST /api/donations/confirm
@@ -29,6 +35,9 @@ export async function POST(
 ): Promise<NextResponse<ApiResponse<DonationResponse>>> {
   try {
     await connectDB();
+
+    // Initialize Stripe (will throw if not configured)
+    const stripe = getStripe();
 
     // Parse and validate request body
     const body = await request.json();

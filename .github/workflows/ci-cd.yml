@@ -25,12 +25,12 @@ jobs:
       - name: 📚 Install dependencies
         run: npm ci
 
-       - name: 🔍 Lint check
-         run: npm run lint
+      - name: 🔍 Lint check
+        run: npm run lint
 
-       # Commented out format check for now - existing codebase needs gradual formatting
-       # - name: 🎨 Format check
-       #   run: npm run format:check
+      # Commented out format check for now - existing codebase needs gradual formatting
+      # - name: 🎨 Format check
+      #   run: npm run format:check
 
       - name: 🧪 Run tests
         run: npm test -- --coverage --watchAll=false

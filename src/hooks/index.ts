@@ -14,6 +14,10 @@ export { useSignIn } from "./useSignIn";
 export { useSignUp } from "./useSignUp";
 export { useTaxSettings } from "./useTaxSettings";
 
+// Enhanced error handling
+export { useRetry } from "./useRetry";
+export type { RetryOptions, UseRetryReturn } from "./useRetry";
+
 // Theme hook
 export { useTheme } from "./useTheme";
 export type { Theme } from "./useTheme";

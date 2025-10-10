@@ -40,3 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 build.log
+
+# bundle analyzer
+bundle-analyzer-report.html

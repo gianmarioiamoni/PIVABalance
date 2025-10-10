@@ -12,10 +12,11 @@ const nextConfig: NextConfig = {
   // Bundle analyzer (run with ANALYZE=true npm run build)
   ...(process.env.ANALYZE === 'true' && {
     webpack: (config: { plugins: unknown[] }) => {
-      const { BundleAnalyzerPlugin } = require('@next/bundle-analyzer')();
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
       config.plugins.push(new BundleAnalyzerPlugin({
-        analyzerMode: 'server',
-        openAnalyzer: true,
+        analyzerMode: 'static',
+        openAnalyzer: false,
+        reportFilename: '../bundle-analyzer-report.html',
       }));
       return config;
     },

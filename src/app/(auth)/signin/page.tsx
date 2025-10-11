@@ -220,7 +220,7 @@ function SignInContent() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="btn-base btn-primary w-full py-3 px-4 rounded-xl body-md font-medium transition-all duration-200 hover:scale-105"
+                                className="btn-base btn-primary w-full py-3 px-4 rounded-xl body-md font-medium transition-all duration-200 hover:scale-105 flex items-center justify-center"
                             >
                                 {isLoading ? (
                                     <>

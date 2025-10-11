@@ -57,9 +57,10 @@ const DEFAULT_PREFERENCES: CookieConsent = {
 export const useCookieConsent = () => {
   const [state, setState] = useState<CookieConsentState>({
     hasConsent: false,
-    showBanner: true,
+    showBanner: false, // Start with hidden banner to prevent flash
     preferences: DEFAULT_PREFERENCES,
   });
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Load consent from localStorage on mount (client-side only)
   useEffect(() => {
@@ -74,6 +75,8 @@ export const useCookieConsent = () => {
         // Validate parsed data
         if (!parsed || typeof parsed !== "object") {
           localStorage.removeItem(CONSENT_STORAGE_KEY);
+          setState(prev => ({ ...prev, showBanner: true }));
+          setIsInitialized(true);
           return;
         }
 
@@ -97,6 +100,7 @@ export const useCookieConsent = () => {
               },
               consentDate: consentDate,
             });
+            setIsInitialized(true);
             return;
           }
         }
@@ -104,6 +108,10 @@ export const useCookieConsent = () => {
         // Clear expired or invalid consent
         localStorage.removeItem(CONSENT_STORAGE_KEY);
       }
+      
+      // No valid consent found, show banner
+      setState(prev => ({ ...prev, showBanner: true }));
+      setIsInitialized(true);
     } catch (error) {
       console.error("Error loading cookie consent:", error);
       // Clear corrupted data
@@ -112,6 +120,8 @@ export const useCookieConsent = () => {
       } catch (clearError) {
         console.error("Error clearing corrupted consent data:", clearError);
       }
+      setState(prev => ({ ...prev, showBanner: true }));
+      setIsInitialized(true);
     }
   }, []);
 
@@ -371,9 +381,10 @@ export const useCookieConsent = () => {
   return {
     // State
     hasConsent: state.hasConsent,
-    showBanner: state.showBanner,
+    showBanner: state.showBanner && isInitialized, // Only show banner after initialization
     preferences: state.preferences,
     consentDate: state.consentDate,
+    isInitialized,
 
     // Actions
     acceptAll,

@@ -7,7 +7,6 @@ import { useMutation } from '@tanstack/react-query';
 import { type SignInCredentials } from '@/services/authService';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { sanitizeInput, escapeHtml, isValidEmail } from '@/utils/security';
-import { LoadingSpinner } from '@/components/ui';
 import { AuthErrorBoundary } from '@/components/error-boundaries';
 
 // Disable prerendering for this page to avoid SSR issues
@@ -220,13 +219,13 @@ function SignInContent() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="btn-base btn-primary w-full py-3 px-4 rounded-xl body-md font-medium transition-all duration-200 hover:scale-105"
+                                className="btn-base btn-primary w-full py-3 px-4 rounded-xl body-md font-medium transition-all duration-200 hover:scale-105 flex items-center justify-center"
                             >
                                 {isLoading ? (
-                                    <>
-                                        <LoadingSpinner size="sm" className="mr-2" />
+                                    <div className="flex items-center justify-center">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                                         Accesso in corso...
-                                    </>
+                                    </div>
                                 ) : (
                                     'Accedi'
                                 )}
@@ -260,7 +259,7 @@ export default function SignInPage() {
         <AuthErrorBoundary authType="signin">
             <Suspense fallback={
                 <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-                    <LoadingSpinner />
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                 </div>
             }>
                 <SignInContent />

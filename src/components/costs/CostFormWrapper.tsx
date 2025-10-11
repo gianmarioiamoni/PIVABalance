@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CostForm } from './CostForm';
 import { CreateCostData } from '@/services/costService';
 import { ICost } from '@/types';
+import { useRetry } from '@/hooks/useRetry';
 
 // Extend ICost to include deductible property for the form
 type CostFormData = ICost & {
@@ -16,10 +17,6 @@ interface CostFormWrapperProps {
     cost?: CreateCostData;
 }
 
-/**
- * Wrapper component to adapt old CostForm interface to new one
- * Maintains backward compatibility while using the new design system
- */
 export const CostFormWrapper: React.FC<CostFormWrapperProps> = ({
     onSubmit,
     onCancel,
@@ -27,6 +24,13 @@ export const CostFormWrapper: React.FC<CostFormWrapperProps> = ({
     error = null,
     cost
 }) => {
+    // Enhanced error handling with automatic retry
+    const { execute: executeWithRetry, isRetrying } = useRetry({
+        maxRetries: 3,
+        delay: 1000,
+        exponentialBackoff: true
+    });
+
     const [formData, setFormData] = useState<Partial<CostFormData>>({
         description: cost?.description || '',
         date: cost?.date ? new Date(cost.date) : new Date(),
@@ -84,9 +88,10 @@ export const CostFormWrapper: React.FC<CostFormWrapperProps> = ({
         };
 
         try {
-            await onSubmit(costData);
+            // Use retry mechanism for better error handling
+            await executeWithRetry(() => onSubmit(costData));
         } catch (err) {
-            console.error('Error submitting cost:', err);
+            console.error('Failed to submit cost after retries:', err);
         }
     };
 
@@ -100,7 +105,7 @@ export const CostFormWrapper: React.FC<CostFormWrapperProps> = ({
             onSubmit={handleSubmit}
             errors={error ? { submit: error } : errors}
             touched={touched}
-            isSubmitting={loading}
+            isSubmitting={loading || isRetrying}
         />
     );
 }; 

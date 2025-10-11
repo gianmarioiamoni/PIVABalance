@@ -6,11 +6,17 @@ import { Donation } from "@/models/Donation";
 import { sendDonationReceipt } from "@/lib/email/donation-receipt";
 
 /**
- * Initialize Stripe with webhook endpoint secret
+ * Initialize Stripe (only if API key is available)
  */
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-02-24.acacia",
-});
+const getStripe = () => {
+  const apiKey = process.env.STRIPE_SECRET_KEY;
+  if (!apiKey) {
+    throw new Error("Stripe configuration missing. Please set STRIPE_SECRET_KEY environment variable.");
+  }
+  return new Stripe(apiKey, {
+    apiVersion: "2025-02-24.acacia",
+  });
+};
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
@@ -33,6 +39,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       console.error("No Stripe signature found");
       return NextResponse.json({ error: "No signature" }, { status: 400 });
     }
+
+    // Initialize Stripe (will throw if not configured)
+    const stripe = getStripe();
 
     // Verify webhook signature
     let event: Stripe.Event;

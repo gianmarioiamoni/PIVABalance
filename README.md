@@ -9,6 +9,9 @@
 
 Una soluzione **production-ready** e **open source** per la gestione fiscale di partite IVA, costruita con **Next.js 15**, **TypeScript**, e **MongoDB** seguendo i principi **SOLID** e **TDD**.
 
+<img width="1351" height="934" alt="Screenshot 2025-10-13 alle 13 36 52" src="https://github.com/user-attachments/assets/3f24d31a-2f07-4c76-aff2-e59b53718e5e" />
+
+
 ## ⭐ **Highlights del Progetto**
 
 - 🎯 **100% SRP Compliance** - Architettura modulare con Single Responsibility Principle
@@ -52,6 +55,47 @@ Una soluzione **production-ready** e **open source** per la gestione fiscale di 
 - 📋 **Data portability** e privacy request automatici
 - 👨‍💼 **Admin system** con gestione ruoli (user/admin/super_admin)
 - 🔐 **Security** - bcrypt, JWT, input validation, rate limiting
+
+### Screenshots
+
+<img width="427" height="739" alt="Screenshot 2025-10-13 alle 20 15 03" src="https://github.com/user-attachments/assets/c09c0635-01d9-43bf-98ee-c651115425ff" />
+
+Dashboard di default ampia ed esaustiva
+
+
+
+<img width="976" height="923" alt="Screenshot 2025-10-13 alle 20 16 53" src="https://github.com/user-attachments/assets/a37f8d4b-8a5a-4866-9d43-551a449c0ce9" />
+
+Dashboard custom ampiamente personalizzabile grazie ad una serie di utili widget
+
+
+
+<img width="988" height="899" alt="Screenshot 2025-10-13 alle 20 17 34" src="https://github.com/user-attachments/assets/247830ac-d374-49e1-9f93-5126b1239ff1" />
+<img width="988" height="921" alt="Screenshot 2025-10-13 alle 20 18 01" src="https://github.com/user-attachments/assets/11c83ee1-cbca-463e-a9f8-ffe41c96337f" />
+<img width="642" height="801" alt="Screenshot 2025-10-13 alle 20 18 33" src="https://github.com/user-attachments/assets/735f3575-45e8-46f7-8db6-9252308283a1" />
+
+Set esteso di analytics e reports
+
+
+
+<img width="1029" height="593" alt="Screenshot 2025-10-13 alle 20 19 55" src="https://github.com/user-attachments/assets/8265cc03-66d7-46ab-bdb8-1c5120a1c955" />
+<img width="1029" height="675" alt="Screenshot 2025-10-13 alle 20 20 09" src="https://github.com/user-attachments/assets/aca3cea5-70ee-4e7d-8e1b-95203fbc5b2c" />
+<img width="1029" height="886" alt="Screenshot 2025-10-13 alle 20 20 29" src="https://github.com/user-attachments/assets/28229bea-112d-403f-88ea-a3108916187f" />
+
+Gestione inserimento fatture, costi e calcolo tasse e contributi in tempo reale
+
+
+
+<img width="1029" height="898" alt="Screenshot 2025-10-13 alle 20 21 08" src="https://github.com/user-attachments/assets/364c41d3-6505-4f32-bcc3-0875a5209b6c" />
+
+Ampia personalizzazione e scelta di regimi fiscali e contributivi
+
+
+
+<img width="1029" height="898" alt="Screenshot 2025-10-13 alle 20 21 32" src="https://github.com/user-attachments/assets/ada6118d-d038-4d13-a166-cca8273b73c3" />
+
+Gestione avanzata profilo utente 
+
 
 ## 🛠 **Tech Stack**
 

@@ -40,7 +40,6 @@ async function initializeTransporter(): Promise<void> {
       return;
     }
 
-
     // Dynamic import of nodemailer (server-side only)
     const nodemailer = await import('nodemailer');
 

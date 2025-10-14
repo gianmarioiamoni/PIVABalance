@@ -3,7 +3,7 @@
  * Email system for donation receipts using Gmail SMTP
  */
 
-import { emailService } from './emailService';
+import { sendEmail } from './emailService';
 
 export interface DonationEmailData {
   donorName?: string;
@@ -167,7 +167,7 @@ export async function sendDonationReceipt(
     const emailContent = generateThankYouEmail(data);
 
     // Send email via Gmail SMTP service
-    const success = await emailService.sendEmail({
+    const success = await sendEmail({
       to: data.donorEmail,
       subject: emailContent.subject,
       text: emailContent.text,

@@ -3,7 +3,7 @@
  * Email system for user welcome and admin notifications using Gmail SMTP
  */
 
-import { emailService } from './emailService';
+import { sendEmail } from './emailService';
 
 export interface UserRegistrationEmailData {
   userName: string;
@@ -287,7 +287,7 @@ export async function sendWelcomeEmail(
     const emailContent = generateWelcomeEmail(data);
 
     // Send email via Gmail SMTP service
-    const success = await emailService.sendEmail({
+    const success = await sendEmail({
       to: data.userEmail,
       subject: emailContent.subject,
       text: emailContent.text,
@@ -319,7 +319,7 @@ export async function sendAdminNotificationEmail(
 
     // Send email via Gmail SMTP service
     const adminEmail = process.env.ADMIN_EMAIL || 'gianmarioiamoni1@gmail.com';
-    const success = await emailService.sendEmail({
+    const success = await sendEmail({
       to: adminEmail,
       subject: emailContent.subject,
       text: emailContent.text,

@@ -1,10 +1,9 @@
 /**
  * Donation Email Service
- * Simple email system for donation receipts and thank you messages
- *
- * Phase 1: Basic email templates
- * Phase 2: Advanced email service integration
+ * Email system for donation receipts using Gmail SMTP
  */
+
+import { emailService } from './emailService';
 
 export interface DonationEmailData {
   donorName?: string;
@@ -158,38 +157,32 @@ Se hai domande, rispondi pure a questa email.
 }
 
 /**
- * Send donation receipt email
- * Phase 1: Log email content (for manual sending)
- * Phase 2: Integrate with email service (SendGrid, Resend, etc.)
+ * Send donation receipt email using Gmail SMTP
  */
 export async function sendDonationReceipt(
   data: DonationEmailData
 ): Promise<boolean> {
   try {
-    // Generate email content for future use
-    generateThankYouEmail(data);
+    // Generate email content
+    const emailContent = generateThankYouEmail(data);
 
-    // Phase 1: Log email content for manual review/sending
-    // TODO: Replace with actual email service
-    console.warn('📧 DONATION RECEIPT EMAIL - To:', data.donorEmail);
-
-    // TODO Phase 2: Integrate with email service
-    // Example with Resend:
-    /*
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    
-    await resend.emails.send({
-      from: 'PIVABalance <noreply@pivabalance.com>',
+    // Send email via Gmail SMTP service
+    const success = await emailService.sendEmail({
       to: data.donorEmail,
       subject: emailContent.subject,
-      html: emailContent.html,
       text: emailContent.text,
+      html: emailContent.html,
     });
-    */
 
-    return true;
+    if (success) {
+      console.warn('✅ Donation receipt email sent to:', data.donorEmail);
+    } else {
+      console.warn('⚠️ Donation receipt email not sent (service not configured)');
+    }
+
+    return success;
   } catch (error) {
-    console.error('Error sending donation receipt:', error);
+    console.error('❌ Error sending donation receipt:', error);
     return false;
   }
 }

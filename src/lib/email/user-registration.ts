@@ -1,10 +1,9 @@
 /**
  * User Registration Email Service
- * Simple email system for user welcome and admin notifications
- *
- * Phase 1: Basic email templates with logging
- * Phase 2: Advanced email service integration
+ * Email system for user welcome and admin notifications using Gmail SMTP
  */
+
+import { emailService } from './emailService';
 
 export interface UserRegistrationEmailData {
   userName: string;
@@ -278,82 +277,65 @@ PIVABalance Admin System
 }
 
 /**
- * Send welcome email to new user
- * Phase 1: Log email content (for manual sending)
- * Phase 2: Integrate with email service (SendGrid, Resend, etc.)
+ * Send welcome email to new user using Gmail SMTP
  */
 export async function sendWelcomeEmail(
   data: UserRegistrationEmailData
 ): Promise<boolean> {
   try {
-    // Generate email content for future use
+    // Generate email content
     const emailContent = generateWelcomeEmail(data);
 
-    // Phase 1: Log email content for manual review/sending
-    // TODO: Replace with actual email service
-    console.warn('📧 WELCOME EMAIL - To:', data.userEmail);
-    console.warn('📧 Subject:', emailContent.subject);
-    console.warn(
-      '📧 Content preview:',
-      emailContent.text.substring(0, 200) + '...'
-    );
-
-    // TODO Phase 2: Integrate with email service
-    // Example with Resend:
-    /*
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    
-    await resend.emails.send({
-      from: 'PIVABalance <noreply@pivabalance.com>',
+    // Send email via Gmail SMTP service
+    const success = await emailService.sendEmail({
       to: data.userEmail,
       subject: emailContent.subject,
-      html: emailContent.html,
       text: emailContent.text,
+      html: emailContent.html,
     });
-    */
 
-    return true;
+    if (success) {
+      console.warn('✅ Welcome email sent to:', data.userEmail);
+    } else {
+      console.warn('⚠️ Welcome email not sent (service not configured)');
+    }
+
+    return success;
   } catch (error) {
-    console.error('Error sending welcome email:', error);
+    console.error('❌ Error sending welcome email:', error);
     return false;
   }
 }
 
 /**
- * Send admin notification email for new user registration
- * Phase 1: Log email content (for manual sending)
- * Phase 2: Integrate with email service (SendGrid, Resend, etc.)
+ * Send admin notification email for new user registration using Gmail SMTP
  */
 export async function sendAdminNotificationEmail(
   data: AdminNotificationEmailData
 ): Promise<boolean> {
   try {
-    // Generate email content for future use
+    // Generate email content
     const emailContent = generateAdminNotificationEmail(data);
 
-    // Phase 1: Log email content for manual review/sending
-    // TODO: Replace with actual email service
-    console.warn('📧 ADMIN NOTIFICATION - To: gianmarioiamoni1@gmail.com');
-    console.warn('📧 Subject:', emailContent.subject);
-    console.warn('📧 New user:', data.userName, '-', data.userEmail);
-
-    // TODO Phase 2: Integrate with email service
-    // Example with Resend:
-    /*
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    
-    await resend.emails.send({
-      from: 'PIVABalance <noreply@pivabalance.com>',
-      to: 'gianmarioiamoni1@gmail.com',
+    // Send email via Gmail SMTP service
+    const adminEmail = process.env.ADMIN_EMAIL || 'gianmarioiamoni1@gmail.com';
+    const success = await emailService.sendEmail({
+      to: adminEmail,
       subject: emailContent.subject,
-      html: emailContent.html,
       text: emailContent.text,
+      html: emailContent.html,
     });
-    */
 
-    return true;
+    if (success) {
+      console.warn('✅ Admin notification sent to:', adminEmail);
+      console.warn('📧 New user:', data.userName, '-', data.userEmail);
+    } else {
+      console.warn('⚠️ Admin notification not sent (service not configured)');
+    }
+
+    return success;
   } catch (error) {
-    console.error('Error sending admin notification email:', error);
+    console.error('❌ Error sending admin notification email:', error);
     return false;
   }
 }

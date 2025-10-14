@@ -7,8 +7,12 @@ import {
   signUpSchema,
   isValidationError,
 } from "@/lib/validations/schemas";
-import { findUserByEmail } from "@/utils/userQueries";
+import { findUserByEmail, getUsersStats } from "@/utils/userQueries";
 import { SignUpCredentials, ApiResponse, AuthResponse } from "@/types";
+import { 
+  sendWelcomeEmail, 
+  sendAdminNotificationEmail 
+} from "@/lib/email/user-registration";
 
 /**
  * POST /api/auth/register
@@ -48,6 +52,42 @@ export async function POST(
 
     // Generate JWT token
     const token = generateToken(user._id.toString(), user.email);
+
+    // Send welcome email to user (non-blocking)
+    try {
+      const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard`;
+      
+      await sendWelcomeEmail({
+        userName: user.name,
+        userEmail: user.email,
+        userId: user._id.toString(),
+        registrationDate: user.createdAt,
+        dashboardUrl,
+      });
+    } catch (emailError) {
+      console.error("Error sending welcome email:", emailError);
+      // Don't fail registration if email fails
+    }
+
+    // Send admin notification email (non-blocking)
+    try {
+      const adminPanelUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/admin/users`;
+      
+      // Get total users count for admin notification
+      const userStats = await getUsersStats();
+      
+      await sendAdminNotificationEmail({
+        userName: user.name,
+        userEmail: user.email,
+        userId: user._id.toString(),
+        registrationDate: user.createdAt,
+        adminPanelUrl,
+        totalUsers: userStats.total,
+      });
+    } catch (emailError) {
+      console.error("Error sending admin notification email:", emailError);
+      // Don't fail registration if email fails
+    }
 
     // Return success response
     return NextResponse.json(

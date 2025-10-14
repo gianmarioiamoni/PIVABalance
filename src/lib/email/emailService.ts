@@ -3,7 +3,6 @@
  * Centralized email service for PIVABalance
  */
 
-import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 
 interface EmailOptions {
@@ -16,12 +15,20 @@ interface EmailOptions {
 class EmailService {
   private transporter: Transporter | null = null;
   private isConfigured = false;
+  private initializationPromise: Promise<void> | null = null;
 
   constructor() {
-    this.initializeTransporter();
+    // Initialize lazily when first needed
   }
 
-  private initializeTransporter(): void {
+  private async ensureInitialized(): Promise<void> {
+    if (!this.initializationPromise) {
+      this.initializationPromise = this.initializeTransporter();
+    }
+    await this.initializationPromise;
+  }
+
+  private async initializeTransporter(): Promise<void> {
     try {
       // Check if Gmail SMTP is configured
       const gmailUser = process.env.GMAIL_USER;
@@ -33,8 +40,11 @@ class EmailService {
         return;
       }
 
+      // Dynamic import of nodemailer (server-side only)
+      const nodemailer = await import('nodemailer');
+
       // Create Gmail SMTP transporter
-      this.transporter = nodemailer.createTransport({
+      this.transporter = nodemailer.default.createTransport({
         service: 'gmail',
         auth: {
           user: gmailUser,
@@ -54,6 +64,9 @@ class EmailService {
    */
   async sendEmail(options: EmailOptions): Promise<boolean> {
     try {
+      // Ensure service is initialized
+      await this.ensureInitialized();
+
       if (!this.isConfigured || !this.transporter) {
         console.warn('📧 Email service not configured - logging email instead');
         console.warn('📧 To:', options.to);
@@ -90,6 +103,9 @@ class EmailService {
    */
   async verifyConnection(): Promise<boolean> {
     try {
+      // Ensure service is initialized
+      await this.ensureInitialized();
+
       if (!this.transporter) {
         return false;
       }

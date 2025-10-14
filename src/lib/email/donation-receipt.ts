@@ -2,9 +2,18 @@
  * Donation Email Service
  * Simple email system for donation receipts and thank you messages
  *
- * Phase 1: Basic email templates
- * Phase 2: Advanced email service integration
+ * Production-ready with Resend email service integration
  */
+
+import { Resend } from 'resend';
+
+// Initialize Resend client only if API key is available
+const getResendClient = () => {
+  if (!process.env.RESEND_API_KEY) {
+    return null;
+  }
+  return new Resend(process.env.RESEND_API_KEY);
+};
 
 export interface DonationEmailData {
   donorName?: string;
@@ -25,14 +34,14 @@ export function generateThankYouEmail(data: DonationEmailData): {
   text: string;
   html: string;
 } {
-  const formattedAmount = new Intl.NumberFormat("it-IT", {
-    style: "currency",
-    currency: "EUR",
+  const formattedAmount = new Intl.NumberFormat('it-IT', {
+    style: 'currency',
+    currency: 'EUR',
   }).format(data.amount / 100);
 
   const donorGreeting =
     data.isAnonymous || !data.donorName
-      ? "Caro sostenitore"
+      ? 'Caro sostenitore'
       : `Ciao ${data.donorName}`;
 
   const subject = `Grazie per la tua donazione a PIVABalance! 💙`;
@@ -48,17 +57,17 @@ Il tuo contributo ci aiuta a:
 • Coprire i costi del server e dell'infrastruttura
 • Rimanere indipendenti senza pubblicità
 
-${data.message ? `Il tuo messaggio: "${data.message}"` : ""}
+${data.message ? `Il tuo messaggio: "${data.message}"` : ''}
 
 ID Donazione: ${data.donationId}
-${data.stripeReceiptUrl ? `Ricevuta Stripe: ${data.stripeReceiptUrl}` : ""}
+${data.stripeReceiptUrl ? `Ricevuta Stripe: ${data.stripeReceiptUrl}` : ''}
 
 Il tuo supporto significa molto per noi e per tutta la comunità di freelancer che usa PIVABalance.
 
 Grazie ancora! 🙏
 
 Il team PIVABalance
-https://pivabalance.com
+${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}
 
 ---
 Questa email è stata inviata perché hai effettuato una donazione su PIVABalance.
@@ -114,7 +123,7 @@ Se hai domande, rispondi pure a questa email.
       </p>
     </div>
     `
-        : ""
+        : ''
     }
 
     <!-- Receipt Info -->
@@ -125,7 +134,7 @@ Se hai domande, rispondi pure a questa email.
       ${
         data.stripeReceiptUrl
           ? `<p style="margin: 5px 0 0 0;"><strong>Ricevuta Stripe:</strong> <a href="${data.stripeReceiptUrl}" style="color: #3498db;">Visualizza ricevuta</a></p>`
-          : ""
+          : ''
       }
     </div>
 
@@ -142,7 +151,7 @@ Se hai domande, rispondi pure a questa email.
   <div style="text-align: center; color: #666; font-size: 14px; border-top: 1px solid #eee; padding-top: 20px;">
     <p style="margin: 0;">
       Il team PIVABalance<br>
-      <a href="https://pivabalance.com" style="color: #3498db; text-decoration: none;">https://pivabalance.com</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="color: #3498db; text-decoration: none;">${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}</a>
     </p>
     <p style="margin: 10px 0 0 0; font-size: 12px; color: #999;">
       Questa email è stata inviata perché hai effettuato una donazione su PIVABalance.<br>
@@ -159,37 +168,49 @@ Se hai domande, rispondi pure a questa email.
 
 /**
  * Send donation receipt email
- * Phase 1: Log email content (for manual sending)
- * Phase 2: Integrate with email service (SendGrid, Resend, etc.)
+ * Production-ready with Resend email service
  */
 export async function sendDonationReceipt(
   data: DonationEmailData
 ): Promise<boolean> {
   try {
-    // Generate email content for future use
-    generateThankYouEmail(data);
+    // Validate email
+    if (!isValidEmail(data.donorEmail)) {
+      console.error('Invalid donor email address:', data.donorEmail);
+      return false;
+    }
 
-    // Phase 1: Log email content for manual review/sending
-    // TODO: Replace with actual email service
-    console.warn("📧 DONATION RECEIPT EMAIL - To:", data.donorEmail);
+    // Get Resend client
+    const resend = getResendClient();
+    if (!resend) {
+      console.warn(
+        '📧 RESEND_API_KEY not configured - Donation receipt not sent'
+      );
+      console.warn('📧 DONATION RECEIPT EMAIL - To:', data.donorEmail);
+      return false;
+    }
 
-    // TODO Phase 2: Integrate with email service
-    // Example with Resend:
-    /*
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    
-    await resend.emails.send({
-      from: 'PIVABalance <noreply@pivabalance.com>',
+    // Generate email content
+    const emailContent = generateThankYouEmail(data);
+
+    // Send email via Resend
+    const result = await resend.emails.send({
+      from: `PIVABalance <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
       to: data.donorEmail,
       subject: emailContent.subject,
       html: emailContent.html,
       text: emailContent.text,
     });
-    */
 
+    if (result.error) {
+      console.error('Resend error sending donation receipt:', result.error);
+      return false;
+    }
+
+      console.log(`✅ Donation receipt sent to: ${data.donorEmail} (ID: ${result.data?.id})`);
     return true;
   } catch (error) {
-    console.error("Error sending donation receipt:", error);
+    console.error('Error sending donation receipt:', error);
     return false;
   }
 }

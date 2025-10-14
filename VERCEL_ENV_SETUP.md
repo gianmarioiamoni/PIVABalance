@@ -15,7 +15,7 @@ SESSION_SECRET=GENERA_UNA_CHIAVE_SICURA_DI_ALMENO_64_CARATTERI
 BCRYPT_ROUNDS=12
 
 # Application URLs
-NEXT_PUBLIC_APP_URL=https://your-app-name.vercel.app
+NEXT_PUBLIC_APP_URL=https://piva-balance.vercel.app
 NODE_ENV=production
 
 # Security Settings (Production)
@@ -38,8 +38,15 @@ STRIPE_SECRET_KEY=sk_live_your_stripe_secret_key
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_your_stripe_publishable_key
 STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 
-# Email (se configurato)
+# Email Configuration (Production Ready)
 EMAIL_FROM=noreply@your-domain.com
+RESEND_API_KEY=re_your_resend_api_key_here
+
+# Admin & Support Email Configuration
+ADMIN_EMAIL=gianmarioiamoni1@gmail.com
+SUPPORT_EMAIL=gianmarioiamoni1@gmail.com
+
+# Legacy SMTP (optional - not used with Resend)
 EMAIL_SERVER_HOST=smtp.your-provider.com
 EMAIL_SERVER_PORT=587
 EMAIL_SERVER_USER=your-email@your-domain.com
@@ -65,4 +72,7 @@ NEXT_PUBLIC_ANALYTICS_ID=your-analytics-id
 - [ ] NEXT_PUBLIC_APP_URL aggiornato con il dominio Vercel
 - [ ] CORS_ORIGIN aggiornato con il dominio Vercel
 - [ ] Stripe configurato (se utilizzato)
+
+```
+
 ```

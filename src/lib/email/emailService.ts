@@ -268,29 +268,29 @@ export async function sendWelcomeEmail(
       return false;
     }
 
-    // Check if in development and email is not the admin email
+    // Check if we need to redirect email (dev mode OR free Resend plan)
     const isDevMode = process.env.NODE_ENV === 'development';
+    const isFreePlan = process.env.RESEND_PLAN === 'free'; // Add this env var
     const adminEmail = process.env.ADMIN_EMAIL || 'gianmarioiamoni1@gmail.com';
+    const shouldRedirect = (isDevMode || isFreePlan) && data.userEmail !== adminEmail;
 
-    if (isDevMode && data.userEmail !== adminEmail) {
-      console.log(`📧 [DEV] Welcome email redirected: ${data.userEmail} → ${adminEmail}`);
+    if (shouldRedirect) {
+      console.log(`📧 [${isDevMode ? 'DEV' : 'FREE-PLAN'}] Welcome email redirected: ${data.userEmail} → ${adminEmail}`);
     }
 
     // Generate email content
     const emailContent = generateWelcomeEmail(data);
 
-    // In development, send to admin email; in production, send to user
-    const recipientEmail =
-      isDevMode && data.userEmail !== adminEmail ? adminEmail : data.userEmail;
+    // Redirect email if needed (dev mode or free plan)
+    const recipientEmail = shouldRedirect ? adminEmail : data.userEmail;
 
     // Send email via Resend
     const result = await resend.emails.send({
       from: `PIVABalance <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
       to: recipientEmail,
-      subject:
-        isDevMode && recipientEmail === adminEmail
-          ? `[DEV] ${emailContent.subject} (per ${data.userEmail})`
-          : emailContent.subject,
+      subject: shouldRedirect
+        ? `[${isDevMode ? 'DEV' : 'FREE-PLAN'}] ${emailContent.subject} (per ${data.userEmail})`
+        : emailContent.subject,
       html: emailContent.html,
       text: emailContent.text,
     });

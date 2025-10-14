@@ -1,15 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/database/mongodb';
-import { User } from '@/models';
-import { generateToken } from '@/lib/auth/jwt';
+import { NextRequest, NextResponse } from "next/server";
+import { connectDB } from "@/lib/database/mongodb";
+import { User } from "@/models";
+import { generateToken } from "@/lib/auth/jwt";
 import {
   validateSchema,
   signUpSchema,
   isValidationError,
-} from '@/lib/validations/schemas';
-import { findUserByEmail } from '@/utils/userQueries';
-import { SignUpCredentials, ApiResponse, AuthResponse } from '@/types';
-import { sendRegistrationEmails } from '@/lib/email/emailService';
+} from "@/lib/validations/schemas";
+import { findUserByEmail, getUsersStats } from "@/utils/userQueries";
+import { SignUpCredentials, ApiResponse, AuthResponse } from "@/types";
+import { 
+  sendWelcomeEmail, 
+  sendAdminNotificationEmail 
+} from "@/lib/email/user-registration";
 
 /**
  * POST /api/auth/register
@@ -32,7 +35,7 @@ export async function POST(
       return NextResponse.json(
         {
           success: false,
-          message: 'Email già registrata',
+          message: "Email già registrata",
         },
         { status: 400 }
       );
@@ -47,40 +50,57 @@ export async function POST(
 
     await user.save();
 
-    // Send registration emails (welcome + admin notification)
-    // Note: Email sending is non-blocking and won't affect registration success
-    try {
-      const adminEmail =
-        process.env.ADMIN_EMAIL || 'gianmarioiamoni1@gmail.com';
-      const supportEmail =
-        process.env.SUPPORT_EMAIL || 'gianmarioiamoni1@gmail.com';
-
-      await sendRegistrationEmails(
-        user.name,
-        user.email,
-        supportEmail,
-        adminEmail
-      );
-    } catch (emailError) {
-      // Log email error but don't fail registration
-      console.error('Failed to send registration emails:', emailError);
-    }
-
     // Generate JWT token
     const token = generateToken(user._id.toString(), user.email);
+
+    // Send welcome email to user (non-blocking)
+    try {
+      const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard`;
+      
+      await sendWelcomeEmail({
+        userName: user.name,
+        userEmail: user.email,
+        userId: user._id.toString(),
+        registrationDate: user.createdAt,
+        dashboardUrl,
+      });
+    } catch (emailError) {
+      console.error("Error sending welcome email:", emailError);
+      // Don't fail registration if email fails
+    }
+
+    // Send admin notification email (non-blocking)
+    try {
+      const adminPanelUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/admin/users`;
+      
+      // Get total users count for admin notification
+      const userStats = await getUsersStats();
+      
+      await sendAdminNotificationEmail({
+        userName: user.name,
+        userEmail: user.email,
+        userId: user._id.toString(),
+        registrationDate: user.createdAt,
+        adminPanelUrl,
+        totalUsers: userStats.total,
+      });
+    } catch (emailError) {
+      console.error("Error sending admin notification email:", emailError);
+      // Don't fail registration if email fails
+    }
 
     // Return success response
     return NextResponse.json(
       {
         success: true,
-        message: 'Registrazione completata con successo',
+        message: "Registrazione completata con successo",
         data: {
           token,
           user: {
             id: user._id.toString(),
             email: user.email,
             name: user.name,
-            role: user.role || 'user',
+            role: user.role || "user",
             isActive: user.isActive ?? true,
             createdAt: user.createdAt,
           },
@@ -89,15 +109,15 @@ export async function POST(
       { status: 201 }
     );
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error("Registration error:", error);
 
     // Handle validation errors
     if (isValidationError(error)) {
-      const errorMessages = error.errors.issues.map(err => err.message);
+      const errorMessages = error.errors.issues.map((err) => err.message);
       return NextResponse.json(
         {
           success: false,
-          message: 'Dati di registrazione non validi',
+          message: "Dati di registrazione non validi",
           errors: errorMessages,
         },
         { status: 400 }
@@ -105,11 +125,11 @@ export async function POST(
     }
 
     // Handle MongoDB duplicate key error
-    if (error instanceof Error && error.message.includes('E11000')) {
+    if (error instanceof Error && error.message.includes("E11000")) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Email già registrata',
+          message: "Email già registrata",
         },
         { status: 400 }
       );
@@ -119,7 +139,7 @@ export async function POST(
     return NextResponse.json(
       {
         success: false,
-        message: 'Errore interno del server',
+        message: "Errore interno del server",
       },
       { status: 500 }
     );

@@ -34,9 +34,12 @@ async function initializeTransporter(): Promise<void> {
 
     if (!gmailUser || !gmailPassword) {
       console.warn('📧 Gmail SMTP not configured - email sending disabled');
-      console.warn('📧 Set GMAIL_USER and GMAIL_APP_PASSWORD environment variables');
+      console.warn(
+        '📧 Set GMAIL_USER and GMAIL_APP_PASSWORD environment variables'
+      );
       return;
     }
+
 
     // Dynamic import of nodemailer (server-side only)
     const nodemailer = await import('nodemailer');
@@ -84,7 +87,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     }
 
     // Send email via Gmail SMTP
-    const result = await transporter.sendMail({
+    await transporter.sendMail({
       from: `PIVABalance <${process.env.GMAIL_USER}>`,
       to: options.to,
       subject: options.subject,
@@ -92,16 +95,16 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       html: options.html,
     });
 
-    console.warn('✅ Email sent successfully:', result.messageId);
+    console.warn('✅ Email sent successfully to:', options.to);
     return true;
   } catch (error) {
     console.error('❌ Failed to send email:', error);
-    
+
     // Fallback to logging
     console.warn('📧 Fallback - logging email content:');
     console.warn('📧 To:', options.to);
     console.warn('📧 Subject:', options.subject);
-    
+
     return false;
   }
 }

@@ -174,9 +174,7 @@ export async function sendDonationReceipt(
       html: emailContent.html,
     });
 
-    if (success) {
-      console.warn('✅ Donation receipt email sent to:', data.donorEmail);
-    } else {
+    if (!success) {
       console.warn('⚠️ Donation receipt email not sent (service not configured)');
     }
 

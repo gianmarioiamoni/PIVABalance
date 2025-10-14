@@ -294,9 +294,7 @@ export async function sendWelcomeEmail(
       html: emailContent.html,
     });
 
-    if (success) {
-      console.warn('✅ Welcome email sent to:', data.userEmail);
-    } else {
+    if (!success) {
       console.warn('⚠️ Welcome email not sent (service not configured)');
     }
 
@@ -327,8 +325,7 @@ export async function sendAdminNotificationEmail(
     });
 
     if (success) {
-      console.warn('✅ Admin notification sent to:', adminEmail);
-      console.warn('📧 New user:', data.userName, '-', data.userEmail);
+      console.warn('📧 New user registered:', data.userName, '-', data.userEmail);
     } else {
       console.warn('⚠️ Admin notification not sent (service not configured)');
     }

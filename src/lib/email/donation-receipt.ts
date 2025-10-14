@@ -25,14 +25,14 @@ export function generateThankYouEmail(data: DonationEmailData): {
   text: string;
   html: string;
 } {
-  const formattedAmount = new Intl.NumberFormat("it-IT", {
-    style: "currency",
-    currency: "EUR",
+  const formattedAmount = new Intl.NumberFormat('it-IT', {
+    style: 'currency',
+    currency: 'EUR',
   }).format(data.amount / 100);
 
   const donorGreeting =
     data.isAnonymous || !data.donorName
-      ? "Caro sostenitore"
+      ? 'Caro sostenitore'
       : `Ciao ${data.donorName}`;
 
   const subject = `Grazie per la tua donazione a PIVABalance! 💙`;
@@ -48,10 +48,10 @@ Il tuo contributo ci aiuta a:
 • Coprire i costi del server e dell'infrastruttura
 • Rimanere indipendenti senza pubblicità
 
-${data.message ? `Il tuo messaggio: "${data.message}"` : ""}
+${data.message ? `Il tuo messaggio: "${data.message}"` : ''}
 
 ID Donazione: ${data.donationId}
-${data.stripeReceiptUrl ? `Ricevuta Stripe: ${data.stripeReceiptUrl}` : ""}
+${data.stripeReceiptUrl ? `Ricevuta Stripe: ${data.stripeReceiptUrl}` : ''}
 
 Il tuo supporto significa molto per noi e per tutta la comunità di freelancer che usa PIVABalance.
 
@@ -114,7 +114,7 @@ Se hai domande, rispondi pure a questa email.
       </p>
     </div>
     `
-        : ""
+        : ''
     }
 
     <!-- Receipt Info -->
@@ -125,7 +125,7 @@ Se hai domande, rispondi pure a questa email.
       ${
         data.stripeReceiptUrl
           ? `<p style="margin: 5px 0 0 0;"><strong>Ricevuta Stripe:</strong> <a href="${data.stripeReceiptUrl}" style="color: #3498db;">Visualizza ricevuta</a></p>`
-          : ""
+          : ''
       }
     </div>
 
@@ -171,7 +171,7 @@ export async function sendDonationReceipt(
 
     // Phase 1: Log email content for manual review/sending
     // TODO: Replace with actual email service
-    console.warn("📧 DONATION RECEIPT EMAIL - To:", data.donorEmail);
+    console.warn('📧 DONATION RECEIPT EMAIL - To:', data.donorEmail);
 
     // TODO Phase 2: Integrate with email service
     // Example with Resend:
@@ -189,7 +189,7 @@ export async function sendDonationReceipt(
 
     return true;
   } catch (error) {
-    console.error("Error sending donation receipt:", error);
+    console.error('Error sending donation receipt:', error);
     return false;
   }
 }

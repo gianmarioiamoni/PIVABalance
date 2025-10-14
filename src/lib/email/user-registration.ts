@@ -31,12 +31,12 @@ export function generateWelcomeEmail(data: UserRegistrationEmailData): {
   text: string;
   html: string;
 } {
-  const formattedDate = new Intl.DateTimeFormat("it-IT", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+  const formattedDate = new Intl.DateTimeFormat('it-IT', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   }).format(data.registrationDate);
 
   const subject = `Benvenuto in PIVABalance! 🎉`;
@@ -167,17 +167,19 @@ ID Utente: ${data.userId}
 /**
  * Generate admin notification email content for new user registrations
  */
-export function generateAdminNotificationEmail(data: AdminNotificationEmailData): {
+export function generateAdminNotificationEmail(
+  data: AdminNotificationEmailData
+): {
   subject: string;
   text: string;
   html: string;
 } {
-  const formattedDate = new Intl.DateTimeFormat("it-IT", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+  const formattedDate = new Intl.DateTimeFormat('it-IT', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   }).format(data.registrationDate);
 
   const subject = `[PIVABalance] Nuovo utente registrato: ${data.userName}`;
@@ -190,7 +192,7 @@ Dettagli utente:
 • Email: ${data.userEmail}
 • ID: ${data.userId}
 • Data registrazione: ${formattedDate}
-${data.totalUsers ? `• Totale utenti: ${data.totalUsers}` : ""}
+${data.totalUsers ? `• Totale utenti: ${data.totalUsers}` : ''}
 
 Gestisci utenti: ${data.adminPanelUrl}
 
@@ -238,12 +240,16 @@ PIVABalance Admin System
           <td style="padding: 8px 0; font-weight: bold; color: #555;">Registrazione:</td>
           <td style="padding: 8px 0; color: #333;">${formattedDate}</td>
         </tr>
-        ${data.totalUsers ? `
+        ${
+          data.totalUsers
+            ? `
         <tr>
           <td style="padding: 8px 0; font-weight: bold; color: #555;">Totale utenti:</td>
           <td style="padding: 8px 0; color: #333;">${data.totalUsers}</td>
         </tr>
-        ` : ""}
+        `
+            : ''
+        }
       </table>
     </div>
 
@@ -285,9 +291,12 @@ export async function sendWelcomeEmail(
 
     // Phase 1: Log email content for manual review/sending
     // TODO: Replace with actual email service
-    console.warn("📧 WELCOME EMAIL - To:", data.userEmail);
-    console.warn("📧 Subject:", emailContent.subject);
-    console.warn("📧 Content preview:", emailContent.text.substring(0, 200) + "...");
+    console.warn('📧 WELCOME EMAIL - To:', data.userEmail);
+    console.warn('📧 Subject:', emailContent.subject);
+    console.warn(
+      '📧 Content preview:',
+      emailContent.text.substring(0, 200) + '...'
+    );
 
     // TODO Phase 2: Integrate with email service
     // Example with Resend:
@@ -305,7 +314,7 @@ export async function sendWelcomeEmail(
 
     return true;
   } catch (error) {
-    console.error("Error sending welcome email:", error);
+    console.error('Error sending welcome email:', error);
     return false;
   }
 }
@@ -324,9 +333,9 @@ export async function sendAdminNotificationEmail(
 
     // Phase 1: Log email content for manual review/sending
     // TODO: Replace with actual email service
-    console.warn("📧 ADMIN NOTIFICATION - To: gianmarioiamoni1@gmail.com");
-    console.warn("📧 Subject:", emailContent.subject);
-    console.warn("📧 New user:", data.userName, "-", data.userEmail);
+    console.warn('📧 ADMIN NOTIFICATION - To: gianmarioiamoni1@gmail.com');
+    console.warn('📧 Subject:', emailContent.subject);
+    console.warn('📧 New user:', data.userName, '-', data.userEmail);
 
     // TODO Phase 2: Integrate with email service
     // Example with Resend:
@@ -344,7 +353,7 @@ export async function sendAdminNotificationEmail(
 
     return true;
   } catch (error) {
-    console.error("Error sending admin notification email:", error);
+    console.error('Error sending admin notification email:', error);
     return false;
   }
 }

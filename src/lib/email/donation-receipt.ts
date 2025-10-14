@@ -183,21 +183,32 @@ export async function sendDonationReceipt(
     // Get Resend client
     const resend = getResendClient();
     if (!resend) {
-      console.warn(
-        '📧 RESEND_API_KEY not configured - Donation receipt not sent'
-      );
-      console.warn('📧 DONATION RECEIPT EMAIL - To:', data.donorEmail);
+      console.warn('📧 RESEND_API_KEY not configured - Donation receipt not sent');
       return false;
+    }
+
+    // Check if we need to redirect email (free Resend plan)
+    const isFreePlan = process.env.RESEND_PLAN === 'free';
+    const adminEmail = process.env.ADMIN_EMAIL || 'gianmarioiamoni1@gmail.com';
+    const shouldRedirect = isFreePlan && data.donorEmail !== adminEmail;
+
+    if (shouldRedirect) {
+      console.log(`📧 [FREE-PLAN] Donation receipt redirected: ${data.donorEmail} → ${adminEmail}`);
     }
 
     // Generate email content
     const emailContent = generateThankYouEmail(data);
 
+    // Redirect email if needed (free plan)
+    const recipientEmail = shouldRedirect ? adminEmail : data.donorEmail;
+
     // Send email via Resend
     const result = await resend.emails.send({
       from: `PIVABalance <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
-      to: data.donorEmail,
-      subject: emailContent.subject,
+      to: recipientEmail,
+      subject: shouldRedirect
+        ? `[FREE-PLAN] ${emailContent.subject} (per ${data.donorEmail})`
+        : emailContent.subject,
       html: emailContent.html,
       text: emailContent.text,
     });
@@ -207,7 +218,7 @@ export async function sendDonationReceipt(
       return false;
     }
 
-      console.log(`✅ Donation receipt sent to: ${data.donorEmail} (ID: ${result.data?.id})`);
+    console.log(`✅ Donation receipt sent to: ${recipientEmail} (ID: ${result.data?.id})`);
     return true;
   } catch (error) {
     console.error('Error sending donation receipt:', error);
